@@ -2,11 +2,13 @@ import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
+import OpenAI from "openai";
 import dotenv from "dotenv";
+import nodemailer from "nodemailer";
 
 dotenv.config();
 
-const ai = new GoogleGenAI({
+const geminiAi = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
   httpOptions: {
     headers: {
@@ -14,6 +16,25 @@ const ai = new GoogleGenAI({
     }
   }
 });
+const openai = process.env.OPENAI_API_KEY
+  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+  : null;
+
+type AiProvider = "openai" | "gemini";
+
+function getActiveAiProvider(): AiProvider | null {
+  const configuredProvider = process.env.AI_PROVIDER?.toLowerCase();
+  if (configuredProvider === "openai" || configuredProvider === "gemini") {
+    return configuredProvider;
+  }
+  if (process.env.OPENAI_API_KEY) return "openai";
+  if (process.env.GEMINI_API_KEY) return "gemini";
+  return null;
+}
+
+function getMissingAiConfigMessage() {
+  return "AI API is not configured on the server. Set AI_PROVIDER to openai or gemini, then configure the matching server-side API key.";
+}
 
 const RESUME_CONTEXT = `
 NAME: AFSHIN SABERI
@@ -77,19 +98,74 @@ async function startServer() {
 
   app.use(express.json());
 
+  async function generateAiText(systemInstruction: string, message: string, history: any[] = []) {
+    const provider = getActiveAiProvider();
+    if (!provider) {
+      const error = new Error(getMissingAiConfigMessage());
+      (error as any).status = 500;
+      throw error;
+    }
+
+    if (provider === "openai") {
+      if (!openai) {
+        const error = new Error(getMissingAiConfigMessage());
+        (error as any).status = 500;
+        throw error;
+      }
+
+      const input: any[] = [];
+      if (Array.isArray(history)) {
+        for (const turn of history) {
+          input.push({
+            role: turn.sender === "user" ? "user" : "assistant",
+            content: turn.text,
+          });
+        }
+      }
+      input.push({ role: "user", content: message });
+
+      const response = await openai.responses.create({
+        model: process.env.OPENAI_MODEL || "gpt-4.1-mini",
+        instructions: systemInstruction,
+        input,
+        temperature: 0.7,
+      });
+
+      return response.output_text;
+    }
+
+    const contents: any[] = [];
+    if (Array.isArray(history)) {
+      for (const turn of history) {
+        contents.push({
+          role: turn.sender === "user" ? "user" : "model",
+          parts: [{ text: turn.text }]
+        });
+      }
+    }
+    contents.push({
+      role: "user",
+      parts: [{ text: message }]
+    });
+
+    const response = await geminiAi.models.generateContent({
+      model: process.env.GEMINI_MODEL || "gemini-3.5-flash",
+      contents,
+      config: {
+        systemInstruction,
+        temperature: 0.7,
+      }
+    });
+
+    return response.text;
+  }
+
   // API endpoint for AI Recruiter Chat
   app.post("/api/chat", async (req, res) => {
     try {
       const { message, history } = req.body;
       if (!message) {
         return res.status(400).json({ error: "Message is required" });
-      }
-
-      // Check if API key is present
-      if (!process.env.GEMINI_API_KEY) {
-        return res.status(500).json({ 
-          error: "GEMINI_API_KEY is not configured on the server. Please check Settings > Secrets in AI Studio." 
-        });
       }
 
       const systemInstruction = `
@@ -100,44 +176,21 @@ Afshin's Resume Summary & Details:
 ${RESUME_CONTEXT}
 
 SECURITY & BILLING CAUTIONS FOR RECRUITERS:
-If asked about billing, abuse, or how this AI Twin works, note that this runs on a secure, server-side sandboxed environment powered by Gemini API within Google AI Studio, using rate-limited API security mechanisms to prevent abuse. It does NOT have access to Afshin's personal Google account, calendar, or billing accounts. It is entirely isolated and safe.
+If asked about billing, abuse, or how this AI Twin works, note that this runs through a secure server-side AI API proxy with API keys kept only in server environment variables. It does NOT have access to Afshin's personal accounts, calendar, billing accounts, or private systems. It is isolated from the browser client.
 
 RULES:
 1. Always base your answers on Afshin's actual background. Do not invent any credentials, roles, or employers. To shield private client data, refer to his work history using the descriptive company names (e.g. "Enterprise Logistics & E-Commerce Systems Provider" or "High-Throughput Infrastructure & Digital Network Host").
 2. If asked about something not in his resume, politely state that he is eager to learn or explain his current knowledge in adjacent areas.
 3. Keep your answers clear, concise, and professional.
 4. Format your output with neat bullet points, bold text, or short paragraphs using markdown where appropriate.
-5. If someone asks for an interview, meeting, or how to contact him, provide his secure domain contact email: contact@theafshin.com, and encourage them to use the website's Secure Placement Console in the overview tab.
+5. If someone asks for an interview, meeting, or how to contact him, provide his secure domain contact email: contact@theafshin.com, and encourage them to use the Recruiter Contact form in the overview tab.
 6. He is currently located in Montreal, QC, but is open to relocation. He has 8+ years of Systems Administration and Network analysis experience. He holds a Master's degree in Information Systems Security from Concordia University.
 `;
 
-      // Format history into content structure for @google/genai
-      const contents: any[] = [];
-      if (history && Array.isArray(history)) {
-        for (const turn of history) {
-          contents.push({
-            role: turn.sender === "user" ? "user" : "model",
-            parts: [{ text: turn.text }]
-          });
-        }
-      }
-      contents.push({
-        role: "user",
-        parts: [{ text: message }]
-      });
-
-      const response = await ai.models.generateContent({
-        model: "gemini-3.5-flash",
-        contents: contents,
-        config: {
-          systemInstruction: systemInstruction,
-          temperature: 0.7,
-        }
-      });
-
-      return res.json({ text: response.text });
+      const text = await generateAiText(systemInstruction, message, history);
+      return res.json({ text, provider: getActiveAiProvider() });
     } catch (e: any) {
-      console.error("Gemini API error:", e);
+      console.error("AI API error:", e);
       return res.status(e.status || 500).json({ 
         error: e.message || "An error occurred while communicating with the AI agent." 
       });
@@ -154,12 +207,12 @@ RULES:
 
       if (!process.env.GEMINI_API_KEY) {
         return res.status(500).json({ 
-          error: "GEMINI_API_KEY is not configured on the server. Please check Settings > Secrets." 
+          error: "AI translation API is not configured on the server." 
         });
       }
 
-      const response = await ai.models.generateContent({
-        model: "gemini-3.5-flash",
+      const response = await geminiAi.models.generateContent({
+        model: process.env.GEMINI_MODEL || "gemini-3.5-flash",
         contents: `Translate the following subtitle segment into ${targetLang}. Keep the exact SRT numbering lines, timestamp markers, and structural layout intact. Do not add explanations or wrapper text. Return only the translated SRT output:
 
 ${text}`,
@@ -169,6 +222,69 @@ ${text}`,
     } catch (e: any) {
       console.error("Translation API error:", e);
       return res.status(500).json({ error: e.message || "Failed to translate subtitle text." });
+    }
+  });
+
+  // API endpoint for real contact form delivery
+  app.post("/api/contact", async (req, res) => {
+    try {
+      const { name, email, company, message } = req.body;
+      if (!name || !email || !message) {
+        return res.status(400).json({ error: "Name, email, and message are required." });
+      }
+
+      const requiredConfig = [
+        "SMTP_HOST",
+        "SMTP_PORT",
+        "SMTP_USER",
+        "SMTP_PASS",
+        "CONTACT_TO_EMAIL"
+      ];
+      const missingConfig = requiredConfig.filter((key) => !process.env[key]);
+      if (missingConfig.length > 0) {
+        return res.status(503).json({
+          error: "Email service is not configured.",
+          missing: missingConfig
+        });
+      }
+
+      const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: Number(process.env.SMTP_PORT),
+        secure: process.env.SMTP_SECURE === "true",
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      });
+
+      const fromEmail = process.env.CONTACT_FROM_EMAIL || process.env.SMTP_USER;
+      const subject = `Portfolio interview request from ${name}`;
+      const body = [
+        "New recruiter contact request",
+        "",
+        `Name: ${name}`,
+        `Email: ${email}`,
+        `Company: ${company || "Not provided"}`,
+        "",
+        "Message:",
+        message,
+      ].join("\n");
+
+      await transporter.sendMail({
+        from: `"Portfolio Contact" <${fromEmail}>`,
+        to: process.env.CONTACT_TO_EMAIL,
+        replyTo: email,
+        subject,
+        text: body,
+      });
+
+      return res.json({ ok: true });
+    } catch (e: any) {
+      console.error("Contact email error:", e);
+      return res.status(500).json({
+        error: e.message || "Failed to send contact email."
+      });
     }
   });
 

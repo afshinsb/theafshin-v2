@@ -1,80 +1,133 @@
-# Afshin Saberi | Security Operations & Systems Administration Portfolio
+# Afshin Saberi Portfolio
 
-An interactive, responsive, and robust portfolio application showcasing 8+ years of expertise in IT systems administration, host infrastructure security, and container orchestration. It features real-time, sandbox-inspired modular workbenches and a full-stack responsive interface.
+Interactive portfolio for infrastructure, networking, and security operations work.
 
----
+The app presents a command-center style profile with project demos, a recruiter contact form, and a server-side technical Q&A assistant. API keys stay on the Express server and are never exposed in the browser bundle.
 
-## 🚀 Key Features
+## Features
 
-- **Interactive AI Recruiter Twin**: Built with a custom, secure server-side conversational agent helper using the contemporary Google Gemini AI integration to answer recruiter and technical queries based directly on professional experience telemetry data.
-- **Security Operations Dashboard (SIEM simulation)**: Active container threat analysis tools, mock threat mitigation simulations, subnet quarantines, and live container metrics tracking.
-- **Universal Translation Automation**: A simulated FastAPI container utility workbench to translate work details and subtitle logs on demand.
-- **Universal Responsiveness & Adaptive Theme**: Highly polished, custom theme modes (eye-safe Dark Slate / Minimal Sky Blue Light theme) featuring a layout with high-contrast accessibility and fluent responsive breakpoints.
+- Professional overview for infrastructure, networking, and security operations roles.
+- Interactive Technical Profile powered by either OpenAI or Gemini.
+- Recruiter Contact form with real SMTP email delivery when configured.
+- Labs section with:
+  - SOC incident triage workbench.
+  - Universal Subtitle Translator project mock with live demo/source links.
+  - Voxa multi-provider voice studio project mock.
+- Responsive dark/light theme with custom scrollbars.
+- Production build bundles the React app and Express server.
 
----
+## Stack
 
-## 🛠️ Technology Stack
+- React 19
+- Vite
+- Tailwind CSS v4
+- Express
+- TypeScript
+- Motion
+- Lucide React
+- OpenAI SDK
+- Google GenAI SDK
+- Nodemailer
 
-- **Frontend**: [React 19](https://react.dev/), [Vite](https://vite.dev/), [Tailwind CSS v4](https://tailwindcss.com/)
-- **State & Animation**: [Motion](https://motion.dev/) (advanced reactive animations) and [Lucide React Icons](https://lucide.dev/)
-- **Backend & Middleware**: [Node.js](https://nodejs.org/) & [Express](https://expressjs.com/) configuration with server-side proxy handlers for complete security of credentials.
-- **AI Integrations**: [Google GenAI SDK](https://www.npmjs.com/package/@google/genai)
-- **Tooling**: TypeScript, esbuild bundling, tsx, and dynamic build orchestration pipelines.
+## Local Setup
 
----
+Install dependencies:
 
-## ⚙️ Project Architecture & Security
-
-To maintain strict security standards and prevent any API key leakage, this project is architected with a strict separation between client and server layers:
-- **Server-Side API Proxy**: The Gemini API keys are accessed solely in `server.ts` via server-side process environments. No credentials are ever exposed to the client-side browser bundle.
-- **Environmental Safety**: Local settings and API keys are stored in a `.env` file, which is listed inside `.gitignore` so it is never committed or pushed to public code repositories on GitHub.
-
----
-
-## 📦 How to Setup & Run Locally
-
-### 1. Prerequisites
-Ensure you have **Node.js (version 18 or higher)** and npm installed.
-
-### 2. Install Dependencies
-Clone the repository and run:
 ```bash
 npm install
 ```
 
-### 3. Configure Environment Variables
-Create a `.env` file in the root directory and add your secret Gemini key:
-```env
-# .env
-GEMINI_API_KEY=your_actual_sec_api_key_here
-```
-*(The `.env` file is automatically ignored by Git to secure your secrets).*
+Create a `.env` file from `.env.example`:
 
-### 4. Run Development Server
-Boot both the Express API and the Vite React frontend concurrently:
+```bash
+cp .env.example .env
+```
+
+Configure at least one AI provider for the Technical Profile.
+
+OpenAI example:
+
+```env
+AI_PROVIDER=openai
+OPENAI_API_KEY=your_openai_api_key_here
+OPENAI_MODEL=gpt-4.1-mini
+```
+
+Gemini example:
+
+```env
+AI_PROVIDER=gemini
+GEMINI_API_KEY=your_gemini_api_key_here
+GEMINI_MODEL=gemini-3.5-flash
+```
+
+If `AI_PROVIDER` is omitted, the server auto-picks OpenAI when `OPENAI_API_KEY` exists, otherwise Gemini when `GEMINI_API_KEY` exists.
+
+## Contact Form Email
+
+The contact form sends real email only when SMTP settings are configured:
+
+```env
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=username@example.com
+SMTP_PASS=your_smtp_or_app_password
+CONTACT_TO_EMAIL=contact@theafshin.com
+CONTACT_FROM_EMAIL=portfolio@theafshin.com
+```
+
+For Gmail, use an app password instead of the normal account password.
+
+## Run
+
+Development server:
+
 ```bash
 npm run dev
 ```
-The server will bind to port `3000`. Open `http://localhost:3000` in your browser.
 
----
+Open:
 
-## 🏗️ Production Build & Porting
+```text
+http://localhost:3000
+```
 
-To compile the application for high-performance production hosting (e.g., Cloud Run, AWS, VPS, or Vercel):
+## Build And Start
 
-### Build Static Assets & Server Bundle
+Build the React app and Express server bundle:
+
 ```bash
 npm run build
 ```
-This builds your React application to the `dist/` directory and compiles your Express backend into a single, self-contained `dist/server.cjs` file using `esbuild`.
 
-### Run Production Server
+Run the production server:
+
 ```bash
 npm run start
 ```
 
----
+## Checks
 
-## 📄 License
-All rights enforced. Developed by **Afshin Saberi**.
+Type-check:
+
+```bash
+npm run lint
+```
+
+Security audit:
+
+```bash
+npm audit
+```
+
+## Environment Safety
+
+- `.env` is ignored by Git.
+- AI provider keys are read only by `server.ts`.
+- SMTP credentials are read only by `server.ts`.
+- The browser communicates with server routes such as `/api/chat` and `/api/contact`.
+
+## License
+
+All rights reserved. Developed by Afshin Saberi.

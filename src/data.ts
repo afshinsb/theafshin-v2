@@ -9,7 +9,7 @@ export const PERSONAL_INFO = {
   linkedin: "https://linkedin.com/in/theafshin", // Updated to match user's actual linkedin username
   github: "https://github.com/afshinsb",
   portfolio: "https://theafshin.com",
-  summary: "IT professional with 8+ years of experience in systems administration and network operations, with a strong focus on security. Skilled in monitoring alerts, investigating incidents, and managing access controls across Windows and Linux environments. Hands-on experience supporting incident response processes, including triage, escalation, and log-based troubleshooting. Experienced in scripting automation and log analysis to improve system reliability and security posture."
+  summary: "Infrastructure and security professional with 8+ years of experience across Linux, Windows, networking, VPNs, cloud platforms, and operational security. Focused on reliable systems, automation, monitoring, and secure infrastructure operations."
 };
 
 export const WORK_EXPERIENCE: WorkExperience[] = [
@@ -58,26 +58,26 @@ export const PROJECTS: ProjectData[] = [
   {
     id: "secure-infra",
     title: "Self-Hosted Secure Infrastructure",
-    subtitle: "Enterprise-grade sandboxing & containerization",
-    description: "Built and maintained a highly secure, self-hosted Linux container cluster showcasing secure private exposure and automated operations management.",
+    subtitle: "Private Linux services, tunnels, VPN access",
+    description: "A small homelab stack for running private services without exposing unnecessary ports.",
     tech: ["Docker Compose", "Cloudflare Tunnel", "Linux", "KVM/libvirt", "Tailscale VPN", "Reverse Proxy"],
     features: [
-      "Secured controlled service exposure with Cloudflare Tunnels (bypassing open-port ingress firewalls) and private Tailscale coordination.",
-      "Created isolated, hypervisor-managed KVM/libvirt Ubuntu testing nodes for risk-free sandboxing and malicious deployment testing.",
-      "Integrated systematic backup pipelines, automated patching templates, runtime monitoring alerts, and container health loops."
+      "Published selected services through Cloudflare Tunnel and kept admin paths private over Tailscale.",
+      "Used Docker Compose for repeatable service layout, health checks, and recovery.",
+      "Tested changes in isolated KVM/libvirt Ubuntu guests before touching live services."
     ],
     githubUrl: "https://github.com/afshinsb/homelab-infra"
   },
   {
     id: "subtitle-translator",
     title: "Universal Subtitle Translator",
-    subtitle: "Dockerized Translation Pipeline App (Live Demo Available)",
-    description: "Architected a fully Dockerized FastAPI automation service to perform batch file translation with robust status diagnostics and structured execution pipelines.",
+    subtitle: "FastAPI app for SRT and media batch translation",
+    description: "A Dockerized tool for translating subtitle files and media folders, with a safe public demo.",
     tech: ["FastAPI", "Python", "Docker", "SQLite", "REST APIs", "Structured Logging", "OAuth"],
     features: [
-      "Created containerized Python workers with secure configurations, default auth safeguards, and isolated SQLite job histories.",
-      "Constructed a rich backend supporting async stream batch processing, real-time job progress tracking, and on-demand job cancellation.",
-      "Published modular documentation and container registries on GitHub, keeping direct code execution distinct from a safe, frontend static sandbox."
+      "Handles single SRT uploads, video subtitle extraction, and mounted-folder batch jobs.",
+      "Tracks progress, logs, cancellation, and job history in SQLite.",
+      "Keeps the public demo separate from the authenticated Docker/FastAPI app."
     ],
     githubUrl: "https://github.com/afshinsb/universal-subtitle-translator",
     liveUrl: "https://translate.theafshin.com/"
@@ -85,14 +85,14 @@ export const PROJECTS: ProjectData[] = [
   {
     id: "voxa",
     title: "Voxa",
-    subtitle: "Multi-Provider AI Voice Studio & Narrative Generator",
-    description: "Developed a multi-provider AI voice studio for writing, refining, and generating natural narration with robust provider-specific adapters and zero client-exposed keys.",
+    subtitle: "Multi-provider AI voice studio",
+    description: "A prerelease Next.js app for rewriting text and generating narration through server-side provider adapters.",
     tech: ["Next.js", "TypeScript", "OpenAI API", "Gemini API", "ElevenLabs", "IndexedDB", "Docker Compose", "Tailwind CSS"],
     features: [
-      "Integrates OpenAI, Gemini (experimental expressive provider), SevenLabs/ElevenLabs, and mock local testing routes server-side.",
-      "Configured six distinct voice characters (Chloe, Vivian, Mia, Titan, Vincent, Adam) mapped with 8 configurable tonalities.",
-      "Implemented offline-first browser features, storing and caching historical generations in IndexedDB alongside a persistent playback dock.",
-      "Supports integrated flow for Persian and English text rewriting or translation before initiating the text-to-speech request."
+      "Supports OpenAI, Gemini, ElevenLabs, and mock local generation behind server routes.",
+      "Maps six voice characters to eight tone presets without exposing provider keys.",
+      "Stores generation history and cached audio locally with IndexedDB.",
+      "Includes Persian/English rewrite and translation before text-to-speech."
     ],
     githubUrl: "https://github.com/afshinsb/voxa"
   }
@@ -135,7 +135,7 @@ export const SKILL_CATEGORIES: SkillCategory[] = [
     title: "Infrastructure & Virtualization",
     iconName: "Server",
     skills: [
-      "Linux Administration (CentOS/Ubuntu/RedHat)",
+      "Linux Administration (Debian/Ubuntu)",
       "Windows Server & Microsoft 365 Core",
       "Docker & multi-container Docker Compose orchestration",
       "VMware virtualization & KVM hypervisors",
