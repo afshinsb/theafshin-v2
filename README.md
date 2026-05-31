@@ -4,13 +4,13 @@ Static React/Vite portfolio for Afshin Saberi, deployed on Cloudflare Pages with
 
 ## Architecture
 
-- Frontend: Cloudflare Pages static build from `dist/`.
+- Frontend: Cloudflare Pages static build from `dist/public`.
 - API: Cloudflare Pages Functions under `functions/api/`.
 - Public API routes:
   - `POST /api/chat`
   - `POST /api/contact`
-- Protected/removed endpoint:
-  - `POST /api/translate` returns `404`; the public portfolio does not expose an expensive translation API.
+- Disabled by default:
+  - `POST /api/translate` returns a generic `404` unless `ENABLE_TRANSLATE_API=true`. If enabled, it requires Turnstile, KV quotas, JSON validation, and Gemini budget controls.
 
 Secrets are read only in Pages Functions. Do not put `OPENAI_API_KEY`, Resend keys, SMTP passwords, or `TURNSTILE_SECRET_KEY` in frontend code or `VITE_*` variables.
 
@@ -32,7 +32,13 @@ Run a production-like Pages Functions preview:
 
 ```bash
 npm run build
-npx wrangler pages dev dist --kv PORTFOLIO_RATE_LIMIT_KV
+npx wrangler pages dev dist/public --kv PORTFOLIO_RATE_LIMIT_KV
+```
+
+The npm helper uses the configured public output directory:
+
+```bash
+npm run pages:dev
 ```
 
 For local function testing, create a local `.dev.vars` file with the server-side values below. You may set `TURNSTILE_BYPASS=true` locally only.
@@ -51,14 +57,20 @@ Cloudflare Pages Functions secrets/vars:
 OPENAI_API_KEY=set_as_cloudflare_secret
 OPENAI_MODEL=gpt-4o-mini
 OPENAI_MAX_OUTPUT_TOKENS=400
+GEMINI_API_KEY=set_as_cloudflare_secret_if_translate_is_enabled
+GEMINI_MODEL=gemini-1.5-flash
+ENABLE_TRANSLATE_API=false
 TURNSTILE_SECRET_KEY=set_as_cloudflare_secret
 RESEND_API_KEY=set_as_cloudflare_secret
 CONTACT_TO_EMAIL=contact@theafshin.com
+CONTACT_FROM_EMAIL=contact@theafshin.com
 CHAT_PER_MINUTE_LIMIT=3
-CHAT_IP_DAILY_LIMIT=20
-CHAT_GLOBAL_DAILY_LIMIT=200
-CONTACT_PER_HOUR_LIMIT=2
+CHAT_IP_DAILY_LIMIT=5
+CHAT_GLOBAL_DAILY_LIMIT=100
+CONTACT_PER_HOUR_LIMIT=3
 CONTACT_IP_DAILY_LIMIT=5
+TRANSLATE_PER_MINUTE_LIMIT=3
+TRANSLATE_IP_DAILY_LIMIT=5
 ```
 
 Required Cloudflare binding:
@@ -73,13 +85,15 @@ Create it as a KV namespace and bind it to the Pages project. The API intentiona
 
 1. Connect the repository to Cloudflare Pages.
 2. Set build command: `npm run build`.
-3. Set build output directory: `dist`.
+3. Set build output directory: `dist/public`.
 4. Add `VITE_TURNSTILE_SITE_KEY` as a Pages build variable.
 5. Add all server-side values as Pages Function secrets or environment variables.
 6. Bind KV namespace `PORTFOLIO_RATE_LIMIT_KV`.
 7. Deploy.
 
 Cloudflare automatically deploys files in `functions/api/` as Pages Functions beside the static Vite site.
+
+There is no Express production server in this deployment and no `server.cjs` build artifact. Do not place server bundles, source maps, or secrets inside `dist/public`.
 
 ## Turnstile Setup
 
@@ -93,12 +107,12 @@ Cloudflare automatically deploys files in `functions/api/` as Pages Functions be
 1. Use an OpenAI project-scoped API key.
 2. Set project budget alerts and a hard monthly budget in OpenAI billing.
 3. Keep `OPENAI_MODEL=gpt-4o-mini`.
-4. Keep `OPENAI_MAX_OUTPUT_TOKENS` between `300` and `500`; default is `400`.
-5. Keep conservative Cloudflare quotas: per-minute, per-IP daily, and global daily limits.
+4. Keep `OPENAI_MAX_OUTPUT_TOKENS=400`.
+5. Keep conservative Cloudflare quotas: `CHAT_IP_DAILY_LIMIT=5` and `CHAT_GLOBAL_DAILY_LIMIT=100` or lower.
 
 The chat route hard-stops before calling OpenAI when a quota is exceeded.
 
-No Gemini route is active in this deployment. If a future Gemini-powered route is added, store `GEMINI_API_KEY` only as a Cloudflare secret, add the same Turnstile and KV quotas, and set a provider-side budget before enabling it publicly.
+The translation route is disabled by default. If `ENABLE_TRANSLATE_API=true`, set `GEMINI_API_KEY` only as a Cloudflare secret, keep `GEMINI_MODEL=gemini-1.5-flash` or another budgeted model, and keep Gemini `maxOutputTokens` at `400`.
 
 ## Email Provider Setup
 
@@ -108,8 +122,9 @@ The contact form uses Resend because SMTP/Nodemailer is not a good fit for Cloud
 2. Create a Resend API key.
 3. Set `RESEND_API_KEY`.
 4. Set `CONTACT_TO_EMAIL` to the inbox that should receive recruiter messages.
+5. Set `CONTACT_FROM_EMAIL` to a fixed verified sender such as `contact@theafshin.com`.
 
-The sender is fixed in code as `Portfolio Contact <contact@theafshin.com>`. Visitor email addresses are used only as `Reply-To`.
+The sender is fixed from `CONTACT_FROM_EMAIL`. Visitor email addresses are used only as `Reply-To`.
 
 ## Cloudflare Security Rules
 
@@ -128,19 +143,21 @@ Add Cloudflare WAF/rate-limit rules in front of the Pages project:
 - `OPENAI_API_KEY` exists only as a Cloudflare server-side secret.
 - `TURNSTILE_SECRET_KEY` exists only as a Cloudflare server-side secret.
 - `RESEND_API_KEY` exists only as a Cloudflare server-side secret.
+- `GEMINI_API_KEY` is set only if translation is intentionally enabled.
 - `VITE_TURNSTILE_SITE_KEY` is the only Turnstile value exposed to the browser.
+- Vite builds public frontend assets to `dist/public`; no server bundle or source map is served from public output.
 - `.env*` files are ignored by Git except `.env.example`.
 - Chat and contact both require Turnstile client tokens and server validation.
-- Chat has per-IP rate limit, per-IP daily quota, and global daily quota.
-- Contact has per-IP hourly and daily quotas, duplicate detection, and a honeypot.
+- Chat has per-IP rate limit, `5` requests per IP per day, and `100` global AI requests per day by default.
+- Contact has `3` requests per IP per hour, daily quotas, duplicate detection, and a honeypot.
 - API requests accept JSON only and reject bodies over 20 KB.
-- Chat rejects malformed, empty, repeated, prompt-injection-like, and over-700-character messages.
-- Chat sends only the last 6 history messages and caps output tokens.
+- Chat validates request bodies with Zod, rejects malformed, empty, repeated, prompt-injection-like, and over-700-character messages.
+- Chat accepts at most 6 history messages, sends only the last 3 validated turns to OpenAI, and caps output tokens at 400.
 - Chat is restricted to Afshin's resume, experience, projects, infrastructure, networking, and security background.
 - Contact uses a fixed From address and puts visitor email only in Reply-To.
 - React Markdown does not render raw HTML and blocks unsafe URL protocols such as `javascript:`.
 - API errors are generic and do not expose stack traces or provider responses.
-- `/api/translate` is not an expensive public API.
+- `/api/translate` is disabled unless explicitly enabled, and then uses the same Turnstile/quota posture as chat.
 
 ## Checks
 

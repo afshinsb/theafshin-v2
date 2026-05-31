@@ -110,22 +110,22 @@ export default function App() {
     header: isDarkMode ? "border-b border-zinc-800 bg-zinc-900/50 sticky top-0 z-50 backdrop-blur-md" : "border-b border-zinc-200 bg-white/90 sticky top-0 z-50 backdrop-blur-md shadow-xs",
     headerText: isDarkMode ? "text-white" : "text-zinc-900",
     card: isDarkMode ? "border border-zinc-800 bg-linear-to-b from-zinc-900 to-zinc-950" : "border border-zinc-200 bg-linear-to-b from-white to-zinc-100/70 shadow-xs",
-    smallCard: isDarkMode ? "bg-zinc-900/50 border border-zinc-800" : "bg-white border border-zinc-250/60 shadow-2xs",
-    subCard: isDarkMode ? "bg-zinc-900/40 p-5 rounded-xl border border-zinc-800" : "bg-white p-5 rounded-xl border border-zinc-250/60 shadow-sm",
+    smallCard: isDarkMode ? "bg-zinc-900/50 border border-zinc-800" : "bg-white border border-zinc-200/60 shadow-2xs",
+    subCard: isDarkMode ? "bg-zinc-900/40 p-5 rounded-xl border border-zinc-800" : "bg-white p-5 rounded-xl border border-zinc-200/60 shadow-sm",
     subCardOverlay: isDarkMode ? "bg-zinc-950/95 border-emerald-500/30" : "bg-white/98 border-sky-300/30 shadow-md",
-    textMuted: isDarkMode ? "text-zinc-400" : "text-zinc-650",
+    textMuted: isDarkMode ? "text-zinc-400" : "text-zinc-600",
     textTitle: isDarkMode ? "text-white" : "text-zinc-900",
-    badge: isDarkMode ? "bg-zinc-800 text-zinc-300 border border-zinc-700/60" : "bg-zinc-150 text-zinc-800 border border-zinc-300/75",
+    badge: isDarkMode ? "bg-zinc-800 text-zinc-300 border border-zinc-700/60" : "bg-zinc-100 text-zinc-800 border border-zinc-300/75",
     tabBg: isDarkMode ? "bg-zinc-950 p-1 border border-zinc-800" : "bg-zinc-200/90 p-1 border border-zinc-300/85",
     input: isDarkMode ? "bg-zinc-950 border border-zinc-800 focus:border-zinc-700 text-zinc-200" : "bg-white border border-zinc-300 focus:border-sky-500 text-zinc-900 focus:ring-1 focus:ring-sky-500",
     codeBlock: isDarkMode ? "bg-zinc-950 border border-zinc-800 text-zinc-300 text-[10px]" : "bg-zinc-100 border border-zinc-300 text-zinc-800 text-[10px]",
     terminalInput: isDarkMode ? "bg-zinc-950 border border-zinc-800 focus:border-zinc-700 text-zinc-200 placeholder:text-zinc-500" : "bg-zinc-100 border border-zinc-300 focus:border-sky-500 text-zinc-800 placeholder:text-zinc-500",
     bullet: isDarkMode ? "text-emerald-500" : "text-[#0284c7]",
     textHeading: isDarkMode ? "text-zinc-400" : "text-zinc-700",
-    divider: isDarkMode ? "bg-zinc-800" : "bg-zinc-250",
+    divider: isDarkMode ? "bg-zinc-800" : "bg-zinc-200",
     btnSec: isDarkMode ? "bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-800" : "bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border border-zinc-300",
     tabAct: isDarkMode ? "bg-zinc-800 text-white border-zinc-700" : "bg-white text-zinc-900 border-zinc-300/80 shadow-xs",
-    tabInact: isDarkMode ? "text-zinc-400 hover:text-zinc-200" : "text-zinc-550 hover:text-zinc-900",
+    tabInact: isDarkMode ? "text-zinc-400 hover:text-zinc-200" : "text-zinc-500 hover:text-zinc-900",
 
     // Responsive Accents
     iconAccent: isDarkMode ? "text-emerald-500" : "text-[#0284c7]",
@@ -478,7 +478,7 @@ export default function App() {
         </label>
       </div>
 
-      <div className={"p-3 rounded border " + (isDarkMode ? "bg-zinc-950 border-zinc-900" : "bg-zinc-100 border-zinc-250")}>
+      <div className={"p-3 rounded border " + (isDarkMode ? "bg-zinc-950 border-zinc-900" : "bg-zinc-100 border-zinc-200")}>
         <div className="flex items-center justify-between gap-3">
           <div>
             <span className="block text-[10px] font-mono text-zinc-500 uppercase">Current Route</span>
@@ -581,7 +581,7 @@ export default function App() {
             <button 
               id="theme-toggle"
               onClick={toggleTheme}
-              className={"p-2 rounded-lg border transition cursor-pointer " + (isDarkMode ? "text-zinc-400 border-zinc-850 bg-zinc-900/50 hover:bg-zinc-800 hover:text-zinc-200" : "text-zinc-500 border-zinc-300 bg-zinc-100 hover:bg-zinc-200 hover:text-zinc-850")}
+              className={"p-2 rounded-lg border transition cursor-pointer " + (isDarkMode ? "text-zinc-400 border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 hover:text-zinc-200" : "text-zinc-500 border-zinc-300 bg-zinc-100 hover:bg-zinc-200 hover:text-zinc-800")}
               title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
             >
               {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
@@ -659,13 +659,13 @@ export default function App() {
                   href={PERSONAL_INFO.linkedin}
                   target="_blank"
                   referrerPolicy="no-referrer"
-                  className={"flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition " + t.textLinkHover + " " + (isDarkMode ? "bg-zinc-900/80 border-zinc-800 text-zinc-400 " + t.borderLinkHover : "bg-white border-zinc-250 text-zinc-700 shadow-2xs " + t.borderLinkHover)}
+                  className={"flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition " + t.textLinkHover + " " + (isDarkMode ? "bg-zinc-900/80 border-zinc-800 text-zinc-400 " + t.borderLinkHover : "bg-white border-zinc-200 text-zinc-700 shadow-2xs " + t.borderLinkHover)}
                 >
                   <Linkedin className={"h-3.5 w-3.5 " + t.iconAccent} /> linkedin.com/in/theafshin
                 </a>
                 <a 
                   href={"mailto:" + PERSONAL_INFO.email}
-                  className={"flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition " + t.textLinkHover + " " + (isDarkMode ? "bg-zinc-900/80 border-zinc-800 text-zinc-400 " + t.borderLinkHover : "bg-white border-zinc-250 text-zinc-700 shadow-2xs " + t.borderLinkHover)}
+                  className={"flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition " + t.textLinkHover + " " + (isDarkMode ? "bg-zinc-900/80 border-zinc-800 text-zinc-400 " + t.borderLinkHover : "bg-white border-zinc-200 text-zinc-700 shadow-2xs " + t.borderLinkHover)}
                 >
                   <Mail className={"h-3.5 w-3.5 " + t.iconAccent} /> {PERSONAL_INFO.email}
                 </a>
@@ -815,7 +815,7 @@ export default function App() {
                             )}
                           </div>
                           <span className={"p-1 text-zinc-500 transition cursor-pointer " + t.textLinkHover}>
-                            <Github className="h-4 w-4" onClick={() => window.open(proj.githubUrl, "_blank")} />
+                            <Github className="h-4 w-4" onClick={() => window.open(proj.githubUrl, "_blank", "noopener,noreferrer")} />
                           </span>
                         </div>
                         <p className={"text-xs font-mono " + t.subTextAccent}>{proj.subtitle}</p>
@@ -916,7 +916,7 @@ export default function App() {
                           <input 
                             type="email" 
                             required
-                            maxLength={160}
+                            maxLength={120}
                             value={contactForm.email}
                             onChange={(e) => {
                               setContactStatus("idle");
@@ -930,7 +930,6 @@ export default function App() {
                           <label className="block text-[10px] font-mono text-zinc-500 uppercase mb-1">Company / Org</label>
                           <input 
                             type="text" 
-                            required
                             maxLength={120}
                             value={contactForm.company}
                             onChange={(e) => {
@@ -948,7 +947,7 @@ export default function App() {
                         <textarea 
                           rows={3}
                           required
-                          maxLength={2000}
+                          maxLength={1500}
                           value={contactForm.message}
                           onChange={(e) => {
                             setContactStatus("idle");
@@ -977,7 +976,7 @@ export default function App() {
                       <button 
                         type="submit" 
                         disabled={isContactSubmitting || !contactTurnstileToken}
-                        className={"w-full py-2.5 rounded text-xs font-mono transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 " + (isDarkMode ? "bg-zinc-850 hover:bg-zinc-800 text-white border border-zinc-700/60" : "bg-[#0284c7] hover:bg-[#0369a1] text-white shadow-xs")}
+                        className={"w-full py-2.5 rounded text-xs font-mono transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 " + (isDarkMode ? "bg-zinc-800 hover:bg-zinc-800 text-white border border-zinc-700/60" : "bg-[#0284c7] hover:bg-[#0369a1] text-white shadow-xs")}
                       >
                         {isContactSubmitting ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
                         {isContactSubmitting ? "Sending..." : "Send Hiring Inquiry"}
@@ -1016,7 +1015,7 @@ export default function App() {
 
                   {/* Operational Status Panel - clean metric elements */}
                   <div className={t.smallCard + " p-5 rounded-xl space-y-3 font-mono text-xs"}>
-                    <h4 className="text-[10px] text-zinc-550 dark:text-zinc-400 uppercase tracking-widest font-bold">SysAdmin Console Logs</h4>
+                    <h4 className="text-[10px] text-zinc-500 dark:text-zinc-400 uppercase tracking-widest font-bold">SysAdmin Console Logs</h4>
                     <div className={"space-y-2 text-[11px] leading-tight " + t.textMuted}>
                       <div className="flex items-center gap-1.5">
                         <span className={t.bullet}>✔</span>
@@ -1080,7 +1079,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className={"p-3.5 rounded border font-mono text-[10px] text-zinc-550 space-y-1 " + t.codeBlock}>
+                <div className={"p-3.5 rounded border font-mono text-[10px] text-zinc-500 space-y-1 " + t.codeBlock}>
                   <div>ENDPOINT: /api/chat</div>
                   <div>MODEL: server-side OpenAI</div>
                   <div>EDGE RUNTIME: Cloudflare</div>
@@ -1088,7 +1087,7 @@ export default function App() {
               </div>
 
               {/* Central Chat Node */}
-              <div className={"lg:col-span-8 flex flex-col rounded-xl overflow-hidden border " + (isDarkMode ? "bg-zinc-900/20 border-zinc-800" : "bg-white border-zinc-250 shadow-sm")}>
+              <div className={"lg:col-span-8 flex flex-col rounded-xl overflow-hidden border " + (isDarkMode ? "bg-zinc-900/20 border-zinc-800" : "bg-white border-zinc-200 shadow-sm")}>
                 
                 {/* Chat Panel Header */}
                 <div className={"px-4 py-3 border-b flex items-center justify-between " + (isDarkMode ? "bg-zinc-900/50 border-zinc-800/60" : "bg-zinc-100 border-zinc-200")}>
@@ -1121,7 +1120,7 @@ export default function App() {
                       <div className={"max-w-[85%] rounded-xl px-4 py-3 text-xs leading-relaxed " + (
                         m.sender === "user" 
                           ? (isDarkMode ? "bg-zinc-800 text-white" : "bg-[#0284c7] text-white") 
-                          : (isDarkMode ? "bg-zinc-900/60 text-zinc-350 border border-zinc-850" : "bg-zinc-100/90 text-zinc-900 border border-zinc-250") + " select-text"
+                          : (isDarkMode ? "bg-zinc-900/60 text-zinc-300 border border-zinc-800" : "bg-zinc-100/90 text-zinc-900 border border-zinc-200") + " select-text"
                       )}>
                         
                         <div className={"font-mono text-[9px] mb-1 leading-none uppercase tracking-wider " + (m.sender === "user" ? (isDarkMode ? "text-zinc-400" : "text-sky-100") : "text-zinc-500")}>
@@ -1138,7 +1137,7 @@ export default function App() {
 
                   {isAiTyping && (
                     <div className="flex justify-start">
-                      <div className={"rounded-xl px-4 py-3 text-xs border flex items-center space-x-2 " + (isDarkMode ? "bg-zinc-900/30 text-zinc-400 border-zinc-850/60" : "bg-zinc-150 text-zinc-750 border-zinc-250")}>
+                      <div className={"rounded-xl px-4 py-3 text-xs border flex items-center space-x-2 " + (isDarkMode ? "bg-zinc-900/30 text-zinc-400 border-zinc-800/60" : "bg-zinc-100 text-zinc-700 border-zinc-200")}>
                         <span className="text-[10px] font-mono text-zinc-500 uppercase">Consulting resume telemetry data</span>
                         <span className="flex space-x-1">
                           <span className={"h-1.5 w-1.5 rounded-full animate-bounce " + t.pinger} style={{ animationDelay: '0ms' }}></span>
@@ -1577,7 +1576,7 @@ export default function App() {
       </main>
 
       {/* Modern Professional Footer */}
-      <footer className={"mt-auto border-t " + (isDarkMode ? "bg-zinc-950 border-zinc-900 text-zinc-500" : "bg-zinc-100 border-zinc-250 text-zinc-650")}>
+      <footer className={"mt-auto border-t " + (isDarkMode ? "bg-zinc-950 border-zinc-900 text-zinc-500" : "bg-zinc-100 border-zinc-200 text-zinc-600")}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-xs">
           <div className="flex flex-col gap-2 text-center text-[11px] font-mono sm:flex-row sm:items-center sm:justify-between sm:text-left">
             <span>© {new Date().getFullYear()} {PERSONAL_INFO.name}. All rights reserved.</span>
@@ -1589,3 +1588,4 @@ export default function App() {
     </div>
   );
 }
+

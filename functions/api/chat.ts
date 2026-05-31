@@ -3,7 +3,6 @@ import {
   enforceQuota,
   genericError,
   getClientIp,
-  hasOnlyFields,
   json,
   parseLimit,
   readJson,
@@ -11,10 +10,28 @@ import {
   validateTurnstile,
 } from "../_shared/security";
 import type { PagesContext } from "../_shared/security";
+import { z } from "zod";
 
 const MAX_MESSAGE_LENGTH = 700;
 const MAX_HISTORY_MESSAGES = 6;
-const CHAT_FIELDS = ["message", "history", "turnstileToken"];
+const HISTORY_TURNS_TO_SEND = 3;
+
+const chatSchema = z.object({
+  message: z.string().trim().min(1).max(MAX_MESSAGE_LENGTH),
+  history: z
+    .array(
+      z.object({
+        sender: z.enum(["user", "assistant", "model"]).optional(),
+        role: z.enum(["user", "assistant", "model"]).optional(),
+        text: z.string().trim().max(MAX_MESSAGE_LENGTH).optional(),
+        content: z.string().trim().max(MAX_MESSAGE_LENGTH).optional(),
+      }).strict(),
+    )
+    .max(MAX_HISTORY_MESSAGES)
+    .optional()
+    .default([]),
+  turnstileToken: z.string().min(10).max(4096),
+}).strict();
 
 const RESUME_CONTEXT = `
 NAME: AFSHIN SABERI
@@ -82,19 +99,12 @@ Resume context:
 ${RESUME_CONTEXT}
 `;
 
-type ChatTurn = {
-  sender?: string;
-  role?: string;
-  text?: unknown;
-  content?: unknown;
-};
+type ChatTurn = z.infer<typeof chatSchema>["history"][number];
 
-function normalizeHistory(history: unknown) {
-  if (!Array.isArray(history)) return [];
-
+function normalizeHistory(history: ChatTurn[]) {
   return history
-    .slice(-MAX_HISTORY_MESSAGES)
-    .map((turn: ChatTurn) => {
+    .slice(-HISTORY_TURNS_TO_SEND)
+    .map((turn) => {
       const role = turn.sender === "user" || turn.role === "user" ? "user" : "assistant";
       const content = clampText(turn.text ?? turn.content, MAX_MESSAGE_LENGTH);
       return content ? { role, content } : null;
@@ -152,14 +162,14 @@ export const onRequestPost = async ({ request, env }: PagesContext) => {
   const parsed = await readJson(request);
   if (!parsed.ok) return parsed.response;
 
-  const body = parsed.body as Record<string, unknown>;
-  if (!hasOnlyFields(body, CHAT_FIELDS)) {
+  const body = chatSchema.safeParse(parsed.body);
+  if (!body.success) {
     console.warn("chat_blocked_schema", { ip });
     return json({ error: "Invalid request body." }, 400);
   }
 
-  const message = clampText(body.message, MAX_MESSAGE_LENGTH + 1);
-  const history = normalizeHistory(body.history);
+  const message = body.data.message;
+  const history = normalizeHistory(body.data.history);
 
   if (!message || message.length > MAX_MESSAGE_LENGTH || isSpammy(message, history)) {
     console.warn("chat_blocked_validation", { ip, reason: "invalid_message" });
@@ -171,7 +181,7 @@ export const onRequestPost = async ({ request, env }: PagesContext) => {
     return json({ error: "Please ask a portfolio-related question about Afshin's background." }, 400);
   }
 
-  const turnstileOk = await validateTurnstile(env, body.turnstileToken, ip);
+  const turnstileOk = await validateTurnstile(env, body.data.turnstileToken, ip);
   if (!turnstileOk) {
     console.warn("chat_blocked_turnstile", { ip });
     return json({ error: "Verification failed. Please refresh and try again." }, 403);
@@ -187,13 +197,13 @@ export const onRequestPost = async ({ request, env }: PagesContext) => {
     },
     {
       key: `chat:ip:${day}:${ip}`,
-      limit: parseLimit(env.CHAT_IP_DAILY_LIMIT, 20, 1, 500),
+      limit: parseLimit(env.CHAT_IP_DAILY_LIMIT, 5, 1, 500),
       ttlSeconds: 172800,
       label: "chat_ip_daily",
     },
     {
       key: `chat:global:${day}`,
-      limit: parseLimit(env.CHAT_GLOBAL_DAILY_LIMIT, 200, 1, 10000),
+      limit: parseLimit(env.CHAT_GLOBAL_DAILY_LIMIT, 100, 1, 10000),
       ttlSeconds: 172800,
       label: "chat_global_daily",
     },
@@ -205,7 +215,7 @@ export const onRequestPost = async ({ request, env }: PagesContext) => {
     return genericError(503);
   }
 
-  const maxOutputTokens = parseLimit(env.OPENAI_MAX_OUTPUT_TOKENS, 400, 300, 500);
+  const maxOutputTokens = parseLimit(env.OPENAI_MAX_OUTPUT_TOKENS, 400, 400, 400);
   const model = env.OPENAI_MODEL || "gpt-4o-mini";
 
   try {

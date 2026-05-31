@@ -2,16 +2,22 @@ export interface Env {
   OPENAI_API_KEY?: string;
   OPENAI_MODEL?: string;
   OPENAI_MAX_OUTPUT_TOKENS?: string;
+  GEMINI_API_KEY?: string;
+  GEMINI_MODEL?: string;
+  ENABLE_TRANSLATE_API?: string;
   TURNSTILE_SECRET_KEY?: string;
   TURNSTILE_BYPASS?: string;
   RESEND_API_KEY?: string;
   CONTACT_TO_EMAIL?: string;
+  CONTACT_FROM_EMAIL?: string;
   PORTFOLIO_RATE_LIMIT_KV?: KVNamespace;
   CHAT_PER_MINUTE_LIMIT?: string;
   CHAT_IP_DAILY_LIMIT?: string;
   CHAT_GLOBAL_DAILY_LIMIT?: string;
   CONTACT_PER_HOUR_LIMIT?: string;
   CONTACT_IP_DAILY_LIMIT?: string;
+  TRANSLATE_PER_MINUTE_LIMIT?: string;
+  TRANSLATE_IP_DAILY_LIMIT?: string;
 }
 
 const MAX_JSON_BODY_BYTES = 20 * 1024;
@@ -89,6 +95,10 @@ export function todayKey() {
 
 export function clampText(value: unknown, maxLength: number) {
   return typeof value === "string" ? value.trim().slice(0, maxLength) : "";
+}
+
+export function stripCrlf(value: string) {
+  return value.replace(/[\r\n]+/g, " ").trim();
 }
 
 export function hasOnlyFields(body: Record<string, unknown>, allowedFields: string[]) {
