@@ -35,6 +35,53 @@ import Markdown from "react-markdown";
 import { PERSONAL_INFO, WORK_EXPERIENCE, PROJECTS, SKILL_CATEGORIES, SUGGESTED_QUESTIONS } from "./data";
 import { ChatMessage } from "./types";
 
+const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY || "";
+
+function TurnstileWidget({
+  onVerify,
+  enabled,
+}: {
+  onVerify: (token: string) => void;
+  enabled: boolean;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!enabled || !containerRef.current) return;
+
+    let widgetId = "";
+    const interval = window.setInterval(() => {
+      if (!containerRef.current || !window.turnstile || widgetId) return;
+      widgetId = window.turnstile.render(containerRef.current, {
+        sitekey: TURNSTILE_SITE_KEY,
+        callback: onVerify,
+        theme: "auto",
+      });
+      window.clearInterval(interval);
+    }, 250);
+
+    return () => {
+      window.clearInterval(interval);
+      if (widgetId) window.turnstile?.remove(widgetId);
+    };
+  }, [enabled, onVerify]);
+
+  if (!enabled) {
+    return <div className="text-[10px] font-mono text-amber-500">Turnstile site key is not configured.</div>;
+  }
+
+  return <div ref={containerRef} className="min-h-[65px]" />;
+}
+
+function safeMarkdownUrl(url: string) {
+  const trimmed = url.trim();
+  const protocolMatch = /^([a-z][a-z0-9+.-]*):/i.exec(trimmed);
+  if (!protocolMatch) return trimmed;
+
+  const protocol = protocolMatch[1].toLowerCase();
+  return ["http", "https", "mailto"].includes(protocol) ? trimmed : "";
+}
+
 export default function App() {
   // Navigation State
   const [activeTab, setActiveTab] = useState<"overview" | "chat" | "experience" | "labs">("overview");
@@ -100,6 +147,7 @@ export default function App() {
   ]);
   const [inputText, setInputText] = useState("");
   const [isAiTyping, setIsAiTyping] = useState(false);
+  const [chatTurnstileToken, setChatTurnstileToken] = useState("");
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   // Subtitle Translator Lab States
@@ -125,11 +173,21 @@ export default function App() {
   const [mitigationLogs, setMitigationLogs] = useState<string[]>([]);
   const [isMitigating, setIsMitigating] = useState(false);
 
-  // Contact Form (Client Simulation)
-  const [contactForm, setContactForm] = useState({ name: "", email: "", company: "", message: "" });
+  const [contactForm, setContactForm] = useState({ name: "", email: "", company: "", message: "", website: "" });
   const [contactStatus, setContactStatus] = useState<"idle" | "success" | "error">("idle");
   const [contactError, setContactError] = useState("");
   const [isContactSubmitting, setIsContactSubmitting] = useState(false);
+  const [contactTurnstileToken, setContactTurnstileToken] = useState("");
+
+  useEffect(() => {
+    if (TURNSTILE_SITE_KEY && !document.querySelector('script[src*="challenges.cloudflare.com/turnstile"]')) {
+      const script = document.createElement("script");
+      script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+      script.async = true;
+      script.defer = true;
+      document.head.appendChild(script);
+    }
+  }, []);
 
   // Autoscroll Chat
   useEffect(() => {
@@ -140,6 +198,28 @@ export default function App() {
   const handleSendChat = async (textToSend?: string) => {
     const rawMsg = textToSend || inputText;
     if (!rawMsg.trim()) return;
+
+    if (rawMsg.trim().length > 700) {
+      const validationMessage: ChatMessage = {
+        id: Math.random().toString(),
+        sender: "ai",
+        text: "Please keep questions under 700 characters.",
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+      setMessages((prev) => [...prev, validationMessage]);
+      return;
+    }
+
+    if (!chatTurnstileToken) {
+      const verificationMessage: ChatMessage = {
+        id: Math.random().toString(),
+        sender: "ai",
+        text: "Please complete the verification before sending a chat message.",
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+      setMessages((prev) => [...prev, verificationMessage]);
+      return;
+    }
 
     if (!textToSend) setInputText("");
 
@@ -159,11 +239,15 @@ export default function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message: rawMsg,
-          history: messages.map(m => ({ sender: m.sender === "user" ? "user" : "model", text: m.text }))
+          history: messages.slice(-6).map(m => ({ sender: m.sender === "user" ? "user" : "assistant", text: m.text })),
+          turnstileToken: chatTurnstileToken
         })
       });
 
       const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "The AI chat is temporarily unavailable.");
+      }
       
       const botMessage: ChatMessage = {
         id: Math.random().toString(),
@@ -173,15 +257,18 @@ export default function App() {
       };
       
       setMessages((prev) => [...prev, botMessage]);
-    } catch (err) {
+    } catch (err: any) {
       const errorMessage: ChatMessage = {
         id: Math.random().toString(),
         sender: "ai",
-        text: "**Connection Offline**: There was a network issue querying the AI system. You can connect with Afshin directly at **contact@theafshin.com**.",
+        text: err?.message || "**Connection Offline**: There was a network issue querying the AI system. You can connect with Afshin directly at **contact@theafshin.com**.",
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
+      setChatTurnstileToken("");
+      setContactTurnstileToken("");
+      window.turnstile?.reset();
       setIsAiTyping(false);
     }
   };
@@ -227,28 +314,6 @@ export default function App() {
         : `1\n00:00:01,500 --> 00:00:04,800\n[${targetLang}] We must maintain high-security firewalls and automated DevOps.\n\n2\n00:00:05,100 --> 00:00:09,200\n[${targetLang}] Docker containers provide excellent replication and isolation.`
     );
     setIsTranslating(false);
-    return;
-
-    try {
-      const response = await fetch("/api/translate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: subtitleText, targetLang })
-      });
-      const data = await response.json();
-      
-      if (data.translated) {
-        setTranslationLogs(prev => [...prev, `✅ Translation success. Writing batch to stdout.`]);
-        setTranslatedResult(data.translated);
-      } else {
-        throw new Error(data.error || "Blank response");
-      }
-    } catch (err: any) {
-      setTranslationLogs(prev => [...prev, `❌ Pipeline failure: ${err.message || 'Server connection error'}`]);
-      setTranslatedResult("/* TRANSLATION CONTAINER OFFLINE. CONTACT AFSHIN FOR THE SOURCE REPOSITORY. */");
-    } finally {
-      setIsTranslating(false);
-    }
   };
 
   const handleGenerateVoxaSample = async () => {
@@ -322,11 +387,18 @@ export default function App() {
     setContactStatus("idle");
     setContactError("");
 
+    if (!contactTurnstileToken) {
+      setContactStatus("error");
+      setContactError("Please complete the verification before sending.");
+      setIsContactSubmitting(false);
+      return;
+    }
+
     try {
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(contactForm),
+        body: JSON.stringify({ ...contactForm, turnstileToken: contactTurnstileToken }),
       });
       const data = await response.json();
 
@@ -335,11 +407,14 @@ export default function App() {
       }
 
       setContactStatus("success");
-      setContactForm({ name: "", email: "", company: "", message: "" });
+      setContactForm({ name: "", email: "", company: "", message: "", website: "" });
     } catch (err: any) {
       setContactStatus("error");
       setContactError(err.message || "Unable to send the message.");
     } finally {
+      setChatTurnstileToken("");
+      setContactTurnstileToken("");
+      window.turnstile?.reset();
       setIsContactSubmitting(false);
     }
   };
@@ -824,6 +899,7 @@ export default function App() {
                         <input 
                           type="text" 
                           required
+                          maxLength={80}
                           value={contactForm.name}
                           onChange={(e) => {
                             setContactStatus("idle");
@@ -840,6 +916,7 @@ export default function App() {
                           <input 
                             type="email" 
                             required
+                            maxLength={160}
                             value={contactForm.email}
                             onChange={(e) => {
                               setContactStatus("idle");
@@ -853,6 +930,8 @@ export default function App() {
                           <label className="block text-[10px] font-mono text-zinc-500 uppercase mb-1">Company / Org</label>
                           <input 
                             type="text" 
+                            required
+                            maxLength={120}
                             value={contactForm.company}
                             onChange={(e) => {
                               setContactStatus("idle");
@@ -869,6 +948,7 @@ export default function App() {
                         <textarea 
                           rows={3}
                           required
+                          maxLength={2000}
                           value={contactForm.message}
                           onChange={(e) => {
                             setContactStatus("idle");
@@ -879,9 +959,24 @@ export default function App() {
                         ></textarea>
                       </div>
 
+                      <div className="hidden" aria-hidden="true">
+                        <label>
+                          Website
+                          <input
+                            type="text"
+                            tabIndex={-1}
+                            autoComplete="off"
+                            value={contactForm.website}
+                            onChange={(e) => setContactForm({ ...contactForm, website: e.target.value })}
+                          />
+                        </label>
+                      </div>
+
+                      <TurnstileWidget onVerify={setContactTurnstileToken} enabled={Boolean(TURNSTILE_SITE_KEY)} />
+
                       <button 
                         type="submit" 
-                        disabled={isContactSubmitting}
+                        disabled={isContactSubmitting || !contactTurnstileToken}
                         className={"w-full py-2.5 rounded text-xs font-mono transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 " + (isDarkMode ? "bg-zinc-850 hover:bg-zinc-800 text-white border border-zinc-700/60" : "bg-[#0284c7] hover:bg-[#0369a1] text-white shadow-xs")}
                       >
                         {isContactSubmitting ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
@@ -975,7 +1070,7 @@ export default function App() {
                       <button
                         key={qidx}
                         onClick={() => handleSendChat(q)}
-                        disabled={isAiTyping}
+                        disabled={isAiTyping || !chatTurnstileToken}
                         className={"w-full text-left p-2.5 text-[11px] font-sans border rounded-sm transition duration-150 flex items-center justify-between cursor-pointer disabled:opacity-50 " + t.input}
                       >
                         <span>{q}</span>
@@ -987,8 +1082,8 @@ export default function App() {
 
                 <div className={"p-3.5 rounded border font-mono text-[10px] text-zinc-550 space-y-1 " + t.codeBlock}>
                   <div>ENDPOINT: /api/chat</div>
-                  <div>MODEL: server-selected AI provider</div>
-                  <div>LAST ACTIVE CLOUD: US-WEST1</div>
+                  <div>MODEL: server-side OpenAI</div>
+                  <div>EDGE RUNTIME: Cloudflare</div>
                 </div>
               </div>
 
@@ -1034,7 +1129,7 @@ export default function App() {
                         </div>
                         
                         <div className="markdown-body select-text">
-                          <Markdown>{m.text}</Markdown>
+                          <Markdown urlTransform={safeMarkdownUrl}>{m.text}</Markdown>
                         </div>
 
                       </div>
@@ -1058,6 +1153,9 @@ export default function App() {
 
                 {/* Bottom Input Area */}
                 <div className={"p-3.5 border-t " + (isDarkMode ? "bg-zinc-900/40 border-zinc-800" : "bg-zinc-100/90 border-zinc-200")}>
+                  <div className="mb-3">
+                    <TurnstileWidget onVerify={setChatTurnstileToken} enabled={Boolean(TURNSTILE_SITE_KEY)} />
+                  </div>
                   <div className="flex space-x-2">
                     <input 
                       type="text"
@@ -1065,12 +1163,13 @@ export default function App() {
                       onChange={(e) => setInputText(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleSendChat()}
                       disabled={isAiTyping}
+                      maxLength={700}
                       className={"flex-1 border rounded px-3 py-2 text-xs transition disabled:opacity-50 " + t.input}
                       placeholder="Type a custom query (e.g., Explain my Docker setup...)"
                     />
                     <button 
                       onClick={() => handleSendChat()}
-                      disabled={isAiTyping || !inputText.trim()}
+                      disabled={isAiTyping || !inputText.trim() || !chatTurnstileToken}
                       className={"p-2 px-3.5 rounded text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer disabled:opacity-50 " + 
                         (isDarkMode 
                           ? "bg-emerald-500 hover:bg-emerald-400 text-zinc-950" 
