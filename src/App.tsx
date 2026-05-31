@@ -239,7 +239,6 @@ export default function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message: rawMsg,
-          history: messages.slice(-6).map(m => ({ sender: m.sender === "user" ? "user" : "assistant", text: m.text })),
           turnstileToken: chatTurnstileToken
         })
       });
@@ -972,6 +971,10 @@ export default function App() {
                       </div>
 
                       <TurnstileWidget onVerify={setContactTurnstileToken} enabled={Boolean(TURNSTILE_SITE_KEY)} />
+
+                      <p className={"text-[10px] leading-relaxed " + t.textMuted}>
+                        To prevent abuse, this form may use basic technical metadata such as IP address, request timing, and verification status.
+                      </p>
 
                       <button 
                         type="submit" 

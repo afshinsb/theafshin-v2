@@ -6,7 +6,6 @@ export interface Env {
   GEMINI_MODEL?: string;
   ENABLE_TRANSLATE_API?: string;
   TURNSTILE_SECRET_KEY?: string;
-  TURNSTILE_BYPASS?: string;
   RESEND_API_KEY?: string;
   CONTACT_TO_EMAIL?: string;
   CONTACT_FROM_EMAIL?: string;
@@ -118,11 +117,6 @@ export async function validateTurnstile(
   token: unknown,
   ip: string,
 ) {
-  if (env.TURNSTILE_BYPASS === "true") {
-    console.warn("turnstile_bypass_enabled");
-    return true;
-  }
-
   if (!env.TURNSTILE_SECRET_KEY) {
     console.error("turnstile_missing_secret");
     return false;

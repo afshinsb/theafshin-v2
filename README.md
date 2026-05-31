@@ -41,7 +41,7 @@ The npm helper uses the configured public output directory:
 npm run pages:dev
 ```
 
-For local function testing, create a local `.dev.vars` file with the server-side values below. You may set `TURNSTILE_BYPASS=true` locally only.
+For local function testing, create a local `.dev.vars` file with the server-side values below. Turnstile validation is always enforced by the API routes; use Cloudflare Turnstile test keys for local or preview testing.
 
 ## Required Environment Variables
 
@@ -100,7 +100,7 @@ There is no Express production server in this deployment and no `server.cjs` bui
 1. Create a Cloudflare Turnstile widget for `theafshin.com` and preview domains.
 2. Put the public site key in `VITE_TURNSTILE_SITE_KEY`.
 3. Put the secret key in `TURNSTILE_SECRET_KEY`.
-4. Keep server-side validation enabled in production. Do not set `TURNSTILE_BYPASS=true` outside local development.
+4. Keep server-side validation enabled in production. There is no production bypass for Turnstile validation.
 
 ## OpenAI Budget Setup
 
@@ -130,6 +130,8 @@ The sender is fixed from `CONTACT_FROM_EMAIL`. Visitor email addresses are used 
 
 Add Cloudflare WAF/rate-limit rules in front of the Pages project:
 
+Server-side KV counters are a second line of defense, not the only control. Cloudflare KV increments are not atomic under high parallel abuse, so production WAF and Cloudflare rate-limit rules are required for `/api/*`.
+
 - Rate limit `POST /api/chat` by IP in addition to the server-side KV quota.
 - Rate limit `POST /api/contact` separately from chat.
 - Challenge or block non-POST requests to `/api/chat` and `/api/contact`.
@@ -152,7 +154,7 @@ Add Cloudflare WAF/rate-limit rules in front of the Pages project:
 - Contact has `3` requests per IP per hour, daily quotas, duplicate detection, and a honeypot.
 - API requests accept JSON only and reject bodies over 20 KB.
 - Chat validates request bodies with Zod, rejects malformed, empty, repeated, prompt-injection-like, and over-700-character messages.
-- Chat accepts at most 6 history messages, sends only the last 3 validated turns to OpenAI, and caps output tokens at 400.
+- Chat accepts the current validated message only for OpenAI input and caps output tokens at 400.
 - Chat is restricted to Afshin's resume, experience, projects, infrastructure, networking, and security background.
 - Contact uses a fixed From address and puts visitor email only in Reply-To.
 - React Markdown does not render raw HTML and blocks unsafe URL protocols such as `javascript:`.

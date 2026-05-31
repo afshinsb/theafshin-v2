@@ -1,5 +1,4 @@
 import {
-  clampText,
   enforceQuota,
   genericError,
   getClientIp,
@@ -14,7 +13,6 @@ import { z } from "zod";
 
 const MAX_MESSAGE_LENGTH = 700;
 const MAX_HISTORY_MESSAGES = 6;
-const HISTORY_TURNS_TO_SEND = 3;
 
 const chatSchema = z.object({
   message: z.string().trim().min(1).max(MAX_MESSAGE_LENGTH),
@@ -38,7 +36,7 @@ NAME: AFSHIN SABERI
 LOCATION: Montreal, QC (Open to relocation)
 CONTACT:
   Email: contact@theafshin.com
-  LinkedIn: https://linkedin.com/in/afshinsb
+  LinkedIn: https://linkedin.com/in/theafshin
   GitHub: https://github.com/afshinsb
   Portfolio: https://theafshin.com
 
@@ -99,31 +97,12 @@ Resume context:
 ${RESUME_CONTEXT}
 `;
 
-type ChatTurn = z.infer<typeof chatSchema>["history"][number];
-
-function normalizeHistory(history: ChatTurn[]) {
-  return history
-    .slice(-HISTORY_TURNS_TO_SEND)
-    .map((turn) => {
-      const role = turn.sender === "user" || turn.role === "user" ? "user" : "assistant";
-      const content = clampText(turn.text ?? turn.content, MAX_MESSAGE_LENGTH);
-      return content ? { role, content } : null;
-    })
-    .filter(Boolean) as Array<{ role: "user" | "assistant"; content: string }>;
-}
-
-function isSpammy(message: string, history: Array<{ role: string; content: string }>) {
+function isSpammy(message: string) {
   const normalized = message.toLowerCase().replace(/\s+/g, " ").trim();
   if (normalized.length < 2) return true;
   if (/^(.)\1{15,}$/i.test(normalized.replace(/\s/g, ""))) return true;
   if (/\b(.{3,40})\b(?:\s+\1\b){3,}/i.test(normalized)) return true;
-
-  const recentUserMessages = history
-    .filter((turn) => turn.role === "user")
-    .slice(-3)
-    .map((turn) => turn.content.toLowerCase().replace(/\s+/g, " ").trim());
-
-  return recentUserMessages.includes(normalized);
+  return false;
 }
 
 function isPromptInjection(message: string) {
@@ -169,9 +148,8 @@ export const onRequestPost = async ({ request, env }: PagesContext) => {
   }
 
   const message = body.data.message;
-  const history = normalizeHistory(body.data.history);
 
-  if (!message || message.length > MAX_MESSAGE_LENGTH || isSpammy(message, history)) {
+  if (!message || message.length > MAX_MESSAGE_LENGTH || isSpammy(message)) {
     console.warn("chat_blocked_validation", { ip, reason: "invalid_message" });
     return json({ error: "Please send a concise portfolio-related question." }, 400);
   }
@@ -229,7 +207,7 @@ export const onRequestPost = async ({ request, env }: PagesContext) => {
       body: JSON.stringify({
         model,
         instructions: SYSTEM_INSTRUCTIONS,
-        input: [...history, { role: "user", content: message }],
+        input: [{ role: "user", content: message }],
         temperature: 0.4,
         max_output_tokens: maxOutputTokens,
       }),
