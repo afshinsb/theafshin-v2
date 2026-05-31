@@ -9,3 +9,8 @@ coverage/
 
 # Private Codex context files
 .codex/
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
