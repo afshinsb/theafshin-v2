@@ -542,8 +542,7 @@ export default function App() {
                 <span className="hidden sm:inline">{PERSONAL_INFO.title}</span>
                 <span className="inline leading-tight sm:hidden">
                   Infrastructure<br />
-                  Cloud Operations<br />
-                  Security Operations
+                  Cloud, Security
                 </span>
               </span>
             </div>
@@ -726,7 +725,7 @@ export default function App() {
               className="space-y-8"
             >
               {/* Performance Metrics Bento */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 
                 <div className={t.smallCard + " p-5 rounded-xl flex flex-col justify-between"}>
                   <div className="flex items-center justify-between mb-3">

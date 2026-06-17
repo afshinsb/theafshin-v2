@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Github, Play } from "lucide-react";
 
 type Stage = "select" | "started" | "verified" | "shipped";
-type CopyStatus = "idle" | "copied" | "error";
 
 interface AiRailWorkflowLabProps {
   isDarkMode: boolean;
@@ -77,7 +77,6 @@ function wait(ms: number) {
 export default function AiRailWorkflowLab({ isDarkMode, className = "" }: AiRailWorkflowLabProps) {
   const [selectedIssueId, setSelectedIssueId] = useState("21");
   const [stage, setStage] = useState<Stage>("select");
-  const [copyStatus, setCopyStatus] = useState<CopyStatus>("idle");
   const [isRunning, setIsRunning] = useState(false);
   const [terminalLines, setTerminalLines] = useState<string[]>(introLines);
   const terminalRef = useRef<HTMLDivElement>(null);
@@ -85,14 +84,6 @@ export default function AiRailWorkflowLab({ isDarkMode, className = "" }: AiRail
   const selectedIssue = sampleIssues.find((issue) => issue.id === selectedIssueId) || sampleIssues[0];
   const hasStarted = stage === "started" || stage === "verified" || stage === "shipped";
   const hasVerified = stage === "verified" || stage === "shipped";
-
-  const promptText = useMemo(() => (
-    `You are working on GitHub issue #${selectedIssue.id} only.\n` +
-    `Goal: ${selectedIssue.title}.\n` +
-    "Stay inside the allowed files.\n" +
-    "Do not touch blocked paths or unrelated features.\n" +
-    "Return changed files, checks run, and review notes."
-  ), [selectedIssue]);
 
   useEffect(() => {
     terminalRef.current?.scrollTo({ top: terminalRef.current.scrollHeight, behavior: "smooth" });
@@ -112,7 +103,6 @@ export default function AiRailWorkflowLab({ isDarkMode, className = "" }: AiRail
   const runLines = async (lines: string[], nextStage?: Stage, clearFirst = false) => {
     if (isRunning) return;
     setIsRunning(true);
-    setCopyStatus("idle");
     if (clearFirst) setTerminalLines([]);
 
     for (const line of lines) {
@@ -186,31 +176,27 @@ export default function AiRailWorkflowLab({ isDarkMode, className = "" }: AiRail
     void runLines(lines, "shipped");
   };
 
-  const copyPrompt = async () => {
-    try {
-      await navigator.clipboard.writeText(promptText);
-      setCopyStatus("copied");
-      setTerminalLines((current) => [...current, "Prompt copied to clipboard."]);
-    } catch {
-      setCopyStatus("error");
-      setTerminalLines((current) => [...current, "Copy unavailable."]);
-    }
-  };
-
   const resetDemo = () => {
     setStage("select");
-    setCopyStatus("idle");
     setIsRunning(false);
     setTerminalLines(introLines);
   };
 
-  const nextAction = stage === "select"
-    ? { label: "Start issue", action: startIssue, disabled: isRunning }
+  const nextButtonClass = stage === "select"
+    ? (isDarkMode ? "bg-emerald-500 hover:bg-emerald-400 text-zinc-950" : "bg-emerald-600 hover:bg-emerald-700 text-white")
     : stage === "started"
-      ? { label: "Run review gate", action: verifyGate, disabled: isRunning }
+      ? (isDarkMode ? "bg-amber-400 hover:bg-amber-300 text-zinc-950" : "bg-amber-500 hover:bg-amber-600 text-white")
       : stage === "verified"
-        ? { label: "Simulate ship", action: shipIssue, disabled: isRunning }
-        : { label: "Ready to ship", action: resetDemo, disabled: isRunning };
+        ? (isDarkMode ? "bg-sky-400 hover:bg-sky-300 text-zinc-950" : "bg-emerald-600 hover:bg-emerald-700 text-white")
+        : (isDarkMode ? "bg-violet-400 hover:bg-violet-300 text-zinc-950" : "bg-violet-600 hover:bg-violet-700 text-white");
+
+  const nextAction = stage === "select"
+    ? { label: "Start issue", icon: "play", action: startIssue, disabled: isRunning }
+    : stage === "started"
+      ? { label: "◆ Run gate", icon: "text", action: verifyGate, disabled: isRunning }
+      : stage === "verified"
+        ? { label: "▲ Ship", icon: "text", action: shipIssue, disabled: isRunning }
+        : { label: "✓ Ready to ship", icon: "text", action: resetDemo, disabled: isRunning };
 
   return (
     <div className={"p-5 rounded-xl flex flex-col space-y-4 " + className}>
@@ -235,7 +221,6 @@ export default function AiRailWorkflowLab({ isDarkMode, className = "" }: AiRail
               onClick={() => {
                 setSelectedIssueId(issue.id);
                 setStage("select");
-                setCopyStatus("idle");
                 void runLines([
                   "$ rail issue-list --open",
                   `Selected issue #${issue.id}: ${issue.title}`,
@@ -280,21 +265,16 @@ export default function AiRailWorkflowLab({ isDarkMode, className = "" }: AiRail
         </div>
       </div>
 
-      <div className="space-y-2">
-        <button type="button" onClick={nextAction.action} disabled={nextAction.disabled} className={"w-full rounded px-3 py-2.5 text-xs font-semibold transition disabled:opacity-50 " + c.primary}>
+      <div className="grid grid-cols-[minmax(0,1fr)_92px_92px] gap-2">
+        <button type="button" onClick={nextAction.action} disabled={nextAction.disabled} className={"rounded px-3 py-2.5 text-xs font-semibold transition disabled:opacity-50 " + nextButtonClass}>
+          {nextAction.icon === "play" && <Play className="mr-1.5 inline h-3.5 w-3.5 fill-current align-[-2px]" />}
           {nextAction.label}
         </button>
-        <div className="grid grid-cols-2 gap-2">
-          <button type="button" onClick={copyPrompt} disabled={isRunning || !hasStarted} className={"rounded border px-2 py-2 text-[10px] font-semibold transition disabled:opacity-50 " + c.secondary}>Copy prompt</button>
-          <button type="button" onClick={showAllowedFiles} disabled={isRunning || !hasStarted} className={"rounded border px-2 py-2 text-[10px] font-semibold transition disabled:opacity-50 " + c.secondary}>Show scope</button>
-        </div>
+        <button type="button" onClick={showAllowedFiles} disabled={isRunning || !hasStarted} className={"h-9 rounded border px-2 text-xs font-semibold transition disabled:opacity-50 flex items-center justify-center " + c.secondary}>Scope</button>
+        <a href="https://github.com/afshinsb/ai-rail" target="_blank" referrerPolicy="no-referrer" className={"h-9 rounded border px-2 text-xs font-semibold transition flex items-center justify-center gap-1.5 whitespace-nowrap " + c.secondary}>
+          <Github className="h-3.5 w-3.5" /> Source
+        </a>
       </div>
-
-      {copyStatus !== "idle" && (
-        <div className={"text-[10px] font-mono " + (copyStatus === "copied" ? c.accent : "text-amber-500")}>
-          {copyStatus === "copied" ? "Prompt copied" : "Copy unavailable"}
-        </div>
-      )}
 
       <div className={"rounded-lg border p-3 text-[10px] leading-relaxed " + c.panel + " " + c.textMuted}>
         This demo is simulated. The real AI Rail CLI runs locally against your repo, GitHub Issues, git, gh, and configured checks.

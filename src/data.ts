@@ -178,6 +178,8 @@ export const SKILL_CATEGORIES: SkillCategory[] = [
 
 export const SUGGESTED_QUESTIONS = [
   "What is your security experience?",
+  "Tell me about your self-hosted infrastructure project.",
+  "How does AI Rail make AI-assisted coding safer?",
   "Tell me about your Concordia University Master's degree.",
   "What automation scripting do you write?",
   "What systems administration tools do you use?",
