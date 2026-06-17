@@ -2,14 +2,14 @@ import { WorkExperience, ProjectData, SkillCategory } from "./types";
 
 export const PERSONAL_INFO = {
   name: "AFSHIN SABERI",
-  title: "IT Security & Systems Operations Specialist",
+  title: "Infrastructure / Cloud Operations / Security Operations",
   location: "",
-  email: "contact@theafshin.com", // Used the portfolio domain
-  phone: "Available upon request", // Hidden for privacy
-  linkedin: "https://linkedin.com/in/theafshin", // Updated to match user's actual linkedin username
+  email: "contact@theafshin.com",
+  phone: "Available upon request",
+  linkedin: "https://linkedin.com/in/theafshin",
   github: "https://github.com/afshinsb",
   portfolio: "https://theafshin.com",
-  summary: "Infrastructure and security professional with 8+ years of experience across Linux, Windows, networking, VPNs, cloud platforms, and operational security. Focused on reliable systems, automation, monitoring, and secure infrastructure operations."
+  summary: "Infrastructure and security operations professional focused on reliable Linux/Windows environments, controlled network exposure, monitoring, incident triage, and practical automation."
 };
 
 export const WORK_EXPERIENCE: WorkExperience[] = [
@@ -58,99 +58,120 @@ export const PROJECTS: ProjectData[] = [
   {
     id: "secure-infra",
     title: "Self-Hosted Secure Infrastructure",
-    subtitle: "Private Linux services, tunnels, VPN access",
-    description: "A small homelab stack for running private services without exposing unnecessary ports.",
-    tech: ["Docker Compose", "Cloudflare Tunnel", "Linux", "KVM/libvirt", "Tailscale VPN", "Reverse Proxy"],
-    features: [
-      "Published selected services through Cloudflare Tunnel and kept admin paths private over Tailscale.",
-      "Used Docker Compose for repeatable service layout, health checks, and recovery.",
-      "Tested changes in isolated KVM/libvirt Ubuntu guests before touching live services."
-    ],
+    subtitle: "Private Linux services with controlled exposure",
+    description: "Run private Linux services safely with controlled public exposure and private admin access.",
+    purpose: "Run private Linux services with controlled public exposure and private admin access.",
+    built: "Docker Compose on Debian/Linux with ZFS, reverse proxying, Cloudflare Tunnel, Tailscale, DNS filtering, and restore planning.",
+    demonstrates: "Linux operations, Docker service management, secure access design, storage awareness, and restore-aware infrastructure.",
+    tech: ["Debian", "Docker Compose", "ZFS", "Cloudflare Tunnel", "Tailscale", "Reverse proxy", "DNS", "KVM/libvirt"],
+    features: [],
     githubUrl: "https://github.com/afshinsb/homelab-infra"
+  },
+  {
+    id: "ai-rail",
+    title: "AI Rail — Local-First AI Development Workflow CLI",
+    subtitle: "Scoped AI-assisted development workflow",
+    description: "Make AI-assisted coding safer and more controlled by forcing one scoped issue at a time.",
+    purpose: "Make AI-assisted coding safer by forcing one scoped issue at a time.",
+    built: "A Python CLI for GitHub Issue workflows with project memory, review packs, safety checks, release validation, and pipx install.",
+    demonstrates: "Python automation, CLI design, Git/GitHub workflow control, safety checks, and release-ready packaging.",
+    tech: ["Python", "GitHub Issues", "Git", "pipx", "CLI tooling", "CI/testing", "Markdown workflows"],
+    features: [],
+    githubUrl: "https://github.com/afshinsb/ai-rail"
   },
   {
     id: "subtitle-translator",
     title: "Universal Subtitle Translator",
-    subtitle: "FastAPI app for SRT and media batch translation",
-    description: "A Dockerized tool for translating subtitle files and media folders, with a safe public demo.",
-    tech: ["FastAPI", "Python", "Docker", "SQLite", "REST APIs", "Structured Logging", "OAuth"],
-    features: [
-      "Handles single SRT uploads, video subtitle extraction, and mounted-folder batch jobs.",
-      "Tracks progress, logs, cancellation, and job history in SQLite.",
-      "Keeps the public demo separate from the authenticated Docker/FastAPI app."
-    ],
+    subtitle: "Dockerized subtitle and media translation jobs",
+    description: "Translate subtitle files and media-folder subtitles in a controlled Dockerized workflow.",
+    purpose: "Translate subtitle files and media-folder subtitles in a controlled Dockerized workflow.",
+    built: "A FastAPI app using FFmpeg/ffprobe, OpenAI API, SQLite history, batch jobs, live progress, cancellation, logs, and admin defaults.",
+    demonstrates: "Python service design, Dockerized workloads, API integration, job state, media automation, safe demos, and operational logging.",
+    tech: ["FastAPI", "Python", "Docker", "SQLite", "FFmpeg/ffprobe", "OpenAI API", "REST APIs", "Cloudflare Pages demo"],
+    features: [],
     githubUrl: "https://github.com/afshinsb/universal-subtitle-translator",
     liveUrl: "https://translate.theafshin.com/"
   },
   {
+    id: "applyflow",
+    title: "ApplyFlow Automation — n8n Workflow Automation System",
+    subtitle: "Job search tracking and workflow automation",
+    description: "Automate job-search tracking and reduce repeated manual work around job alerts, ranking, and application follow-up.",
+    purpose: "Automate job-search tracking around alerts, ranking, and follow-up.",
+    built: "An n8n workflow with Gmail, Google Sheets, JavaScript nodes, HTTP fetches, OpenAI review, deduplication, logs, and separated config.",
+    demonstrates: "Workflow automation, operations thinking, structured data handling, API integration, deduplication, and maintainable automation.",
+    tech: ["n8n", "Gmail", "Google Sheets", "JavaScript code nodes", "HTTP APIs", "OpenAI API", "Structured logs"],
+    features: []
+  },
+  {
+    id: "glowbook",
+    title: "GlowBook — Multi-Tenant Booking SaaS Demo/MVP",
+    subtitle: "Multi-tenant booking platform",
+    description: "Build a SaaS-style booking platform with tenant-aware workflows, staff/service management, appointments, and role-based access.",
+    purpose: "Build a SaaS-style booking platform with tenant-aware workflows and role-based access.",
+    built: "A React/TypeScript + Node/Express demo with tenant APIs, audit logs, appointments, staff/services, clients, notifications, and dashboards.",
+    demonstrates: "Full-stack architecture, multi-tenant thinking, audit logs, business workflows, and production-boundary awareness.",
+    tech: ["React", "TypeScript", "Node.js", "Express", "Audit logs", "REST APIs", "Dashboard UI"],
+    features: [],
+    githubUrl: "https://github.com/afshinsb/Glow"
+  },
+  {
     id: "voxa",
-    title: "Voxa",
-    subtitle: "Multi-provider AI voice studio",
-    description: "A prerelease Next.js app for rewriting text and generating narration through server-side provider adapters.",
-    tech: ["Next.js", "TypeScript", "OpenAI API", "Gemini API", "ElevenLabs", "IndexedDB", "Docker Compose", "Tailwind CSS"],
-    features: [
-      "Supports OpenAI, Gemini, ElevenLabs, and mock local generation behind server routes.",
-      "Maps six voice characters to eight tone presets without exposing provider keys.",
-      "Stores generation history and cached audio locally with IndexedDB.",
-      "Includes Persian/English rewrite and translation before text-to-speech."
-    ],
+    title: "Voxa — Supporting Creative AI Voice Studio",
+    subtitle: "Supporting creative AI project",
+    description: "Explore AI narration workflows with multiple provider options and local history.",
+    purpose: "Explore AI narration workflows with multiple provider options and local history.",
+    built: "A prerelease app for rewriting, translation, narration presets, local history, cached audio metadata, and provider adapters.",
+    demonstrates: "TypeScript UI work, API boundaries, provider abstraction, local persistence, and creative prototyping.",
+    tech: ["Next.js", "TypeScript", "OpenAI API", "Gemini API", "ElevenLabs", "IndexedDB", "Server-side provider routes"],
+    features: [],
     githubUrl: "https://github.com/afshinsb/voxa"
   }
 ];
 
 export const SKILL_CATEGORIES: SkillCategory[] = [
   {
-    title: "Security Operations",
-    iconName: "ShieldAlert",
-    skills: [
-      "Security Alert Monitoring",
-      "Incident Response & Investigation",
-      "Network/Log Parsing & Troubleshooting",
-      "Ticketing Systems & SLA Docs",
-      "System Hardening & Vulnerability Patching"
-    ]
-  },
-  {
-    title: "Threat & Network Security",
-    iconName: "Lock",
-    skills: [
-      "Firewall Rules & Policies",
-      "Enterprise IPSec & SSL VPNs",
-      "Attack Pattern Defense (Phishing, malware, DDoS)",
-      "Network Microsegmentation",
-      "Access Control Audits"
-    ]
-  },
-  {
-    title: "Networking & Protocol Analysis",
-    iconName: "Network",
-    skills: [
-      "TCP/IP, HTTP, DNS, TLS/SSL",
-      "Wireshark packet capture & inspection",
-      "Routing & Custom Switching",
-      "Cloud Virtual Networks (AWS VPC, Subnets)"
-    ]
-  },
-  {
-    title: "Infrastructure & Virtualization",
+    title: "Systems & Infrastructure",
     iconName: "Server",
     skills: [
-      "Linux Administration (Debian/Ubuntu)",
-      "Windows Server & Microsoft 365 Core",
-      "Docker & multi-container Docker Compose orchestration",
-      "VMware virtualization & KVM hypervisors",
-      "AWS Cloud Infrastructure & Services"
+      "Linux administration",
+      "Windows Server / Microsoft 365 basics",
+      "Docker and Docker Compose",
+      "KVM/libvirt virtualization",
+      "Backup and restore validation"
     ]
   },
   {
-    title: "Scripting & DevTools",
+    title: "Cloud & Identity",
+    iconName: "Cloud",
+    skills: [
+      "AWS: EC2, VPC, IAM",
+      "Cloudflare Tunnel and DNS",
+      "Identity lifecycle support",
+      "Access control reviews",
+      "Least-privilege habits"
+    ]
+  },
+  {
+    title: "Network & Security",
+    iconName: "Lock",
+    skills: [
+      "TCP/IP, DNS, HTTP, TLS",
+      "Firewall rules and policy changes",
+      "VPN access and tunnel design",
+      "Wireshark packet review",
+      "Segmentation and exposure reduction"
+    ]
+  },
+  {
+    title: "Automation & DevTools",
     iconName: "Terminal",
     skills: [
-      "Python Scripting for Automation",
-      "PowerShell & Bash Scripting",
-      "Cloudflare Tunnels & Edge Config",
-      "Git / GitHub release versioning",
-      "Structured JSON logs & REST API automation"
+      "Python automation",
+      "Bash and PowerShell scripting",
+      "Git and GitHub workflows",
+      "REST API automation",
+      "Structured logs and CLI tooling"
     ]
   }
 ];

@@ -12,6 +12,9 @@ export interface ProjectData {
   title: string;
   subtitle: string;
   description: string;
+  purpose?: string;
+  built?: string;
+  demonstrates?: string;
   tech: string[];
   features: string[];
   highlights?: string[];

@@ -32,6 +32,7 @@ import {
 import { motion, AnimatePresence } from "motion/react";
 import Markdown from "react-markdown";
 
+import AiRailWorkflowLab from "./components/AiRailWorkflowLab";
 import { PERSONAL_INFO, WORK_EXPERIENCE, PROJECTS, SKILL_CATEGORIES, SUGGESTED_QUESTIONS } from "./data";
 import { ChatMessage } from "./types";
 
@@ -422,7 +423,7 @@ export default function App() {
     <div className={"p-5 rounded-xl flex flex-col space-y-4 justify-between " + t.smallCard}>
       <div className="space-y-1.5">
         <span className={"text-[10px] font-mono uppercase px-2 py-0.5 rounded-sm border " + (isDarkMode ? "bg-violet-950/50 text-violet-300 border-violet-900" : "bg-violet-50 text-violet-700 border-violet-200")}>
-          Lab Module 3: Multi-Provider AI Voice Studio
+          Lab Module 4: Multi-Provider AI Voice Studio
         </span>
         <h4 className={"text-base font-semibold " + t.textTitle}>Voxa Narration Pipeline</h4>
         <p className={"text-xs leading-relaxed " + t.textMuted}>
@@ -527,18 +528,23 @@ export default function App() {
       <header className={t.header}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
           
-          <div className="flex items-center space-x-3">
-            <div className={"w-10 h-10 rounded-lg border flex items-center justify-center font-mono " + 
+          <div className="flex min-w-0 items-center space-x-3">
+            <div className={"h-10 w-10 shrink-0 rounded-lg border flex items-center justify-center font-mono " + 
               (isDarkMode 
                 ? "bg-emerald-950/80 border-emerald-800/60 text-emerald-400" 
                 : "bg-cyan-50 border border-cyan-200 text-[#0284c7] font-semibold text-base")}>
-              {isDarkMode ? <Shield className="h-5 w-5" /> : <span>[ ]</span>}
+              <Shield className="h-5 w-5" />
             </div>
-            <div>
+            <div className="min-w-0">
               <h1 className={"text-lg font-semibold tracking-tight font-sans " + t.textTitle}>{PERSONAL_INFO.name}</h1>
-              <span className="text-xs text-zinc-400 font-mono flex items-center gap-1.5 leading-none">
-                <span className={"h-2 w-2 rounded-full inline-block animate-pulse " + (isDarkMode ? "bg-emerald-500" : "bg-[#0284c7]")}></span>
-                IT Security & Systems Administrator
+              <span className="text-xs text-zinc-400 font-mono flex min-w-0 items-center gap-1.5 leading-none">
+                <span className={"h-2 w-2 shrink-0 rounded-full inline-block animate-pulse " + (isDarkMode ? "bg-emerald-500" : "bg-[#0284c7]")}></span>
+                <span className="hidden sm:inline">{PERSONAL_INFO.title}</span>
+                <span className="inline leading-tight sm:hidden">
+                  Infrastructure<br />
+                  Cloud Operations<br />
+                  Security Operations
+                </span>
               </span>
             </div>
           </div>
@@ -645,47 +651,64 @@ export default function App() {
               <Shield className={"h-64 w-64 " + t.iconAccent} />
             </div>
             
-            <div className="max-w-3xl">
-              <h2 className={"text-3xl sm:text-4xl font-semibold tracking-tight mb-4 " + t.textTitle}>
-                Infrastructure, networking & security operations
+            <div className="w-full flex flex-col items-start">
+              <h2 className={"max-w-3xl text-3xl sm:text-4xl font-semibold tracking-tight mb-4 " + t.textTitle}>
+                Infrastructure, Cloud, Security Operations
               </h2>
-              <p className={"text-sm leading-relaxed mb-6 " + t.textMuted}>
+              <p className={"max-w-3xl text-sm leading-relaxed mb-6 " + t.textMuted}>
                 {PERSONAL_INFO.summary}
               </p>
 
-              <div className={"flex flex-wrap gap-4 text-xs font-mono " + (isDarkMode ? "text-zinc-400" : "text-zinc-600")}>
-                <a 
-                  href={PERSONAL_INFO.linkedin}
-                  target="_blank"
-                  referrerPolicy="no-referrer"
-                  className={"flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition " + t.textLinkHover + " " + (isDarkMode ? "bg-zinc-900/80 border-zinc-800 text-zinc-400 " + t.borderLinkHover : "bg-white border-zinc-200 text-zinc-700 shadow-2xs " + t.borderLinkHover)}
-                >
-                  <Linkedin className={"h-3.5 w-3.5 " + t.iconAccent} /> linkedin.com/in/theafshin
-                </a>
-                <a 
-                  href={"mailto:" + PERSONAL_INFO.email}
-                  className={"flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition " + t.textLinkHover + " " + (isDarkMode ? "bg-zinc-900/80 border-zinc-800 text-zinc-400 " + t.borderLinkHover : "bg-white border-zinc-200 text-zinc-700 shadow-2xs " + t.borderLinkHover)}
-                >
-                  <Mail className={"h-3.5 w-3.5 " + t.iconAccent} /> {PERSONAL_INFO.email}
-                </a>
-              </div>
-
-              <div className="mt-8 flex flex-wrap gap-3">
-                <button 
-                  onClick={() => setActiveTab("chat")} 
-                  className={"px-5 py-2.5 text-xs font-semibold rounded-lg transition duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-lg " + 
-                    (isDarkMode 
-                      ? "bg-emerald-500 hover:bg-emerald-400 text-zinc-950 shadow-emerald-500/25" 
-                      : "bg-[#0284c7] hover:bg-[#0369a1] text-white shadow-sky-600/15")}
-                >
-                  <Sparkles className="h-4 w-4" /> Ask About My Experience
-                </button>
-                <button 
-                  onClick={() => setActiveTab("labs")} 
-                  className={"px-5 py-2.5 text-xs font-semibold rounded-lg transition duration-200 flex items-center justify-center gap-2 cursor-pointer " + t.btnSec}
-                >
-                  <Terminal className="h-4 w-4" /> Experiment in Sandbox Labs
-                </button>
+              <div className="flex w-full flex-col gap-4 md:flex-row md:items-end md:justify-between">
+                <div className={"rounded-lg border overflow-hidden w-full max-w-[368px] " + (isDarkMode ? "bg-zinc-950/85 border-zinc-800" : "bg-zinc-100 border-zinc-300")}>
+                  <div className={"flex items-center justify-between border-b px-3 py-1.5 " + (isDarkMode ? "border-zinc-800" : "border-zinc-300")}>
+                    <div className="flex items-center gap-1.5">
+                      <span className="h-2 w-2 rounded-full bg-red-500/80"></span>
+                      <span className="h-2 w-2 rounded-full bg-amber-400/80"></span>
+                      <span className="h-2 w-2 rounded-full bg-emerald-500/80"></span>
+                    </div>
+                    <span className={"text-[9px] font-mono " + t.textMuted}>ops-fit</span>
+                  </div>
+                  <div className="p-2.5 font-mono text-[10px] leading-relaxed break-words">
+                    <div className={t.textMuted}>
+                      <span className={t.subTextAccent}>afshin@portfolio</span>:~$ ./role-fit --target infra-cloud-sec
+                      <span className={"ml-1 inline-block h-3 w-1 translate-y-0.5 animate-pulse " + (isDarkMode ? "bg-emerald-400" : "bg-sky-600")}></span>
+                    </div>
+                    <div className={"mt-2 space-y-0.5 " + t.textTitle}>
+                      {[
+                        ["systems", "Linux / Windows"],
+                        ["containers", "Docker / Docker Compose"],
+                        ["cloud", "AWS"],
+                        ["network", "firewall / VPN"],
+                        ["operations", "monitoring / incident triage"],
+                        ["automation", "Python / Bash / PowerShell"]
+                      ].map(([label, value]) => (
+                        <div key={label}>
+                          <span className={t.subTextAccent}>{label}</span>
+                          <span className={t.textMuted}> = </span>
+                          <span>{value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex w-full flex-col gap-3 md:ml-auto md:w-[250px] md:items-stretch">
+                  <button 
+                    onClick={() => setActiveTab("chat")} 
+                    className={"w-full px-5 py-2.5 text-xs font-semibold rounded-lg transition duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-lg " + 
+                      (isDarkMode 
+                        ? "bg-emerald-500 hover:bg-emerald-400 text-zinc-950 shadow-emerald-500/25" 
+                        : "bg-[#0284c7] hover:bg-[#0369a1] text-white shadow-sky-600/15")}
+                  >
+                    <Sparkles className="h-4 w-4" /> Ask About My Experience
+                  </button>
+                  <button 
+                    onClick={() => setActiveTab("labs")} 
+                    className={"w-full px-5 py-2.5 text-xs font-semibold rounded-lg transition duration-200 flex items-center justify-center gap-2 cursor-pointer " + t.btnSec}
+                  >
+                    <Terminal className="h-4 w-4" /> Experiment in Sandbox Labs
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -703,22 +726,22 @@ export default function App() {
               className="space-y-8"
             >
               {/* Performance Metrics Bento */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 
                 <div className={t.smallCard + " p-5 rounded-xl flex flex-col justify-between"}>
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-zinc-500 text-[10px] font-mono uppercase tracking-wider">Expertise Age</span>
+                    <span className="text-zinc-500 text-[10px] font-mono uppercase tracking-wider">Operations Depth</span>
                     <Activity className={"h-4 w-4 " + t.iconAccent} />
                   </div>
                   <div>
                     <div className={"text-2xl font-bold font-mono mb-1 " + t.textTitle}>8+ Years</div>
-                    <span className={t.textMuted + " text-xs"}>Systems & Network Security Ops</span>
+                    <span className={t.textMuted + " text-xs"}>Systems, networking, security support</span>
                   </div>
                 </div>
 
                 <div className={t.smallCard + " p-5 rounded-xl flex flex-col justify-between"}>
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-zinc-500 text-[10px] font-mono uppercase tracking-wider">Education Level</span>
+                    <span className="text-zinc-500 text-[10px] font-mono uppercase tracking-wider">Security Education</span>
                     <GraduationCap className="h-4 w-4 text-cyan-500" />
                   </div>
                   <div>
@@ -729,18 +752,18 @@ export default function App() {
 
                 <div className={t.smallCard + " p-5 rounded-xl flex flex-col justify-between"}>
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-zinc-500 text-[10px] font-mono uppercase tracking-wider">Host Capabilities</span>
+                    <span className="text-zinc-500 text-[10px] font-mono uppercase tracking-wider">Infrastructure</span>
                     <Server className="h-4 w-4 text-amber-500" />
                   </div>
                   <div>
                     <div className={"text-2xl font-bold font-mono mb-1 " + t.textTitle}>Linux & AWS</div>
-                    <span className={t.textMuted + " text-xs"}>Docker, KVM, Shell, Cloud</span>
+                    <span className={t.textMuted + " text-xs"}>Docker, KVM, shell, cloud basics</span>
                   </div>
                 </div>
 
                 <div className={t.smallCard + " p-5 rounded-xl flex flex-col justify-between"}>
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-zinc-500 text-[10px] font-mono uppercase tracking-wider">Threat Minimization</span>
+                    <span className="text-zinc-500 text-[10px] font-mono uppercase tracking-wider">Secure Access</span>
                     <Lock className="h-4 w-4 text-rose-500" />
                   </div>
                   <div>
@@ -754,15 +777,15 @@ export default function App() {
               {/* Skill Matrix Segment */}
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-mono uppercase text-zinc-500 tracking-wider">Security Operations Matrix</h3>
+                  <h3 className="text-sm font-mono uppercase text-zinc-500 tracking-wider">Core Role Fit</h3>
                   <div className={"h-px flex-1 ml-4 " + t.divider}></div>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {SKILL_CATEGORIES.slice(0, 3).map((cat, idx) => (
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                  {SKILL_CATEGORIES.map((cat, idx) => (
                     <div key={idx} className={t.smallCard + " p-5 rounded-xl transition duration-200 " + (isDarkMode ? "hover:border-emerald-500/50" : "hover:border-[#0284c7]/40")}>
                       <div className="flex items-center gap-2 mb-3">
-                        {idx === 0 ? <ShieldAlert className={"h-4 w-4 " + t.iconAccent} /> : idx === 1 ? <Lock className="h-4 w-4 text-cyan-500" /> : <Network className="h-4 w-4 text-amber-500" />}
+                        {idx === 0 ? <Server className={"h-4 w-4 " + t.iconAccent} /> : idx === 1 ? <ShieldAlert className="h-4 w-4 text-cyan-500" /> : idx === 2 ? <Network className="h-4 w-4 text-amber-500" /> : idx === 3 ? <Activity className="h-4 w-4 text-rose-500" /> : <Terminal className="h-4 w-4 text-violet-500" />}
                         <h4 className={"text-sm font-semibold " + t.textTitle}>{cat.title}</h4>
                       </div>
                       <ul className="space-y-1.5 text-xs">
@@ -778,11 +801,11 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Profile Dashboard Row: Core Projects & Mock Ticketing System */}
+              {/* Featured projects and recruiter contact */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 
                 {/* Featured Projects Column */}
-                <div className="lg:col-span-7 space-y-6">
+                <div className="lg:col-span-8 space-y-6">
                   <div className="flex items-center justify-between">
                     <h3 className="text-sm font-mono text-zinc-500 uppercase tracking-lighter">Featured Engineering Work</h3>
                     <span onClick={() => setActiveTab("labs")} className={"text-xs font-mono hover:underline transition cursor-pointer flex items-center gap-1 " + t.subTextAccent + " " + t.textLinkHover}>
@@ -790,44 +813,53 @@ export default function App() {
                     </span>
                   </div>
 
+                  <div className="grid grid-cols-1 gap-6">
                   {PROJECTS.map((proj) => {
-                    const isCoreProject = proj.id === "secure-infra" || proj.id === "subtitle-translator";
-                    const isSupportingProject = proj.id === "voxa";
+                    const isCoreProject = proj.id === "secure-infra" || proj.id === "ai-rail";
 
                     return (
                     <div
                       key={proj.id}
-                      className={"p-5 rounded-xl space-y-4 transition " + t.smallCard + " " + (
+                      className={"p-6 rounded-xl space-y-5 transition " + t.smallCard + " " + (
                         isCoreProject
                           ? (isDarkMode ? "border-emerald-500/30" : "border-sky-300")
-                          : isSupportingProject
+                          : proj.id === "voxa"
                             ? "opacity-90"
                             : ""
                       )}
                     >
                       <div>
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-start justify-between gap-3">
                           <div className="flex items-center gap-2">
-                            <h4 className={(isSupportingProject ? "text-base" : "text-lg") + " font-semibold " + t.textTitle}>{proj.title}</h4>
+                            <h4 className={(proj.id === "voxa" ? "text-base" : "text-lg") + " font-semibold leading-snug " + t.textTitle}>{proj.title}</h4>
                             {isCoreProject && (
-                              <span className={"px-1.5 py-0.5 rounded border text-[9px] font-mono uppercase " + t.badge}>Core</span>
+                              <span className={"shrink-0 px-1.5 py-0.5 rounded border text-[9px] font-mono uppercase " + t.badge}>Priority</span>
                             )}
                           </div>
-                          <span className={"p-1 text-zinc-500 transition cursor-pointer " + t.textLinkHover}>
+                          {proj.githubUrl && (
+                          <span className={"shrink-0 p-1 text-zinc-500 transition cursor-pointer " + t.textLinkHover}>
                             <Github className="h-4 w-4" onClick={() => window.open(proj.githubUrl, "_blank", "noopener,noreferrer")} />
                           </span>
+                          )}
                         </div>
                         <p className={"text-xs font-mono " + t.subTextAccent}>{proj.subtitle}</p>
                       </div>
 
-                      <p className={"text-xs leading-relaxed " + t.textMuted}>{proj.description}</p>
-
-                      <div className="flex flex-wrap gap-1.5">
-                        {proj.tech.map((tItem) => (
-                          <span key={tItem} className={"px-2 py-0.5 rounded text-[10px] font-mono border " + t.badge}>
-                            {tItem}
-                          </span>
+                      <div className="space-y-3 text-xs leading-relaxed">
+                        {[
+                          ["Purpose", proj.purpose || proj.description],
+                          ["Built", proj.built || proj.features[0]],
+                          ["Demonstrates", proj.demonstrates || proj.features[1]]
+                        ].map(([label, value]) => (
+                          <div key={label}>
+                            <span className={"font-mono text-[10px] uppercase " + t.subTextAccent}>{label}: </span>
+                            <span className={t.textMuted}>{value}</span>
+                          </div>
                         ))}
+                        <div>
+                          <span className={"font-mono text-[10px] uppercase " + t.subTextAccent}>Stack: </span>
+                          <span className={t.textMuted}>{proj.tech.join(", ")}.</span>
+                        </div>
                       </div>
 
                       {proj.liveUrl && (
@@ -842,46 +874,14 @@ export default function App() {
                         </button>
                       )}
 
-                      {proj.highlights && (
-                        <div className={"p-2.5 rounded-lg text-xs flex flex-col gap-1 border " + (isDarkMode ? "bg-emerald-500/10 border-emerald-500/25 text-emerald-400" : "bg-sky-50 border-sky-200/60 text-[#0284c7]")}>
-                          {proj.highlights.map((high, hIdx) => (
-                            <div key={hIdx} className="flex items-center gap-1.5 font-mono text-[11px]">
-                              <span className={"h-1 w-1 rounded-full inline-block animate-ping " + t.pinger}></span>
-                              <span>{high}</span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-
-                      {proj.id === "secure-infra" && (
-                        <div className={"p-3 rounded-lg border font-mono text-[10px] " + (isDarkMode ? "bg-zinc-950/70 border-zinc-800 text-zinc-300" : "bg-zinc-100 border-zinc-300 text-zinc-800")}>
-                          <div className="mb-2 uppercase tracking-wider text-zinc-500">Sanitized Architecture</div>
-                          <div className="flex flex-wrap items-center gap-1.5">
-                            {["Browser", "Cloudflare Tunnel", "Reverse Proxy", "Docker Services", "Tailscale Admin Access"].map((node, nodeIdx) => (
-                              <React.Fragment key={node}>
-                                <span className={"px-2 py-1 rounded border " + (isDarkMode ? "bg-zinc-900 border-zinc-800" : "bg-white border-zinc-300")}>{node}</span>
-                                {nodeIdx < 4 && <span className="text-zinc-500">-&gt;</span>}
-                              </React.Fragment>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      <ul className={"space-y-1.5 text-xs pt-2 border-t " + (isDarkMode ? "border-zinc-800/60" : "border-zinc-200")}>
-                        {proj.features.slice(0, isSupportingProject ? 2 : 3).map((f, fIdx) => (
-                          <li key={fIdx} className="flex items-start gap-1.5">
-                            <span className="text-zinc-500 mt-0.5">▪</span>
-                            <span className={"text-[11px] " + t.textMuted}>{f}</span>
-                          </li>
-                        ))}
-                      </ul>
                     </div>
                     );
                   })}
+                  </div>
                 </div>
 
                 {/* Secure Contact Portal Column */}
-                <div className="lg:col-span-5 space-y-6">
+                <div className="lg:col-span-4 space-y-6">
                   <div className="flex items-center justify-between">
                     <h3 className="text-sm font-mono uppercase text-zinc-500 tracking-wider">Recruiter Contact</h3>
                   </div>
@@ -1015,26 +1015,25 @@ export default function App() {
                       </div>
                     )}
                   </div>
-
-                  {/* Operational Status Panel - clean metric elements */}
+                  {/* Chat and labs helper */}
                   <div className={t.smallCard + " p-5 rounded-xl space-y-3 font-mono text-xs"}>
-                    <h4 className="text-[10px] text-zinc-500 dark:text-zinc-400 uppercase tracking-widest font-bold">SysAdmin Console Logs</h4>
+                    <h4 className="text-[10px] text-zinc-500 dark:text-zinc-400 uppercase tracking-widest font-bold">Chat / Labs</h4>
                     <div className={"space-y-2 text-[11px] leading-tight " + t.textMuted}>
                       <div className="flex items-center gap-1.5">
-                        <span className={t.bullet}>✔</span>
-                        <span>Docker subnet static bridging [OK]</span>
+                        <span className={t.bullet}>-</span>
+                        <span>Ask focused questions about role fit, projects, and experience.</span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <span className={t.bullet}>✔</span>
-                        <span>Cloudflare Tunnel tunnels: active, stable</span>
+                        <span className={t.bullet}>-</span>
+                        <span>Run safe interactive demos based on selected projects.</span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <span className={t.bullet}>✔</span>
-                        <span>M.Eng Security database rules: ENFORCED</span>
+                        <span className={t.bullet}>-</span>
+                        <span>Some actions are simulated for privacy, security, and cost control.</span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <span className={t.bullet}>✔</span>
-                        <span>Canada Ingress availability: Core Node ACTIVE</span>
+                        <span className={t.bullet}>-</span>
+                        <span>Use these as optional demos, not the main portfolio path.</span>
                       </div>
                     </div>
                   </div>
@@ -1053,10 +1052,10 @@ export default function App() {
               animate={{ opacity: 1, y: 0 }} 
               exit={{ opacity: 0, y: -15 }}
               transition={{ duration: 0.3 }}
-              className="grid grid-cols-1 lg:grid-cols-12 gap-8 h-[calc(100vh-14rem)] min-h-[500px]"
+              className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:h-[calc(100vh-14rem)] lg:min-h-[500px]"
             >
               {/* Suggestion Sidebar panel */}
-              <div className={"lg:col-span-4 p-5 rounded-xl flex flex-col justify-between space-y-4 " + t.smallCard}>
+              <div className={"order-2 lg:order-1 lg:col-span-4 p-5 rounded-xl flex flex-col justify-between space-y-4 " + t.smallCard}>
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     <Sparkles className={"h-4.5 w-4.5 " + t.iconAccent} />
@@ -1090,7 +1089,7 @@ export default function App() {
               </div>
 
               {/* Central Chat Node */}
-              <div className={"lg:col-span-8 flex flex-col rounded-xl overflow-hidden border " + (isDarkMode ? "bg-zinc-900/20 border-zinc-800" : "bg-white border-zinc-200 shadow-sm")}>
+              <div className={"order-1 lg:order-2 lg:col-span-8 flex min-h-[560px] flex-col rounded-xl overflow-hidden border lg:min-h-0 " + (isDarkMode ? "bg-zinc-900/20 border-zinc-800" : "bg-white border-zinc-200 shadow-sm")}>
                 
                 {/* Chat Panel Header */}
                 <div className={"px-4 py-3 border-b flex items-center justify-between " + (isDarkMode ? "bg-zinc-900/50 border-zinc-800/60" : "bg-zinc-100 border-zinc-200")}>
@@ -1312,7 +1311,7 @@ export default function App() {
                 <div>
                   <h3 className={"text-lg font-semibold " + t.textTitle}>Operations Sandbox Live Labs</h3>
                   <p className={"text-xs mt-1 " + t.textMuted}>
-                    To satisfy standard audit verification, explore two native simulation pipelines representing my published resume solutions.
+                    Safe interactive demos based on selected projects. Inputs and logs are simulated to avoid exposing private infrastructure, secrets, or API costs.
                   </p>
                 </div>
                 <div className={"text-xs font-mono px-2.5 py-1.5 rounded border flex items-center gap-2 " + t.badge}>
@@ -1321,13 +1320,15 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <AiRailWorkflowLab isDarkMode={isDarkMode} className={t.smallCard + " order-1"} />
+
                 {/* Lab 1: SOC Incident Triage Workbench */}
-                <div className={"p-5 rounded-xl flex flex-col space-y-4 " + t.smallCard}>
+                <div className={"p-5 rounded-xl flex flex-col space-y-4 order-3 lg:order-2 " + t.smallCard}>
                   <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                     <div className="space-y-1.5">
                       <span className={"text-[10px] font-mono uppercase px-2 py-0.5 rounded-sm border " + (isDarkMode ? "bg-red-950/50 text-red-400 border-red-900" : "bg-red-50 text-red-700 border-red-200")}>
-                        Lab Module 1: SOC Incident Triage
+                        Lab Module 3: SOC Incident Triage
                       </span>
                       <h4 className={"text-base font-semibold " + t.textTitle}>Web Attack Investigation Workbench</h4>
                       <p className={"text-xs leading-relaxed max-w-2xl " + t.textMuted}>
@@ -1396,7 +1397,7 @@ export default function App() {
                     </div>
                   </div>
 
-                  <div className={"rounded-lg border p-4 min-h-[160px] " + (isDarkMode ? "bg-zinc-950 border-zinc-800" : "bg-zinc-50 border-zinc-200")}>
+                  <div className={"rounded-lg border p-4 min-h-[192px] " + (isDarkMode ? "bg-zinc-950 border-zinc-800" : "bg-zinc-50 border-zinc-200")}>
                     {triageStep === "select" && (
                       <div className="grid gap-3 md:grid-cols-[auto_1fr] md:items-center">
                         <Search className="h-5 w-5 text-zinc-500" />
@@ -1468,7 +1469,7 @@ export default function App() {
                 </div>
 
                 {/* Lab 2: Universal Subtitle Translator Live Test Frame */}
-                <div className={"p-5 rounded-xl flex flex-col space-y-4 justify-between " + t.smallCard}>
+                <div className={"p-5 rounded-xl flex flex-col space-y-3 order-2 lg:order-3 " + t.smallCard}>
                   <div className="space-y-1.5">
                     <span className={"text-[10px] font-mono uppercase px-2 py-0.5 rounded-sm border " + (isDarkMode ? "bg-emerald-950/50 text-emerald-400 border-emerald-900" : "bg-sky-50 text-sky-700 border-sky-200")}>
                       Lab Module 2: Universal Subtitle Translator Mock
@@ -1479,22 +1480,22 @@ export default function App() {
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {/* Input Subtitle block */}
                     <div>
                       <span className="block text-[10px] font-mono text-zinc-500 uppercase mb-1">Source SRT / Extracted Track Preview</span>
                       <textarea
                         value={subtitleText}
                         onChange={(e) => setSubtitleText(e.target.value)}
-                        rows={5}
-                        className={"w-full rounded px-2.5 py-1.5 text-xs font-mono resize-none leading-normal transition " + t.terminalInput}
+                        rows={4}
+                        className={"w-full rounded px-2.5 py-1.5 text-[11px] font-mono resize-none leading-normal transition " + t.terminalInput}
                       ></textarea>
                     </div>
 
                     {/* Output translation block */}
                     <div>
                       <span className="block text-[10px] font-mono text-zinc-500 uppercase mb-1">Translated .srt Output Preview</span>
-                      <div className={"w-full h-[112px] rounded p-2.5 text-xs font-mono overflow-y-auto whitespace-pre-wrap leading-normal " + t.terminalInput}>
+                      <div className={"w-full h-[94px] rounded p-2.5 text-[11px] font-mono overflow-y-auto whitespace-pre-wrap leading-normal " + t.terminalInput}>
                         {isTranslating ? (
                           <div className={"flex items-center space-x-1 justify-center h-full text-[10px] " + (isDarkMode ? "text-zinc-500" : "text-zinc-600")}>
                             <span className="animate-spin">⏳</span>
@@ -1510,7 +1511,7 @@ export default function App() {
                   </div>
 
                   {/* Operational Settings Console */}
-                  <div className="flex items-center justify-between gap-4">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="flex items-center gap-2">
                       <span className="text-[10px] text-zinc-500 font-mono uppercase">Target Language:</span>
                       <select 
@@ -1538,7 +1539,7 @@ export default function App() {
                     </button>
                   </div>
 
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-1.5">
                     <span className={"px-2 py-1 rounded border text-[10px] font-mono " + t.badge}>FastAPI</span>
                     <span className={"px-2 py-1 rounded border text-[10px] font-mono " + t.badge}>Docker Compose</span>
                     <span className={"px-2 py-1 rounded border text-[10px] font-mono " + t.badge}>FFmpeg</span>
@@ -1547,7 +1548,7 @@ export default function App() {
                   </div>
 
                   {/* Console telemetry readout */}
-                  <div className={"p-3.5 rounded border text-[10px] font-mono h-[100px] overflow-y-auto space-y-1 select-all " + t.codeBlock}>
+                  <div className={"p-3 rounded border text-[10px] font-mono h-[84px] overflow-y-auto space-y-1 select-all " + t.codeBlock}>
                     <span className="text-zinc-500 block">SUBTITLE TRANSLATOR JOB LOG:</span>
                     {translationLogs.length === 0 ? (
                       <span className="text-zinc-500 italic block pt-2">Run a sample to initialize scan, extraction, translation, and report telemetry.</span>
@@ -1569,7 +1570,9 @@ export default function App() {
 
                 </div>
 
-                {voxaLabCard}
+                <div className="order-4">
+                  {voxaLabCard}
+                </div>
 
               </div>
             </motion.div>

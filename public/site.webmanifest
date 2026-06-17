@@ -1,0 +1,9 @@
+{
+  "name": "Afshin Saberi Portfolio",
+  "short_name": "Afshin",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#22c55e",
+  "description": "Infrastructure and security operations portfolio for Afshin Saberi, focused on Linux, Windows Server, Docker, AWS, networking, automation, and secure systems operations."
+}
