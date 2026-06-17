@@ -386,13 +386,19 @@ export default function App() {
       });
       const responseText = await response.text();
       let data: { error?: string; ok?: boolean } = {};
+      const contentType = response.headers.get("content-type") || "";
 
       if (responseText.trim()) {
         try {
           data = JSON.parse(responseText);
         } catch {
           const isHtmlFallback = responseText.trimStart().toLowerCase().startsWith("<!doctype")
-            || response.headers.get("content-type")?.toLowerCase().includes("text/html");
+            || contentType.toLowerCase().includes("text/html");
+          console.warn("contact_api_unreadable_response", {
+            status: response.status,
+            contentType,
+            htmlFallback: isHtmlFallback,
+          });
           throw new Error(isHtmlFallback
             ? "Contact API route is not available in this deployment."
             : "Contact API returned an unreadable response.");
@@ -400,6 +406,11 @@ export default function App() {
       }
 
       if (!response.ok) {
+        console.warn("contact_api_error_response", {
+          status: response.status,
+          contentType,
+          body: data,
+        });
         throw new Error(data.error || "Unable to send the message.");
       }
 

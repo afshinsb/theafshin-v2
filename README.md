@@ -9,6 +9,8 @@ Static React/Vite portfolio for Afshin Saberi, deployed on Cloudflare Pages with
 - Public API routes:
   - `POST /api/chat`
   - `POST /api/contact`
+  - `GET /api/contact`
+  - `GET /api/debug-contact`
 - Disabled by default:
   - `POST /api/translate` returns a generic `404` unless `ENABLE_TRANSLATE_API=true`. If enabled, it requires Turnstile, KV quotas, JSON validation, and Gemini budget controls.
 
@@ -106,6 +108,8 @@ If the contact form response starts with `<!DOCTYPE`, the request is falling bac
 - The build output directory is `dist/public`.
 - The `functions/api/contact.ts` file is included in the deployment.
 - `POST /api/contact` is handled by Pages Functions and not by the static app fallback.
+
+If the contact form shows `Unable to process this request right now.`, open `/api/debug-contact` on the deployed site. It returns safe booleans only, such as whether required secrets, email values, and the KV binding are present and whether contact email values are syntactically valid. Then inspect Cloudflare Pages Function logs for branches such as `contact_turnstile_result`, `contact_quota_result`, `contact_email_missing_config`, `contact_email_invalid_config`, `resend_provider_error`, or `contact_email_error`.
 
 ## Turnstile Setup
 
