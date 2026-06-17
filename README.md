@@ -41,7 +41,7 @@ The npm helper uses the configured public output directory:
 npm run pages:dev
 ```
 
-For local function testing, create a local `.dev.vars` file with the server-side values below. Turnstile validation is always enforced by the API routes; use Cloudflare Turnstile test keys for local or preview testing.
+For local function testing, create a local `.dev.vars` file with the server-side values below. Turnstile validation is enforced by the contact route; use Cloudflare Turnstile test keys for local or preview testing.
 
 ## Required Environment Variables
 
@@ -84,16 +84,28 @@ Create it as a KV namespace and bind it to the Pages project. The API intentiona
 ## Cloudflare Pages Deployment
 
 1. Connect the repository to Cloudflare Pages.
-2. Set build command: `npm run build`.
-3. Set build output directory: `dist/public`.
-4. Add `VITE_TURNSTILE_SITE_KEY` as a Pages build variable.
-5. Add all server-side values as Pages Function secrets or environment variables.
-6. Bind KV namespace `PORTFOLIO_RATE_LIMIT_KV`.
-7. Deploy.
+2. Set the Cloudflare Pages project root directory to the repository root.
+3. Set build command: `npm run build`.
+4. Set build output directory: `dist/public`.
+5. Confirm `functions/api/contact.ts` is deployed by Cloudflare Pages as `POST /api/contact`.
+6. Add `VITE_TURNSTILE_SITE_KEY` as a Pages build variable.
+7. Add all server-side values as Pages Function secrets or environment variables.
+8. Bind KV namespace `PORTFOLIO_RATE_LIMIT_KV`.
+9. Deploy.
 
 Cloudflare automatically deploys files in `functions/api/` as Pages Functions beside the static Vite site.
 
 There is no Express production server in this deployment and no `server.cjs` build artifact. Do not place server bundles, source maps, or secrets inside `dist/public`.
+
+### Contact API Troubleshooting
+
+If the contact form response starts with `<!DOCTYPE`, the request is falling back to the static SPA instead of the Pages Function. Check that:
+
+- The Cloudflare Pages project root directory is the repository root, not `dist/public`.
+- The build command is `npm run build`.
+- The build output directory is `dist/public`.
+- The `functions/api/contact.ts` file is included in the deployment.
+- `POST /api/contact` is handled by Pages Functions and not by the static app fallback.
 
 ## Turnstile Setup
 
@@ -149,7 +161,7 @@ Server-side KV counters are a second line of defense, not the only control. Clou
 - `VITE_TURNSTILE_SITE_KEY` is the only Turnstile value exposed to the browser.
 - Vite builds public frontend assets to `dist/public`; no server bundle or source map is served from public output.
 - `.env*` files are ignored by Git except `.env.example`.
-- Chat and contact both require Turnstile client tokens and server validation.
+- Contact requires Turnstile client tokens and server validation.
 - Chat has per-IP rate limit, `5` requests per IP per day, and `100` global AI requests per day by default.
 - Contact has `3` requests per IP per hour, daily quotas, duplicate detection, and a honeypot.
 - API requests accept JSON only and reject bodies over 20 KB.

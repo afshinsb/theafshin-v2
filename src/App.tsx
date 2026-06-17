@@ -384,7 +384,20 @@ export default function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...contactForm, turnstileToken: contactTurnstileToken }),
       });
-      const data = await response.json();
+      const responseText = await response.text();
+      let data: { error?: string; ok?: boolean } = {};
+
+      if (responseText.trim()) {
+        try {
+          data = JSON.parse(responseText);
+        } catch {
+          const isHtmlFallback = responseText.trimStart().toLowerCase().startsWith("<!doctype")
+            || response.headers.get("content-type")?.toLowerCase().includes("text/html");
+          throw new Error(isHtmlFallback
+            ? "Contact API route is not available in this deployment."
+            : "Contact API returned an unreadable response.");
+        }
+      }
 
       if (!response.ok) {
         throw new Error(data.error || "Unable to send the message.");
