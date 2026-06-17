@@ -577,11 +577,11 @@ export default function App() {
           </nav>
 
           {/* Contact Fast-link panel & Theme Toggle */}
-          <div className="flex items-center space-x-2">
+          <div className="flex shrink-0 items-center space-x-1.5 sm:space-x-2">
             <button 
               id="theme-toggle"
               onClick={toggleTheme}
-              className={"p-2 rounded-lg border transition cursor-pointer " + (isDarkMode ? "text-zinc-400 border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 hover:text-zinc-200" : "text-zinc-500 border-zinc-300 bg-zinc-100 hover:bg-zinc-200 hover:text-zinc-800")}
+              className={"p-1.5 sm:p-2 rounded-lg border transition cursor-pointer " + (isDarkMode ? "text-zinc-400 border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 hover:text-zinc-200" : "text-zinc-500 border-zinc-300 bg-zinc-100 hover:bg-zinc-200 hover:text-zinc-800")}
               title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
             >
               {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
@@ -590,7 +590,7 @@ export default function App() {
             <a 
               id="link-email"
               href={"mailto:" + PERSONAL_INFO.email} 
-              className={"p-2 rounded-lg border transition " + (isDarkMode ? "text-zinc-400 border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 hover:text-white" : "text-zinc-600 border-zinc-300 bg-zinc-100/80 hover:bg-zinc-200 hover:text-zinc-950")} 
+              className={"p-1.5 sm:p-2 rounded-lg border transition " + (isDarkMode ? "text-zinc-400 border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 hover:text-white" : "text-zinc-600 border-zinc-300 bg-zinc-100/80 hover:bg-zinc-200 hover:text-zinc-950")} 
               title="Send Direct Email"
             >
               <Mail className="h-4 w-4" />
@@ -600,7 +600,7 @@ export default function App() {
               href={PERSONAL_INFO.github} 
               target="_blank" 
               referrerPolicy="no-referrer" 
-              className={"hidden sm:block p-2 rounded-lg border transition " + (isDarkMode ? "text-zinc-400 border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 hover:text-white" : "text-zinc-600 border-zinc-300 bg-zinc-100/80 hover:bg-zinc-200 hover:text-zinc-950")}
+              className={"p-1.5 sm:p-2 rounded-lg border transition " + (isDarkMode ? "text-zinc-400 border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 hover:text-white" : "text-zinc-600 border-zinc-300 bg-zinc-100/80 hover:bg-zinc-200 hover:text-zinc-950")}
               title="GitHub Profile"
             >
               <Github className="h-4 w-4" />
@@ -610,7 +610,7 @@ export default function App() {
               href={PERSONAL_INFO.linkedin} 
               target="_blank" 
               referrerPolicy="no-referrer" 
-              className={"hidden sm:block p-2 rounded-lg border transition " + (isDarkMode ? "text-zinc-400 border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 hover:text-white" : "text-zinc-600 border-zinc-300 bg-zinc-100/80 hover:bg-zinc-200 hover:text-zinc-950")}
+              className={"p-1.5 sm:p-2 rounded-lg border transition " + (isDarkMode ? "text-zinc-400 border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 hover:text-white" : "text-zinc-600 border-zinc-300 bg-zinc-100/80 hover:bg-zinc-200 hover:text-zinc-950")}
               title="LinkedIn Profile"
             >
               <Linkedin className="h-4 w-4" />
