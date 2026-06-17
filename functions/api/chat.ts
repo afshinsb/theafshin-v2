@@ -6,7 +6,6 @@ import {
   parseLimit,
   readJson,
   todayKey,
-  validateTurnstile,
 } from "../_shared/security";
 import type { PagesContext } from "../_shared/security";
 import { z } from "zod";
@@ -24,11 +23,10 @@ const chatSchema = z.object({
         text: z.string().trim().max(MAX_MESSAGE_LENGTH).optional(),
         content: z.string().trim().max(MAX_MESSAGE_LENGTH).optional(),
       }).strict(),
-    )
+  )
     .max(MAX_HISTORY_MESSAGES)
     .optional()
     .default([]),
-  turnstileToken: z.string().min(10).max(4096),
 }).strict();
 
 const RESUME_CONTEXT = `
@@ -210,12 +208,6 @@ export const onRequestPost = async ({ request, env }: PagesContext) => {
   if (isPromptInjection(message)) {
     console.warn("chat_blocked_prompt_injection", { ip });
     return json({ error: "Please ask a portfolio-related question about Afshin's background." }, 400);
-  }
-
-  const turnstileOk = await validateTurnstile(env, body.data.turnstileToken, ip);
-  if (!turnstileOk) {
-    console.warn("chat_blocked_turnstile", { ip });
-    return json({ error: "Verification failed. Please refresh and try again." }, 403);
   }
 
   const day = todayKey();

@@ -148,7 +148,6 @@ export default function App() {
   ]);
   const [inputText, setInputText] = useState("");
   const [isAiTyping, setIsAiTyping] = useState(false);
-  const [chatTurnstileToken, setChatTurnstileToken] = useState("");
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   // Subtitle Translator Lab States
@@ -211,17 +210,6 @@ export default function App() {
       return;
     }
 
-    if (!chatTurnstileToken) {
-      const verificationMessage: ChatMessage = {
-        id: Math.random().toString(),
-        sender: "ai",
-        text: "Please complete the verification before sending a chat message.",
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-      setMessages((prev) => [...prev, verificationMessage]);
-      return;
-    }
-
     if (!textToSend) setInputText("");
 
     const userMessage: ChatMessage = {
@@ -239,8 +227,7 @@ export default function App() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          message: rawMsg,
-          turnstileToken: chatTurnstileToken
+          message: rawMsg
         })
       });
 
@@ -266,9 +253,6 @@ export default function App() {
       };
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
-      setChatTurnstileToken("");
-      setContactTurnstileToken("");
-      window.turnstile?.reset();
       setIsAiTyping(false);
     }
   };
@@ -412,7 +396,6 @@ export default function App() {
       setContactStatus("error");
       setContactError(err.message || "Unable to send the message.");
     } finally {
-      setChatTurnstileToken("");
       setContactTurnstileToken("");
       window.turnstile?.reset();
       setIsContactSubmitting(false);
@@ -1066,7 +1049,7 @@ export default function App() {
                       <button
                         key={qidx}
                         onClick={() => handleSendChat(q)}
-                        disabled={isAiTyping || !chatTurnstileToken}
+                        disabled={isAiTyping}
                         className={"w-full text-left p-2.5 text-[11px] font-sans border rounded-sm transition duration-150 flex items-center justify-between cursor-pointer disabled:opacity-50 " + t.input}
                       >
                         <span>{q}</span>
@@ -1149,9 +1132,6 @@ export default function App() {
 
                 {/* Bottom Input Area */}
                 <div className={"p-3.5 border-t " + (isDarkMode ? "bg-zinc-900/40 border-zinc-800" : "bg-zinc-100/90 border-zinc-200")}>
-                  <div className="mb-3">
-                    <TurnstileWidget onVerify={setChatTurnstileToken} enabled={Boolean(TURNSTILE_SITE_KEY)} />
-                  </div>
                   <div className="flex space-x-2">
                     <input 
                       type="text"
@@ -1165,7 +1145,7 @@ export default function App() {
                     />
                     <button 
                       onClick={() => handleSendChat()}
-                      disabled={isAiTyping || !inputText.trim() || !chatTurnstileToken}
+                      disabled={isAiTyping || !inputText.trim()}
                       className={"p-2 px-3.5 rounded text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer disabled:opacity-50 " + 
                         (isDarkMode 
                           ? "bg-emerald-500 hover:bg-emerald-400 text-zinc-950" 
