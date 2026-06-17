@@ -29,12 +29,22 @@ function escapeHeader(value: string) {
   return stripCrlf(value);
 }
 
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function contactEnvState(env: PagesContext["env"]) {
   const contactToEmailValid = emailSchema.safeParse(env.CONTACT_TO_EMAIL).success;
   const contactFromEmailValid = emailSchema.safeParse(env.CONTACT_FROM_EMAIL).success;
   return {
     hasTurnstileSecret: Boolean(env.TURNSTILE_SECRET_KEY),
-    hasResendApiKey: Boolean(env.RESEND_API_KEY),
+    hasCloudflareAccountId: Boolean(env.CLOUDFLARE_ACCOUNT_ID),
+    hasCloudflareEmailApiToken: Boolean(env.CLOUDFLARE_EMAIL_API_TOKEN),
     hasContactToEmail: Boolean(env.CONTACT_TO_EMAIL),
     hasContactFromEmail: Boolean(env.CONTACT_FROM_EMAIL),
     contactToEmailValid,
@@ -112,7 +122,12 @@ export const onRequestPost = async ({ request, env }: PagesContext) => {
   console.info("contact_duplicate_result", { blocked: duplicate.blocked });
   if (duplicate.blocked) return duplicate.response;
 
-  if (!env.RESEND_API_KEY || !env.CONTACT_TO_EMAIL || !env.CONTACT_FROM_EMAIL) {
+  if (
+    !env.CLOUDFLARE_ACCOUNT_ID ||
+    !env.CLOUDFLARE_EMAIL_API_TOKEN ||
+    !env.CONTACT_TO_EMAIL ||
+    !env.CONTACT_FROM_EMAIL
+  ) {
     console.error("contact_email_missing_config", contactEnvState(env));
     return genericError(503);
   }
@@ -127,49 +142,70 @@ export const onRequestPost = async ({ request, env }: PagesContext) => {
     return genericError(503);
   }
 
-  const subject = `Portfolio inquiry from ${escapeHeader(name)}`;
+  const timestamp = new Date().toISOString();
+  const sourceUrl = new URL(request.url).origin;
+  const subject = `New portfolio contact message from ${escapeHeader(name)}`;
   const text = [
-    "New portfolio contact request",
+    "New portfolio contact message",
     "",
     `Name: ${name}`,
     `Email: ${email}`,
     `Company: ${company}`,
-    `Source IP: ${ip}`,
+    `Timestamp: ${timestamp}`,
+    `Source URL: ${sourceUrl}`,
     "",
     "Message:",
     message,
   ].join("\n");
+  const html = [
+    "<h2>New portfolio contact message</h2>",
+    "<dl>",
+    `<dt>Name</dt><dd>${escapeHtml(name)}</dd>`,
+    `<dt>Email</dt><dd>${escapeHtml(email)}</dd>`,
+    `<dt>Company</dt><dd>${escapeHtml(company || "Not provided")}</dd>`,
+    `<dt>Timestamp</dt><dd>${escapeHtml(timestamp)}</dd>`,
+    `<dt>Source URL</dt><dd>${escapeHtml(sourceUrl)}</dd>`,
+    "</dl>",
+    "<h3>Message</h3>",
+    `<p>${escapeHtml(message).replace(/\n/g, "<br>")}</p>`,
+  ].join("");
 
   try {
-    console.info("contact_resend_start", {
-      hasResendApiKey: Boolean(env.RESEND_API_KEY),
+    console.info("contact_email_send_start", {
+      hasCloudflareAccountId: Boolean(env.CLOUDFLARE_ACCOUNT_ID),
+      hasCloudflareEmailApiToken: Boolean(env.CLOUDFLARE_EMAIL_API_TOKEN),
       contactFromEmailValid,
       contactToEmailValid,
     });
-    const response = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        authorization: `Bearer ${env.RESEND_API_KEY}`,
-        "content-type": "application/json",
+
+    const response = await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(env.CLOUDFLARE_ACCOUNT_ID)}/email/sending/send`,
+      {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${env.CLOUDFLARE_EMAIL_API_TOKEN}`,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          to: env.CONTACT_TO_EMAIL,
+          from: env.CONTACT_FROM_EMAIL,
+          subject,
+          text,
+          html,
+        }),
       },
-      body: JSON.stringify({
-        from: `Portfolio Contact <${env.CONTACT_FROM_EMAIL}>`,
-        to: [env.CONTACT_TO_EMAIL],
-        reply_to: email,
-        subject,
-        text,
-      }),
+    );
+
+    console.info("contact_email_send_result", {
+      ok: response.ok,
+      status: response.status,
     });
 
-    if (!response.ok) {
-      console.error("resend_provider_error", { status: response.status });
-      return genericError(502);
-    }
+    if (!response.ok) return genericError(502);
 
-    console.info("contact_resend_result", { status: response.status });
     return json({ ok: true });
   } catch {
-    console.error("contact_email_error", { branch: "resend_fetch_catch" });
+    console.error("contact_email_send_error", { branch: "cloudflare_email_rest_catch" });
     return genericError(502);
   }
 };

@@ -170,7 +170,6 @@ function isPromptInjection(message: string) {
     "api key",
     "openai_api_key",
     "turnstile_secret",
-    "resend_api_key",
     "server code",
   ].some((needle) => normalized.includes(needle));
 }
