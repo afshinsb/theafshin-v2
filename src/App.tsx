@@ -536,14 +536,10 @@ export default function App() {
               <Shield className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <h1 className={"text-lg font-semibold tracking-tight font-sans " + t.textTitle}>{PERSONAL_INFO.name}</h1>
-              <span className="text-xs text-zinc-400 font-mono flex min-w-0 items-center gap-1.5 leading-none">
+              <h1 className={"truncate whitespace-nowrap text-lg font-semibold tracking-tight font-sans " + t.textTitle}>{PERSONAL_INFO.name}</h1>
+              <span className="hidden text-xs text-zinc-400 font-mono sm:flex min-w-0 items-center gap-1.5 leading-none">
                 <span className={"h-2 w-2 shrink-0 rounded-full inline-block animate-pulse " + (isDarkMode ? "bg-emerald-500" : "bg-[#0284c7]")}></span>
-                <span className="hidden sm:inline">{PERSONAL_INFO.title}</span>
-                <span className="inline leading-tight sm:hidden">
-                  Infrastructure<br />
-                  Cloud, Security
-                </span>
+                <span>{PERSONAL_INFO.title}</span>
               </span>
             </div>
           </div>
@@ -604,7 +600,7 @@ export default function App() {
               href={PERSONAL_INFO.github} 
               target="_blank" 
               referrerPolicy="no-referrer" 
-              className={"p-2 rounded-lg border transition " + (isDarkMode ? "text-zinc-400 border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 hover:text-white" : "text-zinc-600 border-zinc-300 bg-zinc-100/80 hover:bg-zinc-200 hover:text-zinc-950")}
+              className={"hidden sm:block p-2 rounded-lg border transition " + (isDarkMode ? "text-zinc-400 border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 hover:text-white" : "text-zinc-600 border-zinc-300 bg-zinc-100/80 hover:bg-zinc-200 hover:text-zinc-950")}
               title="GitHub Profile"
             >
               <Github className="h-4 w-4" />
@@ -614,7 +610,7 @@ export default function App() {
               href={PERSONAL_INFO.linkedin} 
               target="_blank" 
               referrerPolicy="no-referrer" 
-              className={"p-2 rounded-lg border transition " + (isDarkMode ? "text-zinc-400 border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 hover:text-white" : "text-zinc-600 border-zinc-300 bg-zinc-100/80 hover:bg-zinc-200 hover:text-zinc-950")}
+              className={"hidden sm:block p-2 rounded-lg border transition " + (isDarkMode ? "text-zinc-400 border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 hover:text-white" : "text-zinc-600 border-zinc-300 bg-zinc-100/80 hover:bg-zinc-200 hover:text-zinc-950")}
               title="LinkedIn Profile"
             >
               <Linkedin className="h-4 w-4" />

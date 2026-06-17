@@ -265,13 +265,13 @@ export default function AiRailWorkflowLab({ isDarkMode, className = "" }: AiRail
         </div>
       </div>
 
-      <div className="grid grid-cols-[minmax(0,1fr)_92px_92px] gap-2">
-        <button type="button" onClick={nextAction.action} disabled={nextAction.disabled} className={"rounded px-3 py-2.5 text-xs font-semibold transition disabled:opacity-50 " + nextButtonClass}>
+      <div className="grid grid-cols-3 gap-2">
+        <button type="button" onClick={nextAction.action} disabled={nextAction.disabled} className={"min-w-0 rounded px-2 py-2.5 text-[11px] font-semibold transition disabled:opacity-50 flex items-center justify-center gap-1.5 " + nextButtonClass}>
           {nextAction.icon === "play" && <Play className="mr-1.5 inline h-3.5 w-3.5 fill-current align-[-2px]" />}
-          {nextAction.label}
+          <span className="truncate">{nextAction.label}</span>
         </button>
-        <button type="button" onClick={showAllowedFiles} disabled={isRunning || !hasStarted} className={"h-9 rounded border px-2 text-xs font-semibold transition disabled:opacity-50 flex items-center justify-center " + c.secondary}>Scope</button>
-        <a href="https://github.com/afshinsb/ai-rail" target="_blank" referrerPolicy="no-referrer" className={"h-9 rounded border px-2 text-xs font-semibold transition flex items-center justify-center gap-1.5 whitespace-nowrap " + c.secondary}>
+        <button type="button" onClick={showAllowedFiles} disabled={isRunning || !hasStarted} className={"min-w-0 rounded border px-2 py-2.5 text-[11px] font-semibold transition disabled:opacity-50 flex items-center justify-center " + c.secondary}>Scope</button>
+        <a href="https://github.com/afshinsb/ai-rail" target="_blank" referrerPolicy="no-referrer" className={"min-w-0 rounded border px-2 py-2.5 text-[11px] font-semibold transition flex items-center justify-center gap-1.5 whitespace-nowrap " + c.secondary}>
           <Github className="h-3.5 w-3.5" /> Source
         </a>
       </div>
