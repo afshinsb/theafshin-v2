@@ -142,30 +142,55 @@ export const onRequestPost = async ({ request, env }: PagesContext) => {
 
   const timestamp = new Date().toISOString();
   const sourceUrl = new URL(request.url).origin;
-  const subject = `New portfolio contact message from ${escapeHeader(name)}`;
+  const safeSubjectName = escapeHeader(name);
+  const subject = safeSubjectName ? `Portfolio inquiry: ${safeSubjectName}` : "Portfolio inquiry";
   const text = [
-    "New portfolio contact message",
+    "New portfolio inquiry",
+    "Sent from theafshin.com",
     "",
     `Name: ${name}`,
     `Email: ${email}`,
-    `Company: ${company}`,
-    `Timestamp: ${timestamp}`,
-    `Source URL: ${sourceUrl}`,
+    `Company: ${company || "Not provided"}`,
+    `Time: ${timestamp}`,
+    `Source: ${sourceUrl}`,
     "",
     "Message:",
+    "",
     message,
+    "",
+    "Reply directly to this email to respond to the sender.",
   ].join("\n");
+  const fields = [
+    ["Name", name],
+    ["Email", email],
+    ["Company", company || "Not provided"],
+    ["Time", timestamp],
+    ["Source", sourceUrl],
+  ];
   const html = [
-    "<h2>New portfolio contact message</h2>",
-    "<dl>",
-    `<dt>Name</dt><dd>${escapeHtml(name)}</dd>`,
-    `<dt>Email</dt><dd>${escapeHtml(email)}</dd>`,
-    `<dt>Company</dt><dd>${escapeHtml(company || "Not provided")}</dd>`,
-    `<dt>Timestamp</dt><dd>${escapeHtml(timestamp)}</dd>`,
-    `<dt>Source URL</dt><dd>${escapeHtml(sourceUrl)}</dd>`,
-    "</dl>",
-    "<h3>Message</h3>",
-    `<p>${escapeHtml(message).replace(/\n/g, "<br>")}</p>`,
+    '<div style="margin:0;padding:24px;background:#f4f4f5;font-family:Arial,Helvetica,sans-serif;color:#18181b;">',
+    '<div style="max-width:600px;margin:0 auto;background:#ffffff;border:1px solid #e4e4e7;border-radius:12px;overflow:hidden;">',
+    '<div style="padding:24px 24px 12px;border-bottom:1px solid #e4e4e7;">',
+    '<h1 style="margin:0;font-size:22px;line-height:1.3;color:#09090b;">New portfolio inquiry</h1>',
+    '<p style="margin:8px 0 0;font-size:13px;color:#71717a;">Sent from theafshin.com</p>',
+    "</div>",
+    '<div style="padding:20px 24px;">',
+    '<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;border:1px solid #e4e4e7;border-radius:8px;overflow:hidden;">',
+    ...fields.map(([label, value]) => [
+      "<tr>",
+      `<td style="width:120px;padding:12px 14px;background:#fafafa;border-bottom:1px solid #e4e4e7;font-size:12px;font-weight:bold;color:#52525b;text-transform:uppercase;letter-spacing:.04em;">${escapeHtml(label)}</td>`,
+      `<td style="padding:12px 14px;border-bottom:1px solid #e4e4e7;font-size:14px;color:#18181b;">${escapeHtml(value)}</td>`,
+      "</tr>",
+    ].join("")),
+    "</table>",
+    '<div style="margin-top:22px;">',
+    '<h2 style="margin:0 0 10px;font-size:16px;color:#09090b;">Message</h2>',
+    `<div style="white-space:pre-wrap;font-size:15px;line-height:1.6;color:#27272a;background:#fafafa;border:1px solid #e4e4e7;border-radius:8px;padding:14px;">${escapeHtml(message)}</div>`,
+    "</div>",
+    '<p style="margin:22px 0 0;font-size:13px;color:#71717a;">Reply directly to this email to respond to the sender.</p>',
+    "</div>",
+    "</div>",
+    "</div>",
   ].join("");
 
   try {
