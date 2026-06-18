@@ -38,6 +38,18 @@ function escapeHtml(value: string) {
     .replace(/'/g, "&#39;");
 }
 
+function formatEmailTime(date: Date) {
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: "UTC",
+    timeZoneName: "short",
+  }).format(date);
+}
+
 function contactEnvState(env: PagesContext["env"]) {
   const contactToEmailValid = emailSchema.safeParse(env.CONTACT_TO_EMAIL).success;
   const contactFromEmailValid = emailSchema.safeParse(env.CONTACT_FROM_EMAIL).success;
@@ -140,7 +152,7 @@ export const onRequestPost = async ({ request, env }: PagesContext) => {
     return genericError(503);
   }
 
-  const timestamp = new Date().toISOString();
+  const timestamp = formatEmailTime(new Date());
   const sourceUrl = new URL(request.url).origin;
   const safeSubjectName = escapeHeader(name);
   const subject = safeSubjectName ? `Portfolio inquiry: ${safeSubjectName}` : "Portfolio inquiry";
@@ -157,8 +169,6 @@ export const onRequestPost = async ({ request, env }: PagesContext) => {
     "Message:",
     "",
     message,
-    "",
-    "Reply directly to this email to respond to the sender.",
   ].join("\n");
   const fields = [
     ["Name", name],
@@ -168,26 +178,23 @@ export const onRequestPost = async ({ request, env }: PagesContext) => {
     ["Source", sourceUrl],
   ];
   const html = [
-    '<div style="margin:0;padding:24px;background:#f4f4f5;font-family:Arial,Helvetica,sans-serif;color:#18181b;">',
-    '<div style="max-width:600px;margin:0 auto;background:#ffffff;border:1px solid #e4e4e7;border-radius:12px;overflow:hidden;">',
-    '<div style="padding:24px 24px 12px;border-bottom:1px solid #e4e4e7;">',
-    '<h1 style="margin:0;font-size:22px;line-height:1.3;color:#09090b;">New portfolio inquiry</h1>',
-    '<p style="margin:8px 0 0;font-size:13px;color:#71717a;">Sent from theafshin.com</p>',
+    '<div style="margin:0;padding:20px;background:#09090b;font-family:Arial,Helvetica,sans-serif;color:#e4e4e7;">',
+    '<div style="max-width:600px;margin:0 auto;background:#111113;border:1px solid #27272a;border-radius:14px;overflow:hidden;">',
+    '<div style="padding:24px 20px 16px;border-bottom:1px solid #27272a;background:#18181b;">',
+    '<h1 style="margin:0;font-size:22px;line-height:1.3;color:#fafafa;">New portfolio inquiry</h1>',
+    '<p style="margin:8px 0 0;font-size:13px;line-height:1.5;color:#a1a1aa;">Sent from theafshin.com</p>',
     "</div>",
-    '<div style="padding:20px 24px;">',
-    '<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;border:1px solid #e4e4e7;border-radius:8px;overflow:hidden;">',
+    '<div style="padding:20px;">',
     ...fields.map(([label, value]) => [
-      "<tr>",
-      `<td style="width:120px;padding:12px 14px;background:#fafafa;border-bottom:1px solid #e4e4e7;font-size:12px;font-weight:bold;color:#52525b;text-transform:uppercase;letter-spacing:.04em;">${escapeHtml(label)}</td>`,
-      `<td style="padding:12px 14px;border-bottom:1px solid #e4e4e7;font-size:14px;color:#18181b;">${escapeHtml(value)}</td>`,
-      "</tr>",
+      '<div style="display:block;width:100%;box-sizing:border-box;margin:0 0 10px;padding:13px 14px;background:#18181b;border:1px solid #27272a;border-radius:10px;">',
+      `<div style="margin:0 0 6px;font-size:11px;line-height:1.3;font-weight:bold;color:#a1a1aa;text-transform:uppercase;letter-spacing:.06em;">${escapeHtml(label)}</div>`,
+      `<div style="margin:0;font-size:15px;line-height:1.5;color:#f4f4f5;word-break:break-word;overflow-wrap:anywhere;">${escapeHtml(value)}</div>`,
+      "</div>",
     ].join("")),
-    "</table>",
-    '<div style="margin-top:22px;">',
-    '<h2 style="margin:0 0 10px;font-size:16px;color:#09090b;">Message</h2>',
-    `<div style="white-space:pre-wrap;font-size:15px;line-height:1.6;color:#27272a;background:#fafafa;border:1px solid #e4e4e7;border-radius:8px;padding:14px;">${escapeHtml(message)}</div>`,
+    '<div style="margin-top:18px;">',
+    '<h2 style="margin:0 0 10px;font-size:16px;line-height:1.4;color:#fafafa;">Message</h2>',
+    `<div style="display:block;width:100%;box-sizing:border-box;white-space:pre-wrap;font-size:15px;line-height:1.65;color:#e4e4e7;background:#18181b;border:1px solid #27272a;border-radius:10px;padding:14px;word-break:break-word;overflow-wrap:anywhere;">${escapeHtml(message)}</div>`,
     "</div>",
-    '<p style="margin:22px 0 0;font-size:13px;color:#71717a;">Reply directly to this email to respond to the sender.</p>',
     "</div>",
     "</div>",
     "</div>",
