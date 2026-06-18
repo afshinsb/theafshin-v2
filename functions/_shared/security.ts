@@ -6,8 +6,7 @@ export interface Env {
   GEMINI_MODEL?: string;
   ENABLE_TRANSLATE_API?: string;
   TURNSTILE_SECRET_KEY?: string;
-  CLOUDFLARE_ACCOUNT_ID?: string;
-  CLOUDFLARE_EMAIL_API_TOKEN?: string;
+  RESEND_API_KEY?: string;
   CONTACT_TO_EMAIL?: string;
   CONTACT_FROM_EMAIL?: string;
   PORTFOLIO_RATE_LIMIT_KV?: KVNamespace;

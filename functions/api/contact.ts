@@ -43,8 +43,7 @@ function contactEnvState(env: PagesContext["env"]) {
   const contactFromEmailValid = emailSchema.safeParse(env.CONTACT_FROM_EMAIL).success;
   return {
     hasTurnstileSecret: Boolean(env.TURNSTILE_SECRET_KEY),
-    hasCloudflareAccountId: Boolean(env.CLOUDFLARE_ACCOUNT_ID),
-    hasCloudflareEmailApiToken: Boolean(env.CLOUDFLARE_EMAIL_API_TOKEN),
+    hasEmailApiKey: Boolean(env.RESEND_API_KEY),
     hasContactToEmail: Boolean(env.CONTACT_TO_EMAIL),
     hasContactFromEmail: Boolean(env.CONTACT_FROM_EMAIL),
     contactToEmailValid,
@@ -123,8 +122,7 @@ export const onRequestPost = async ({ request, env }: PagesContext) => {
   if (duplicate.blocked) return duplicate.response;
 
   if (
-    !env.CLOUDFLARE_ACCOUNT_ID ||
-    !env.CLOUDFLARE_EMAIL_API_TOKEN ||
+    !env.RESEND_API_KEY ||
     !env.CONTACT_TO_EMAIL ||
     !env.CONTACT_FROM_EMAIL
   ) {
@@ -172,40 +170,47 @@ export const onRequestPost = async ({ request, env }: PagesContext) => {
 
   try {
     console.info("contact_email_send_start", {
-      hasCloudflareAccountId: Boolean(env.CLOUDFLARE_ACCOUNT_ID),
-      hasCloudflareEmailApiToken: Boolean(env.CLOUDFLARE_EMAIL_API_TOKEN),
+      provider: "resend",
+      hasEmailApiKey: Boolean(env.RESEND_API_KEY),
       contactFromEmailValid,
       contactToEmailValid,
     });
 
-    const response = await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(env.CLOUDFLARE_ACCOUNT_ID)}/email/sending/send`,
-      {
-        method: "POST",
-        headers: {
-          authorization: `Bearer ${env.CLOUDFLARE_EMAIL_API_TOKEN}`,
-          "content-type": "application/json",
-        },
-        body: JSON.stringify({
-          to: env.CONTACT_TO_EMAIL,
-          from: env.CONTACT_FROM_EMAIL,
-          subject,
-          text,
-          html,
-        }),
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${env.RESEND_API_KEY}`,
+        "content-type": "application/json",
       },
-    );
+      body: JSON.stringify({
+        from: `Portfolio Contact <${env.CONTACT_FROM_EMAIL}>`,
+        to: [env.CONTACT_TO_EMAIL],
+        reply_to: email,
+        subject,
+        text,
+        html,
+      }),
+    });
 
     console.info("contact_email_send_result", {
+      provider: "resend",
       ok: response.ok,
       status: response.status,
     });
 
-    if (!response.ok) return genericError(502);
+    if (!response.ok) {
+      const responseBody = await response.text();
+      console.error("contact_email_send_error", {
+        provider: "resend",
+        status: response.status,
+        responseBody: responseBody.slice(0, 1000),
+      });
+      return genericError(502);
+    }
 
     return json({ ok: true });
   } catch {
-    console.error("contact_email_send_error", { branch: "cloudflare_email_rest_catch" });
+    console.error("contact_email_send_error", { provider: "resend", branch: "resend_fetch_catch" });
     return genericError(502);
   }
 };

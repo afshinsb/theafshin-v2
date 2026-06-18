@@ -62,8 +62,7 @@ GEMINI_API_KEY=set_as_cloudflare_secret_if_translate_is_enabled
 GEMINI_MODEL=gemini-1.5-flash
 ENABLE_TRANSLATE_API=false
 TURNSTILE_SECRET_KEY=set_as_cloudflare_secret
-CLOUDFLARE_ACCOUNT_ID=your_cloudflare_account_id
-CLOUDFLARE_EMAIL_API_TOKEN=set_as_cloudflare_secret
+RESEND_API_KEY=set_as_cloudflare_secret
 CONTACT_FROM_EMAIL=contact@example.com
 CONTACT_TO_EMAIL=your-destination-email@example.com
 CHAT_PER_MINUTE_LIMIT=3
@@ -81,7 +80,7 @@ Required Cloudflare binding:
 PORTFOLIO_RATE_LIMIT_KV
 ```
 
-Create it as a KV namespace and bind it to the Pages project. Cloudflare Email Sending uses the REST API in this Pages project, not a Pages binding. The API intentionally returns a generic `503` if the quota KV binding or required email configuration is missing.
+Create it as a KV namespace and bind it to the Pages project. The API intentionally returns a generic `503` if the quota KV binding or required email configuration is missing.
 
 ## Cloudflare Pages Deployment
 
@@ -93,7 +92,7 @@ Create it as a KV namespace and bind it to the Pages project. Cloudflare Email S
 6. Add `VITE_TURNSTILE_SITE_KEY` as a Pages build variable.
 7. Add all server-side values as Pages Function secrets or environment variables.
 8. Bind KV namespace `PORTFOLIO_RATE_LIMIT_KV`.
-9. Add `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_EMAIL_API_TOKEN`, `CONTACT_FROM_EMAIL`, and `CONTACT_TO_EMAIL` for Cloudflare Email Sending REST delivery.
+9. Add `RESEND_API_KEY`, `CONTACT_FROM_EMAIL`, and `CONTACT_TO_EMAIL` for contact form delivery.
 10. Deploy.
 
 Cloudflare automatically deploys files in `functions/api/` as Pages Functions beside the static Vite site.
@@ -133,13 +132,11 @@ The translation route is disabled by default. If `ENABLE_TRANSLATE_API=true`, se
 
 ## Email Provider Setup
 
-The contact form uses Cloudflare Email Sending through the Cloudflare REST API. It does not call a third-party email API and does not use a Pages email binding.
+The contact form uses Resend REST API for outbound delivery from Cloudflare Pages Functions.
 
-1. Enable Cloudflare Email Sending for the site domain.
-2. Verify the real `CONTACT_FROM_EMAIL` sender address.
-3. Verify the real `CONTACT_TO_EMAIL` destination address.
-4. Create a Cloudflare API token allowed to send email for the account.
-5. Set `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_EMAIL_API_TOKEN`, `CONTACT_FROM_EMAIL`, and `CONTACT_TO_EMAIL` in the Pages project.
+1. Verify the real `CONTACT_FROM_EMAIL` sender address or sending domain in Resend.
+2. Create a Resend API key.
+3. Set `RESEND_API_KEY`, `CONTACT_FROM_EMAIL`, and `CONTACT_TO_EMAIL` in the Pages project.
 
 Use placeholders in committed examples and docs. Configure real email values only in Cloudflare Pages Variables and secrets. Visitor email addresses are used only as `Reply-To`.
 
@@ -161,7 +158,7 @@ Server-side KV counters are a second line of defense, not the only control. Clou
 
 - `OPENAI_API_KEY` exists only as a Cloudflare server-side secret.
 - `TURNSTILE_SECRET_KEY` exists only as a Cloudflare server-side secret.
-- Cloudflare Email Sending REST credentials exist only as Cloudflare server-side values.
+- `RESEND_API_KEY` exists only as a Cloudflare server-side secret.
 - `GEMINI_API_KEY` is set only if translation is intentionally enabled.
 - `VITE_TURNSTILE_SITE_KEY` is the only Turnstile value exposed to the browser.
 - Vite builds public frontend assets to `dist/public`; no server bundle or source map is served from public output.
