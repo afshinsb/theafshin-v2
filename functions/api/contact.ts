@@ -38,18 +38,6 @@ function escapeHtml(value: string) {
     .replace(/'/g, "&#39;");
 }
 
-function formatEmailTime(date: Date) {
-  return new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-    timeZone: "UTC",
-    timeZoneName: "short",
-  }).format(date);
-}
-
 function contactEnvState(env: PagesContext["env"]) {
   const contactToEmailValid = emailSchema.safeParse(env.CONTACT_TO_EMAIL).success;
   const contactFromEmailValid = emailSchema.safeParse(env.CONTACT_FROM_EMAIL).success;
@@ -152,7 +140,6 @@ export const onRequestPost = async ({ request, env }: PagesContext) => {
     return genericError(503);
   }
 
-  const timestamp = formatEmailTime(new Date());
   const sourceUrl = new URL(request.url).origin;
   const safeSubjectName = escapeHeader(name);
   const subject = safeSubjectName ? `Portfolio inquiry: ${safeSubjectName}` : "Portfolio inquiry";
@@ -163,7 +150,6 @@ export const onRequestPost = async ({ request, env }: PagesContext) => {
     `Name: ${name}`,
     `Email: ${email}`,
     `Company: ${company || "Not provided"}`,
-    `Time: ${timestamp}`,
     `Source: ${sourceUrl}`,
     "",
     "Message:",
@@ -174,27 +160,22 @@ export const onRequestPost = async ({ request, env }: PagesContext) => {
     ["Name", name],
     ["Email", email],
     ["Company", company || "Not provided"],
-    ["Time", timestamp],
     ["Source", sourceUrl],
   ];
   const html = [
-    '<div style="margin:0;padding:20px;background:#09090b;font-family:Arial,Helvetica,sans-serif;color:#e4e4e7;">',
-    '<div style="max-width:600px;margin:0 auto;background:#111113;border:1px solid #27272a;border-radius:14px;overflow:hidden;">',
-    '<div style="padding:24px 20px 16px;border-bottom:1px solid #27272a;background:#18181b;">',
-    '<h1 style="margin:0;font-size:22px;line-height:1.3;color:#fafafa;">New portfolio inquiry</h1>',
-    '<p style="margin:8px 0 0;font-size:13px;line-height:1.5;color:#a1a1aa;">Sent from theafshin.com</p>',
+    '<div style="margin:0;padding:18px;font-family:Arial,Helvetica,sans-serif;color:#18181b;">',
+    '<div style="max-width:600px;margin:0 auto;">',
+    '<div style="padding:8px 2px 16px;">',
+    '<h1 style="margin:0;font-size:22px;line-height:1.3;color:#111827;">Portfolio inquiry</h1>',
+    '<p style="margin:6px 0 0;font-size:13px;line-height:1.5;color:#6b7280;">Sent from theafshin.com</p>',
     "</div>",
-    '<div style="padding:20px;">',
+    '<div style="display:block;width:100%;box-sizing:border-box;margin:0 0 14px;padding:14px 16px;border:1px solid #e5e7eb;border-radius:10px;">',
     ...fields.map(([label, value]) => [
-      '<div style="display:block;width:100%;box-sizing:border-box;margin:0 0 10px;padding:13px 14px;background:#18181b;border:1px solid #27272a;border-radius:10px;">',
-      `<div style="margin:0 0 6px;font-size:11px;line-height:1.3;font-weight:bold;color:#a1a1aa;text-transform:uppercase;letter-spacing:.06em;">${escapeHtml(label)}</div>`,
-      `<div style="margin:0;font-size:15px;line-height:1.5;color:#f4f4f5;word-break:break-word;overflow-wrap:anywhere;">${escapeHtml(value)}</div>`,
-      "</div>",
+      `<p style="margin:0 0 8px;font-size:14px;line-height:1.5;color:#374151;word-break:break-word;overflow-wrap:anywhere;"><strong style="color:#111827;">${escapeHtml(label)}:</strong> ${escapeHtml(value)}</p>`,
     ].join("")),
     '<div style="margin-top:18px;">',
-    '<h2 style="margin:0 0 10px;font-size:16px;line-height:1.4;color:#fafafa;">Message</h2>',
-    `<div style="display:block;width:100%;box-sizing:border-box;white-space:pre-wrap;font-size:15px;line-height:1.65;color:#e4e4e7;background:#18181b;border:1px solid #27272a;border-radius:10px;padding:14px;word-break:break-word;overflow-wrap:anywhere;">${escapeHtml(message)}</div>`,
-    "</div>",
+    '<h2 style="margin:0 0 8px;font-size:16px;line-height:1.4;color:#111827;">Message</h2>',
+    `<div style="display:block;width:100%;box-sizing:border-box;white-space:pre-wrap;font-size:15px;line-height:1.65;color:#1f2937;border:1px solid #e5e7eb;border-radius:10px;padding:14px;word-break:break-word;overflow-wrap:anywhere;">${escapeHtml(message)}</div>`,
     "</div>",
     "</div>",
     "</div>",
