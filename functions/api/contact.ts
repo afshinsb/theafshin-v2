@@ -173,9 +173,10 @@ export const onRequestPost = async ({ request, env }: PagesContext) => {
     ...fields.map(([label, value]) => [
       `<p style="margin:0 0 8px;font-size:14px;line-height:1.5;color:#374151;word-break:break-word;overflow-wrap:anywhere;"><strong style="color:#111827;">${escapeHtml(label)}:</strong> ${escapeHtml(value)}</p>`,
     ].join("")),
-    '<div style="margin-top:18px;">',
+    "</div>",
+    '<div style="display:block;width:100%;box-sizing:border-box;padding:14px 16px;border:1px solid #e5e7eb;border-radius:10px;">',
     '<h2 style="margin:0 0 8px;font-size:16px;line-height:1.4;color:#111827;">Message</h2>',
-    `<div style="display:block;width:100%;box-sizing:border-box;white-space:pre-wrap;font-size:15px;line-height:1.65;color:#1f2937;border:1px solid #e5e7eb;border-radius:10px;padding:14px;word-break:break-word;overflow-wrap:anywhere;">${escapeHtml(message)}</div>`,
+    `<div style="display:block;width:100%;box-sizing:border-box;white-space:pre-wrap;font-size:15px;line-height:1.65;color:#1f2937;word-break:break-word;overflow-wrap:anywhere;">${escapeHtml(message)}</div>`,
     "</div>",
     "</div>",
     "</div>",
