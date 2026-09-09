@@ -2,54 +2,39 @@ import { WorkExperience, ProjectData, SkillCategory } from "./types";
 
 export const PERSONAL_INFO = {
   name: "AFSHIN SABERI",
-  title: "Infrastructure / Cloud Operations / Security Operations",
-  location: "",
+  title: "Security Operations | Infrastructure Security",
+  location: "Montreal, QC",
   email: "contact@theafshin.com",
   phone: "Available upon request",
   linkedin: "https://linkedin.com/in/theafshin",
   github: "https://github.com/afshinsb",
   portfolio: "https://theafshin.com",
-  summary: "Infrastructure and security operations professional focused on reliable Linux/Windows environments, controlled network exposure, monitoring, incident triage, and practical automation."
+  summary: "Security and infrastructure professional with a networking foundation, systems administration experience, and hands-on security-focused infrastructure project work. Focused on identity and access, secure connectivity, Windows/Linux operations, log-based troubleshooting, and resilient self-hosted services."
 };
 
 export const WORK_EXPERIENCE: WorkExperience[] = [
   {
-    id: "tzanet",
-    company: "Enterprise Logistics & E-Commerce Systems Provider",
-    role: "Systems Administrator",
-    location: "",
+    id: "private-employer",
+    company: "Private Employer",
+    role: "Systems Administrator — Infrastructure & Security Operations",
+    location: "Montreal, QC",
     period: "Jan 2023 - Jan 2025",
     bullets: [
-      "Performed security monitoring by analyzing system and network alerts to investigate issues impacting availability.",
-      "Supported incident response processes including triage, escalation, and resolution.",
-      "Managed firewall rules and VPN access to reduce security exposure and enforce least-privilege policies.",
-      "Applied strict system hardening practices, automated patch cycles, and maintained OS distributions.",
-      "Managed identity lifecycle and fine-grained access control solutions across the cloud tenant and directory environments.",
-      "Developed robust Python scripts to automate basic AWS instance provisioning and routine operational tasks."
+      "Microsoft 365 & Identity: Managed user accounts, permissions, MFA, and authentication/access issues.",
+      "Network & Secure Access: Supported VPN connectivity, firewall rules, DNS, and remote-access troubleshooting.",
+      "Windows/Linux Operations: Performed patching, service checks, backup/restore, and general systems maintenance.",
+      "Troubleshooting: Investigated system, network, and application incidents using logs."
     ]
   },
   {
-    id: "arin-analyst",
-    company: "High-Throughput Infrastructure & Digital Network Host",
-    role: "Network Systems Analyst",
-    location: "",
-    period: "Mar 2018 - Jan 2022",
-    bullets: [
-      "Maintained secure multi-site network environments across enterprise Linux servers and public/hybrid cloud infrastructure.",
-      "Implemented enterprise firewall policies and secure site-to-site VPN connectivity.",
-      "Investigated network anomalies and security incidents using Wireshark for direct packet analysis and threat diagnosis.",
-      "Improved infrastructure segmentation and access control mechanisms to minimize blast radius."
-    ]
-  },
-  {
-    id: "arin-technician",
-    company: "High-Throughput Infrastructure & Digital Network Host",
+    id: "airin-pars-media",
+    company: "Airin Pars Media",
     role: "Network Technician",
-    location: "",
-    period: "Mar 2016 - Feb 2018",
+    location: "Shiraz, Iran",
+    period: "Sep 2017 - Feb 2021",
     bullets: [
-      "Supported enterprise physical and virtual infrastructure installation, wiring, optimization, and system troubleshooting.",
-      "Assisted senior engineers in maintaining stable, highly available, and secure day-to-day operations."
+      "Supported multi-site LAN/WAN infrastructure across routing, switching, VPNs, firewall policies, network segmentation, and access-control changes using Ubiquiti and MikroTik equipment.",
+      "Diagnosed outages, connectivity, and access issues with Wireshark, logs, firewall-rule reviews, and network diagnostics; documented configuration changes and resolutions."
     ]
   }
 ];
@@ -57,20 +42,35 @@ export const WORK_EXPERIENCE: WorkExperience[] = [
 export const PROJECTS: ProjectData[] = [
   {
     id: "secure-infra",
-    title: "Self-Hosted Secure Infrastructure",
-    subtitle: "Private Linux services with controlled exposure",
-    description: "Run private Linux services safely with controlled public exposure and private admin access.",
-    purpose: "Run private Linux services with controlled public exposure and private admin access.",
-    built: "Docker Compose on Debian/Linux with ZFS, reverse proxying, Cloudflare Tunnel, Tailscale, DNS filtering, and restore planning.",
-    demonstrates: "Linux operations, Docker service management, secure access design, storage awareness, and restore-aware infrastructure.",
-    tech: ["Debian", "Docker Compose", "ZFS", "Cloudflare Tunnel", "Tailscale", "Reverse proxy", "DNS", "KVM/libvirt"],
-    features: [],
-    githubUrl: "https://github.com/afshinsb/homelab-infra"
+    title: "Security & Infrastructure Homelab",
+    subtitle: "Primary security and infrastructure project",
+    period: "Feb 2025 - Present",
+    repositoryVisibility: "private",
+    description: "Build and operate a Linux-based self-hosted environment with controlled service exposure and private remote access.",
+    purpose: "Develop deeper hands-on security and infrastructure operations experience in a private lab environment.",
+    built: "A Linux-based self-hosted environment using Docker, DNS, reverse proxying, VPN/private remote access, monitoring, backup and recovery, and security-focused service configuration.",
+    demonstrates: "Service exposure management, network access control, credential handling, system updates, troubleshooting, monitoring, and recovery documentation.",
+    tech: ["Linux", "Docker", "DNS", "Reverse proxy", "VPN", "Monitoring", "Backup and recovery"],
+    features: []
+  },
+  {
+    id: "blushtime",
+    title: "Blushtime — Family Business Technology Project",
+    subtitle: "Private family-business project work",
+    period: "Feb 2025 - Aug 2026",
+    repositoryVisibility: "private",
+    description: "Built and supported a booking and administration platform while helping with operational setup during the business launch.",
+    purpose: "Support a family business launch with a practical booking and administration platform.",
+    built: "A Next.js and TypeScript platform using Supabase/PostgreSQL, authentication, payments, notifications, integrations, and Cloudflare deployment.",
+    demonstrates: "Applied platform development, access-aware workflows, integrations, deployment, troubleshooting, and operational launch support.",
+    tech: ["Next.js", "TypeScript", "Supabase", "PostgreSQL", "Authentication", "Payments", "Cloudflare"],
+    features: []
   },
   {
     id: "ai-rail",
-    title: "AI Rail — Local-First AI Development Workflow CLI",
-    subtitle: "Scoped AI-assisted development workflow",
+    title: "AI Rail",
+    subtitle: "Supporting public project",
+    repositoryVisibility: "public",
     description: "Make AI-assisted coding safer and more controlled by forcing one scoped issue at a time.",
     purpose: "Make AI-assisted coding safer by forcing one scoped issue at a time.",
     built: "A Python CLI for GitHub Issue workflows with project memory, review packs, safety checks, release validation, and pipx install.",
@@ -82,7 +82,8 @@ export const PROJECTS: ProjectData[] = [
   {
     id: "subtitle-translator",
     title: "Universal Subtitle Translator",
-    subtitle: "Dockerized subtitle and media translation jobs",
+    subtitle: "Supporting public project",
+    repositoryVisibility: "public",
     description: "Translate subtitle files and media-folder subtitles in a controlled Dockerized workflow.",
     purpose: "Translate subtitle files and media-folder subtitles in a controlled Dockerized workflow.",
     built: "A FastAPI app using FFmpeg/ffprobe, OpenAI API, SQLite history, batch jobs, live progress, cancellation, logs, and admin defaults.",
@@ -91,41 +92,6 @@ export const PROJECTS: ProjectData[] = [
     features: [],
     githubUrl: "https://github.com/afshinsb/universal-subtitle-translator",
     liveUrl: "https://translate.theafshin.com/"
-  },
-  {
-    id: "applyflow",
-    title: "ApplyFlow Automation — n8n Workflow Automation System",
-    subtitle: "Job search tracking and workflow automation",
-    description: "Automate job-search tracking and reduce repeated manual work around job alerts, ranking, and application follow-up.",
-    purpose: "Automate job-search tracking around alerts, ranking, and follow-up.",
-    built: "An n8n workflow with Gmail, Google Sheets, JavaScript nodes, HTTP fetches, OpenAI review, deduplication, logs, and separated config.",
-    demonstrates: "Workflow automation, operations thinking, structured data handling, API integration, deduplication, and maintainable automation.",
-    tech: ["n8n", "Gmail", "Google Sheets", "JavaScript code nodes", "HTTP APIs", "OpenAI API", "Structured logs"],
-    features: []
-  },
-  {
-    id: "glowbook",
-    title: "GlowBook — Multi-Tenant Booking SaaS Demo/MVP",
-    subtitle: "Multi-tenant booking platform",
-    description: "Build a SaaS-style booking platform with tenant-aware workflows, staff/service management, appointments, and role-based access.",
-    purpose: "Build a SaaS-style booking platform with tenant-aware workflows and role-based access.",
-    built: "A React/TypeScript + Node/Express demo with tenant APIs, audit logs, appointments, staff/services, clients, notifications, and dashboards.",
-    demonstrates: "Full-stack architecture, multi-tenant thinking, audit logs, business workflows, and production-boundary awareness.",
-    tech: ["React", "TypeScript", "Node.js", "Express", "Audit logs", "REST APIs", "Dashboard UI"],
-    features: [],
-    githubUrl: "https://github.com/afshinsb/Glow"
-  },
-  {
-    id: "voxa",
-    title: "Voxa — Supporting Creative AI Voice Studio",
-    subtitle: "Supporting creative AI project",
-    description: "Explore AI narration workflows with multiple provider options and local history.",
-    purpose: "Explore AI narration workflows with multiple provider options and local history.",
-    built: "A prerelease app for rewriting, translation, narration presets, local history, cached audio metadata, and provider adapters.",
-    demonstrates: "TypeScript UI work, API boundaries, provider abstraction, local persistence, and creative prototyping.",
-    tech: ["Next.js", "TypeScript", "OpenAI API", "Gemini API", "ElevenLabs", "IndexedDB", "Server-side provider routes"],
-    features: [],
-    githubUrl: "https://github.com/afshinsb/voxa"
   }
 ];
 
@@ -137,19 +103,18 @@ export const SKILL_CATEGORIES: SkillCategory[] = [
       "Linux administration",
       "Windows Server / Microsoft 365 basics",
       "Docker and Docker Compose",
-      "KVM/libvirt virtualization",
       "Backup and restore validation"
     ]
   },
   {
-    title: "Cloud & Identity",
-    iconName: "Cloud",
+    title: "Identity & Secure Access",
+    iconName: "Lock",
     skills: [
-      "AWS: EC2, VPC, IAM",
-      "Cloudflare Tunnel and DNS",
-      "Identity lifecycle support",
-      "Access control reviews",
-      "Least-privilege habits"
+      "Microsoft 365 user administration",
+      "Permissions and MFA support",
+      "Authentication and access troubleshooting",
+      "VPN and private remote access",
+      "Credentials and service exposure management"
     ]
   },
   {
@@ -177,11 +142,12 @@ export const SKILL_CATEGORIES: SkillCategory[] = [
 ];
 
 export const SUGGESTED_QUESTIONS = [
-  "What is your security experience?",
-  "Tell me about your self-hosted infrastructure project.",
-  "How does AI Rail make AI-assisted coding safer?",
-  "Tell me about your Concordia University Master's degree.",
-  "What automation scripting do you write?",
-  "What systems administration tools do you use?",
-  "Detail your work at your previous logistics role."
+  "Tell me about your security and infrastructure background.",
+  "Why are you moving deeper into Security Operations?",
+  "What did you do as a Systems Administrator?",
+  "How does your networking background apply to security?",
+  "Tell me about your Security & Infrastructure Homelab.",
+  "What was your role in the Blushtime project?",
+  "What have you been working on since early 2025?",
+  "What security or infrastructure roles are the best fit?"
 ];

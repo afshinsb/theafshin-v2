@@ -11,6 +11,8 @@ export interface ProjectData {
   id: string;
   title: string;
   subtitle: string;
+  period?: string;
+  repositoryVisibility: "public" | "private";
   description: string;
   purpose?: string;
   built?: string;

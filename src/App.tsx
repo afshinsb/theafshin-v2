@@ -152,20 +152,12 @@ export default function App() {
 
   // Subtitle Translator Lab States
   const [subtitleText, setSubtitleText] = useState<string>(
-    `1\n00:00:01,500 --> 00:00:04,800\nWe must maintain high-security firewalls and automated DevOps.\n\n2\n00:00:05,100 --> 00:00:09,200\nDocker containers provide excellent replication and isolation.`
+    `1\n00:00:01,500 --> 00:00:04,800\nWe review firewall rules and routine system maintenance.\n\n2\n00:00:05,100 --> 00:00:09,200\nDocker containers support repeatable service deployment.`
   );
   const [targetLang, setTargetLang] = useState("French");
   const [translationLogs, setTranslationLogs] = useState<string[]>([]);
   const [isTranslating, setIsTranslating] = useState(false);
   const [translatedResult, setTranslatedResult] = useState<string>("");
-
-  // Voxa Voice Studio Lab States
-  const [voxaProvider, setVoxaProvider] = useState("OpenAI");
-  const [voxaCharacter, setVoxaCharacter] = useState("Chloe");
-  const [voxaTone, setVoxaTone] = useState("Warm");
-  const [voxaMode, setVoxaMode] = useState("Balanced");
-  const [voxaLogs, setVoxaLogs] = useState<string[]>([]);
-  const [isVoxaGenerating, setIsVoxaGenerating] = useState(false);
 
   // Wireshark Incident Lab States
   const [selectedIp, setSelectedIp] = useState<string | null>(null);
@@ -294,34 +286,10 @@ export default function App() {
     setTranslationLogs(prev => [...prev, "Sample translation complete. Download report and translated .srt would be attached to the job."]);
     setTranslatedResult(
       targetLang === "Persian"
-        ? `1\n00:00:01,500 --> 00:00:04,800\nما باید فایروال‌های امنیتی و DevOps خودکار را حفظ کنیم.\n\n2\n00:00:05,100 --> 00:00:09,200\nکانتینرهای Docker بازتولید و جداسازی عالی فراهم می‌کنند.`
-        : `1\n00:00:01,500 --> 00:00:04,800\n[${targetLang}] We must maintain high-security firewalls and automated DevOps.\n\n2\n00:00:05,100 --> 00:00:09,200\n[${targetLang}] Docker containers provide excellent replication and isolation.`
+        ? `1\n00:00:01,500 --> 00:00:04,800\nما قوانین فایروال و نگهداری معمول سیستم را بررسی می‌کنیم.\n\n2\n00:00:05,100 --> 00:00:09,200\nکانتینرهای Docker از استقرار تکرارپذیر سرویس پشتیبانی می‌کنند.`
+        : `1\n00:00:01,500 --> 00:00:04,800\n[${targetLang}] We review firewall rules and routine system maintenance.\n\n2\n00:00:05,100 --> 00:00:09,200\n[${targetLang}] Docker containers support repeatable service deployment.`
     );
     setIsTranslating(false);
-  };
-
-  const handleGenerateVoxaSample = async () => {
-    if (isVoxaGenerating) return;
-    setIsVoxaGenerating(true);
-    setVoxaLogs([]);
-
-    const steps = [
-      "Loading Voxa provider adapter: " + voxaProvider,
-      "Selecting voice character: " + voxaCharacter,
-      "Applying tone preset: " + voxaTone,
-      "Generation mode: " + voxaMode,
-      "Checking server-only provider key boundary",
-      "Preparing rewrite and bilingual text pipeline",
-      "Caching generated audio metadata in browser history",
-      "Sample ready for playback dock handoff"
-    ];
-
-    for (let i = 0; i < steps.length; i++) {
-      await new Promise(resolve => setTimeout(resolve, 420));
-      setVoxaLogs(prev => [...prev, steps[i]]);
-    }
-
-    setIsVoxaGenerating(false);
   };
 
   // Wireshark Incident Lab Logic
@@ -340,13 +308,13 @@ export default function App() {
     setMitigationLogs([]);
 
     const steps = [
-      "🔍 Extracting anomalous packet payloads...",
-      "⚠️ Matching signature: SYN Scanning + SQL Injection (OR 1=1 block detected)",
-      "🛡️ Formulating defensive security orchestrations...",
-      "⚙️ Injecting iptables command to drop ingress from 198.51.100.22...",
-      "☁️ Transmitting Cloudflare edge filter blocking policy for 198.51.100.22...",
-      "📬 Filing ticket incident SLA documentation under Security Operations...",
-      "🎯 Infrastructure state normalized. Threat quarantined completely."
+      "Reviewing synthetic network records...",
+      "Flagging the sample HTTP request for closer inspection...",
+      "Comparing the request pattern with the provided context...",
+      "Drafting a temporary-block recommendation for the exercise...",
+      "Noting follow-up checks for web and authentication logs...",
+      "Recording the educational review steps...",
+      "Simulation complete. No production system was changed."
     ];
 
     for (let i = 0; i < steps.length; i++) {
@@ -426,108 +394,6 @@ export default function App() {
     }
   };
 
-  const voxaLabCard = (
-    <div className={"p-5 rounded-xl flex flex-col space-y-4 justify-between " + t.smallCard}>
-      <div className="space-y-1.5">
-        <span className={"text-[10px] font-mono uppercase px-2 py-0.5 rounded-sm border " + (isDarkMode ? "bg-violet-950/50 text-violet-300 border-violet-900" : "bg-violet-50 text-violet-700 border-violet-200")}>
-          Lab Module 4: Multi-Provider AI Voice Studio
-        </span>
-        <h4 className={"text-base font-semibold " + t.textTitle}>Voxa Narration Pipeline</h4>
-        <p className={"text-xs leading-relaxed " + t.textMuted}>
-          I built Voxa as a prerelease Next.js voice studio for OpenAI, Gemini, ElevenLabs, and local mock audio. Test how provider, character, tone, and generation mode shape a secure server-routed narration workflow.
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <label className="space-y-1">
-          <span className="block text-[10px] font-mono text-zinc-500 uppercase">Provider</span>
-          <select value={voxaProvider} onChange={(e) => setVoxaProvider(e.target.value)} className={"w-full border p-1.5 text-[11px] font-mono rounded " + t.input}>
-            <option>OpenAI</option>
-            <option>Gemini</option>
-            <option>ElevenLabs</option>
-            <option>Mock</option>
-          </select>
-        </label>
-
-        <label className="space-y-1">
-          <span className="block text-[10px] font-mono text-zinc-500 uppercase">Character</span>
-          <select value={voxaCharacter} onChange={(e) => setVoxaCharacter(e.target.value)} className={"w-full border p-1.5 text-[11px] font-mono rounded " + t.input}>
-            <option>Chloe</option>
-            <option>Vivian</option>
-            <option>Mia</option>
-            <option>Titan</option>
-            <option>Vincent</option>
-            <option>Adam</option>
-          </select>
-        </label>
-
-        <label className="space-y-1">
-          <span className="block text-[10px] font-mono text-zinc-500 uppercase">Tone</span>
-          <select value={voxaTone} onChange={(e) => setVoxaTone(e.target.value)} className={"w-full border p-1.5 text-[11px] font-mono rounded " + t.input}>
-            <option>Calm</option>
-            <option>Warm</option>
-            <option>Cheerful</option>
-            <option>Whisper</option>
-            <option>Energetic</option>
-            <option>Cinematic</option>
-            <option>Intimate</option>
-            <option>Storyteller</option>
-          </select>
-        </label>
-
-        <label className="space-y-1">
-          <span className="block text-[10px] font-mono text-zinc-500 uppercase">Mode</span>
-          <select value={voxaMode} onChange={(e) => setVoxaMode(e.target.value)} className={"w-full border p-1.5 text-[11px] font-mono rounded " + t.input}>
-            <option>Lowest quota usage</option>
-            <option>Balanced</option>
-            <option>Highest consistency</option>
-          </select>
-        </label>
-      </div>
-
-      <div className={"p-3 rounded border " + (isDarkMode ? "bg-zinc-950 border-zinc-900" : "bg-zinc-100 border-zinc-200")}>
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <span className="block text-[10px] font-mono text-zinc-500 uppercase">Current Route</span>
-            <p className={"text-xs font-mono mt-1 " + t.textTitle}>POST /api/tts</p>
-          </div>
-          <div className="flex gap-1.5">
-            {["rewrite", "translate", "tts"].map((step) => (
-              <span key={step} className={"px-2 py-1 rounded border text-[10px] font-mono uppercase " + t.badge}>
-                {step}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className={"p-3.5 rounded border text-[10px] font-mono h-[118px] overflow-y-auto space-y-1 select-all " + t.codeBlock}>
-        <span className="text-zinc-500 block">VOXA PROVIDER CONSOLE:</span>
-        {voxaLogs.length === 0 ? (
-          <span className="text-zinc-500 italic block pt-2">Run a sample to inspect the narration pipeline.</span>
-        ) : (
-          voxaLogs.map((log, index) => (
-            <div key={index}>{log}</div>
-          ))
-        )}
-      </div>
-
-      <div className="flex flex-wrap items-center gap-3">
-        <a href="https://github.com/afshinsb/voxa" target="_blank" referrerPolicy="no-referrer" className={"px-3 py-2 text-xs font-semibold rounded border transition flex items-center justify-center gap-1.5 " + t.btnSec}>
-          <Github className="h-3.5 w-3.5" /> Source
-        </a>
-        <button
-          onClick={handleGenerateVoxaSample}
-          disabled={isVoxaGenerating}
-          className={"px-4 py-2 text-xs font-semibold rounded cursor-pointer transition flex items-center justify-center gap-1.5 disabled:opacity-50 " + (isDarkMode ? "bg-violet-400 hover:bg-violet-300 text-zinc-950" : "bg-violet-600 hover:bg-violet-700 text-white")}
-        >
-          {isVoxaGenerating ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <Play className="h-3.5 w-3.5 fill-current" />}
-          Run Voxa Sample
-        </button>
-      </div>
-    </div>
-  );
-
   return (
     <div className={t.bg + " flex flex-col"}>
       
@@ -558,28 +424,28 @@ export default function App() {
               onClick={() => setActiveTab("overview")} 
               className={"px-4 py-1.5 text-xs font-medium rounded-md transition " + (activeTab === "overview" ? t.tabAct : t.tabInact)}
             >
-              Command Center
+              Overview
             </button>
             <button 
               id="tab-experience"
               onClick={() => setActiveTab("experience")} 
               className={"px-4 py-1.5 text-xs font-medium rounded-md transition " + (activeTab === "experience" ? t.tabAct : t.tabInact)}
             >
-              Career Timeline
+              Experience
             </button>
             <button 
               id="tab-labs"
               onClick={() => setActiveTab("labs")} 
               className={"px-4 py-1.5 text-xs font-medium rounded-md transition " + (activeTab === "labs" ? t.tabAct : t.tabInact)}
             >
-              Interactive Labs
+              Projects / Labs
             </button>
             <button 
               id="tab-chat"
               onClick={() => setActiveTab("chat")} 
               className={"px-4 py-1.5 text-xs font-medium rounded-md transition flex items-center gap-1.5 " + (activeTab === "chat" ? t.tabAct : t.tabInact)}
             >
-              <Sparkles className={"h-3 w-3 " + t.iconAccent} /> Ask About Experience
+              <Sparkles className={"h-3 w-3 " + t.iconAccent} /> Ask About My Background
             </button>
           </nav>
 
@@ -629,13 +495,13 @@ export default function App() {
         {/* Mobile Navigation Bar */}
         <div className={"md:hidden flex space-x-1 justify-around px-2 py-2 border-t border-b " + (isDarkMode ? "bg-zinc-900 border-zinc-800 text-zinc-300" : "bg-zinc-200 border-zinc-300 text-zinc-800")}>
           <button onClick={() => setActiveTab("overview")} className={"flex-1 py-1 text-center text-[10px] uppercase font-mono tracking-wider " + (activeTab === "overview" ? t.tabAct + " rounded" : t.tabInact)}>
-            Command
+            Overview
           </button>
           <button onClick={() => setActiveTab("experience")} className={"flex-1 py-1 text-center text-[10px] uppercase font-mono tracking-wider " + (activeTab === "experience" ? t.tabAct + " rounded" : t.tabInact)}>
-            Career
+            Experience
           </button>
           <button onClick={() => setActiveTab("labs")} className={"flex-1 py-1 text-center text-[10px] uppercase font-mono tracking-wider " + (activeTab === "labs" ? t.tabAct + " rounded" : t.tabInact)}>
-            Labs
+            Projects
           </button>
           <button onClick={() => setActiveTab("chat")} className={"flex-1 py-1 text-center text-[10px] uppercase font-mono tracking-wider flex justify-center items-center gap-0.5 " + (activeTab === "chat" ? t.tabAct + " rounded" : t.tabInact)}>
             <Sparkles className={"h-2 w-2 " + t.iconAccent} /> Q&A
@@ -655,10 +521,10 @@ export default function App() {
             
             <div className="w-full flex flex-col items-start">
               <h2 className={"max-w-3xl text-3xl sm:text-4xl font-semibold tracking-tight mb-4 " + t.textTitle}>
-                Infrastructure, Cloud, Security Operations
+                Security Operations &amp; Infrastructure Security
               </h2>
               <p className={"max-w-3xl text-sm leading-relaxed mb-6 " + t.textMuted}>
-                {PERSONAL_INFO.summary}
+                Systems and infrastructure professional with a networking foundation, hands-on Linux/Windows operations, secure access, VPN/firewall/DNS troubleshooting, and an MEng in Information Systems Security—now focused on moving deeper into Security Operations and Infrastructure Security.
               </p>
 
               <div className="flex w-full flex-col gap-4 md:flex-row md:items-end md:justify-between">
@@ -673,17 +539,18 @@ export default function App() {
                   </div>
                   <div className="p-2.5 font-mono text-[10px] leading-relaxed break-words">
                     <div className={t.textMuted}>
-                      <span className={t.subTextAccent}>afshin@portfolio</span>:~$ ./role-fit --target infra-cloud-sec
+                      <span className={t.subTextAccent}>afshin@portfolio</span>:~$ ./role-fit --target security-operations
                       <span className={"ml-1 inline-block h-3 w-1 translate-y-0.5 animate-pulse " + (isDarkMode ? "bg-emerald-400" : "bg-sky-600")}></span>
                     </div>
                     <div className={"mt-2 space-y-0.5 " + t.textTitle}>
                       {[
+                        ["target", "Security Operations / Infrastructure Security"],
                         ["systems", "Linux / Windows"],
-                        ["containers", "Docker / Docker Compose"],
-                        ["cloud", "AWS"],
-                        ["network", "firewall / VPN"],
-                        ["operations", "monitoring / incident triage"],
-                        ["automation", "Python / Bash / PowerShell"]
+                        ["identity", "Microsoft 365 / MFA / access"],
+                        ["network", "VPN / firewall / DNS"],
+                        ["containers", "Docker / Compose"],
+                        ["troubleshooting", "logs / network diagnostics"],
+                        ["automation", "Git / GitHub / Python"]
                       ].map(([label, value]) => (
                         <div key={label}>
                           <span className={t.subTextAccent}>{label}</span>
@@ -702,13 +569,13 @@ export default function App() {
                         ? "bg-emerald-500 hover:bg-emerald-400 text-zinc-950 shadow-emerald-500/25" 
                         : "bg-[#0284c7] hover:bg-[#0369a1] text-white shadow-sky-600/15")}
                   >
-                    <Sparkles className="h-4 w-4" /> Ask About My Experience
+                    <Sparkles className="h-4 w-4" /> Ask About My Background
                   </button>
                   <button 
                     onClick={() => setActiveTab("labs")} 
                     className={"w-full px-5 py-2.5 text-xs font-semibold rounded-lg transition duration-200 flex items-center justify-center gap-2 cursor-pointer " + t.btnSec}
                   >
-                    <Terminal className="h-4 w-4" /> Experiment in Sandbox Labs
+                    <Terminal className="h-4 w-4" /> View Projects &amp; Labs
                   </button>
                 </div>
               </div>
@@ -732,12 +599,12 @@ export default function App() {
                 
                 <div className={t.smallCard + " p-5 rounded-xl flex flex-col justify-between"}>
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-zinc-500 text-[10px] font-mono uppercase tracking-wider">Operations Depth</span>
+                    <span className="text-zinc-500 text-[10px] font-mono uppercase tracking-wider">Security Focus</span>
                     <Activity className={"h-4 w-4 " + t.iconAccent} />
                   </div>
                   <div>
-                    <div className={"text-2xl font-bold font-mono mb-1 " + t.textTitle}>8+ Years</div>
-                    <span className={t.textMuted + " text-xs"}>Systems, networking, security support</span>
+                    <div className={"text-xl font-bold font-sans mb-1 " + t.textTitle}>Security Operations</div>
+                    <span className={t.textMuted + " text-xs"}>Infrastructure Security</span>
                   </div>
                 </div>
 
@@ -747,30 +614,30 @@ export default function App() {
                     <GraduationCap className="h-4 w-4 text-cyan-500" />
                   </div>
                   <div>
-                    <div className={"text-xl font-bold font-sans mb-1 " + t.textTitle}>M.Eng (ISS)</div>
+                    <div className={"text-xl font-bold font-sans mb-1 " + t.textTitle}>MEng</div>
                     <span className={t.textMuted + " text-xs"}>Information Systems Security</span>
                   </div>
                 </div>
 
                 <div className={t.smallCard + " p-5 rounded-xl flex flex-col justify-between"}>
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-zinc-500 text-[10px] font-mono uppercase tracking-wider">Infrastructure</span>
+                    <span className="text-zinc-500 text-[10px] font-mono uppercase tracking-wider">Systems</span>
                     <Server className="h-4 w-4 text-amber-500" />
                   </div>
                   <div>
-                    <div className={"text-2xl font-bold font-mono mb-1 " + t.textTitle}>Linux & AWS</div>
-                    <span className={t.textMuted + " text-xs"}>Docker, KVM, shell, cloud basics</span>
+                    <div className={"text-xl font-bold font-sans mb-1 " + t.textTitle}>Linux / Windows</div>
+                    <span className={t.textMuted + " text-xs"}>Microsoft 365, Docker, maintenance</span>
                   </div>
                 </div>
 
                 <div className={t.smallCard + " p-5 rounded-xl flex flex-col justify-between"}>
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-zinc-500 text-[10px] font-mono uppercase tracking-wider">Secure Access</span>
+                    <span className="text-zinc-500 text-[10px] font-mono uppercase tracking-wider">Network &amp; Secure Access</span>
                     <Lock className="h-4 w-4 text-rose-500" />
                   </div>
                   <div>
-                    <div className={"text-2xl font-bold font-mono mb-1 " + t.textTitle}>Zero Trust</div>
-                    <span className={t.textMuted + " text-xs"}>Firewalls, VPN logs, Tunnels</span>
+                    <div className={"text-xl font-bold font-sans mb-1 " + t.textTitle}>VPN / Firewalls / DNS</div>
+                    <span className={t.textMuted + " text-xs"}>Connectivity and access troubleshooting</span>
                   </div>
                 </div>
 
@@ -784,7 +651,12 @@ export default function App() {
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-                  {SKILL_CATEGORIES.map((cat, idx) => (
+                  {[
+                    { ...SKILL_CATEGORIES[1], title: "Security Operations & Access" },
+                    SKILL_CATEGORIES[0],
+                    { ...SKILL_CATEGORIES[2], title: "Networking" },
+                    { ...SKILL_CATEGORIES[3], title: "Automation & Engineering Tools" }
+                  ].map((cat, idx) => (
                     <div key={idx} className={t.smallCard + " p-5 rounded-xl transition duration-200 " + (isDarkMode ? "hover:border-emerald-500/50" : "hover:border-[#0284c7]/40")}>
                       <div className="flex items-center gap-2 mb-3">
                         {idx === 0 ? <Server className={"h-4 w-4 " + t.iconAccent} /> : idx === 1 ? <ShieldAlert className="h-4 w-4 text-cyan-500" /> : idx === 2 ? <Network className="h-4 w-4 text-amber-500" /> : idx === 3 ? <Activity className="h-4 w-4 text-rose-500" /> : <Terminal className="h-4 w-4 text-violet-500" />}
@@ -809,15 +681,15 @@ export default function App() {
                 {/* Featured Projects Column */}
                 <div className="lg:col-span-8 space-y-6">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-mono text-zinc-500 uppercase tracking-lighter">Featured Engineering Work</h3>
+                    <h3 className="text-sm font-mono text-zinc-500 uppercase tracking-lighter">Project Work</h3>
                     <span onClick={() => setActiveTab("labs")} className={"text-xs font-mono hover:underline transition cursor-pointer flex items-center gap-1 " + t.subTextAccent + " " + t.textLinkHover}>
-                      Run Live Demos <ExternalLink className="h-3 w-3" />
+                      View Portfolio Labs <ExternalLink className="h-3 w-3" />
                     </span>
                   </div>
 
                   <div className="grid grid-cols-1 gap-6">
                   {PROJECTS.map((proj) => {
-                    const isCoreProject = proj.id === "secure-infra" || proj.id === "ai-rail";
+                    const isCoreProject = proj.id === "secure-infra";
 
                     return (
                     <div
@@ -825,26 +697,33 @@ export default function App() {
                       className={"p-6 rounded-xl space-y-5 transition " + t.smallCard + " " + (
                         isCoreProject
                           ? (isDarkMode ? "border-emerald-500/30" : "border-sky-300")
-                          : proj.id === "voxa"
-                            ? "opacity-90"
-                            : ""
+                          : ""
                       )}
                     >
                       <div>
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex items-center gap-2">
-                            <h4 className={(proj.id === "voxa" ? "text-base" : "text-lg") + " font-semibold leading-snug " + t.textTitle}>{proj.title}</h4>
+                            <h4 className={"text-lg font-semibold leading-snug " + t.textTitle}>{proj.title}</h4>
                             {isCoreProject && (
-                              <span className={"shrink-0 px-1.5 py-0.5 rounded border text-[9px] font-mono uppercase " + t.badge}>Priority</span>
+                              <span className={"shrink-0 px-1.5 py-0.5 rounded border text-[9px] font-mono uppercase " + t.badge}>Primary Project</span>
+                            )}
+                            {proj.id === "blushtime" && (
+                              <span className={"shrink-0 px-1.5 py-0.5 rounded border text-[9px] font-mono uppercase " + t.badge}>Family Business Project</span>
                             )}
                           </div>
-                          {proj.githubUrl && (
+                          {proj.repositoryVisibility === "public" && proj.githubUrl && (
                           <span className={"shrink-0 p-1 text-zinc-500 transition cursor-pointer " + t.textLinkHover}>
                             <Github className="h-4 w-4" onClick={() => window.open(proj.githubUrl, "_blank", "noopener,noreferrer")} />
                           </span>
                           )}
                         </div>
                         <p className={"text-xs font-mono " + t.subTextAccent}>{proj.subtitle}</p>
+                        <div className="mt-2 flex flex-wrap gap-1.5">
+                          {proj.period && <span className={"px-2 py-0.5 rounded border text-[9px] font-mono " + t.badge}>{proj.period}</span>}
+                          <span className={"px-2 py-0.5 rounded border text-[9px] font-mono " + t.badge}>
+                            {proj.repositoryVisibility === "private" ? "Private repository · sanitized case study" : "Public project"}
+                          </span>
+                        </div>
                       </div>
 
                       <div className="space-y-3 text-xs leading-relaxed">
@@ -896,7 +775,7 @@ export default function App() {
                     
                     <form onSubmit={handleContactSubmit} className="space-y-3.5">
                       <div>
-                        <label className="block text-[10px] font-mono text-zinc-500 uppercase mb-1">Inquirer Name</label>
+                        <label className="block text-[10px] font-mono text-zinc-500 uppercase mb-1">Name</label>
                         <input 
                           type="text" 
                           required
@@ -907,13 +786,13 @@ export default function App() {
                             setContactForm({ ...contactForm, name: e.target.value });
                           }}
                           className={"w-full border rounded px-3 py-2 text-xs transition " + t.input} 
-                          placeholder="Agent / Recruiter / Hiring Mgr"
+                          placeholder="Your name"
                         />
                       </div>
                       
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-[10px] font-mono text-zinc-500 uppercase mb-1">Secure Email</label>
+                          <label className="block text-[10px] font-mono text-zinc-500 uppercase mb-1">Email</label>
                           <input 
                             type="email" 
                             required
@@ -928,7 +807,7 @@ export default function App() {
                           />
                         </div>
                         <div>
-                          <label className="block text-[10px] font-mono text-zinc-500 uppercase mb-1">Company / Org</label>
+                          <label className="block text-[10px] font-mono text-zinc-500 uppercase mb-1">Company</label>
                           <input 
                             type="text" 
                             maxLength={120}
@@ -938,13 +817,13 @@ export default function App() {
                               setContactForm({ ...contactForm, company: e.target.value });
                             }}
                             className={"w-full border rounded px-3 py-2 text-xs transition " + t.input} 
-                            placeholder="Enterprise Inc."
+                            placeholder="Company name"
                           />
                         </div>
                       </div>
 
                       <div>
-                        <label className="block text-[10px] font-mono text-zinc-500 uppercase mb-1">Request Parameters (Message)</label>
+                        <label className="block text-[10px] font-mono text-zinc-500 uppercase mb-1">Message</label>
                         <textarea 
                           rows={3}
                           required
@@ -955,7 +834,7 @@ export default function App() {
                             setContactForm({ ...contactForm, message: e.target.value });
                           }}
                           className={"w-full border rounded px-3 py-2 text-xs transition resize-none " + t.input} 
-                          placeholder="Describe the open role, server requirements, or project details..."
+                          placeholder="Tell me about the role or what you would like to discuss..."
                         ></textarea>
                       </div>
 
@@ -1202,8 +1081,8 @@ export default function App() {
                     <div className="flex items-center gap-2">
                       <GraduationCap className={"h-5 w-5 " + t.iconAccent} />
                       <div>
-                        <h3 className={"text-sm font-semibold " + t.textTitle}>M.Eng Information Systems Security</h3>
-                        <p className={"text-[11px] font-mono " + t.subTextAccent}>Concordia University</p>
+                        <h3 className={"text-sm font-semibold " + t.textTitle}>MEng — Information Systems Security</h3>
+                        <p className={"text-[11px] font-mono " + t.subTextAccent}>Concordia University · May 2022 - Dec 2023</p>
                       </div>
                     </div>
                     <span className={"px-2 py-1 rounded border text-[10px] font-mono shrink-0 " + t.badge}>ISS</span>
@@ -1252,8 +1131,8 @@ export default function App() {
               {/* Dynamic work history timelining */}
               <div className="lg:col-span-8 space-y-6">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-mono text-zinc-500 uppercase tracking-widest">Chronological Security Experience logs</h3>
-                  <span className={"text-[10px] font-mono tracking-wider " + t.subTextAccent}>8+ Years Total Experience</span>
+                  <h3 className="text-sm font-mono text-zinc-500 uppercase tracking-widest">Professional Experience</h3>
+                  <span className={"text-[10px] font-mono tracking-wider " + t.subTextAccent}>Systems and networking foundation</span>
                 </div>
 
                 <div className={"space-y-8 relative before:absolute before:inset-y-0 before:left-3.5 before:w-px " + (isDarkMode ? "before:bg-zinc-800" : "before:bg-zinc-400")}>
@@ -1268,7 +1147,7 @@ export default function App() {
                       <div className={t.smallCard + " p-5 rounded-xl space-y-3 transition " + (isDarkMode ? "hover:border-emerald-500/50" : "hover:border-sky-500/40")}>
                         <div className="flex flex-wrap items-center justify-between gap-2">
                           <div>
-                            <h4 className={"text-base font-semibold " + t.textTitle}>{job.role}</h4>
+                            <h4 className={"text-base font-semibold " + t.textTitle}>{job.id === "private-employer" ? "Systems Administrator" : job.role}</h4>
                             <p className={"text-xs font-mono " + t.subTextAccent}>{job.company}{job.location ? " — " + job.location : ""}</p>
                           </div>
                           <span className={"px-2.5 py-1 text-[10px] font-mono font-medium rounded-md border " + t.badge}>
@@ -1308,34 +1187,34 @@ export default function App() {
               {/* Introduction header */}
               <div className={"p-5 rounded-xl flex flex-wrap justify-between items-center gap-4 " + t.smallCard}>
                 <div>
-                  <h3 className={"text-lg font-semibold " + t.textTitle}>Operations Sandbox Live Labs</h3>
+                  <h3 className={"text-lg font-semibold " + t.textTitle}>Projects / Labs</h3>
                   <p className={"text-xs mt-1 " + t.textMuted}>
-                    Safe interactive demos based on selected projects. Inputs and logs are simulated to avoid exposing private infrastructure, secrets, or API costs.
+                    Secondary portfolio labs and educational demos. Scenarios, inputs, and logs are synthetic and are not presented as production incident experience.
                   </p>
                 </div>
                 <div className={"text-xs font-mono px-2.5 py-1.5 rounded border flex items-center gap-2 " + t.badge}>
                   <Activity className={"h-4 w-4 " + t.iconAccent} />
-                  <span>Host Sandbox Nodes: Online</span>
+                  <span>Portfolio Labs · Simulations</span>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <AiRailWorkflowLab isDarkMode={isDarkMode} className={t.smallCard + " order-1"} />
 
-                {/* Lab 1: SOC Incident Triage Workbench */}
+                {/* Educational network evidence review simulation */}
                 <div className={"p-5 rounded-xl flex flex-col space-y-4 order-3 lg:order-2 " + t.smallCard}>
                   <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                     <div className="space-y-1.5">
                       <span className={"text-[10px] font-mono uppercase px-2 py-0.5 rounded-sm border " + (isDarkMode ? "bg-red-950/50 text-red-400 border-red-900" : "bg-red-50 text-red-700 border-red-200")}>
-                        Lab Module 3: SOC Incident Triage
+                        Educational Demo · Simulation
                       </span>
-                      <h4 className={"text-base font-semibold " + t.textTitle}>Web Attack Investigation Workbench</h4>
+                      <h4 className={"text-base font-semibold " + t.textTitle}>Network Evidence Review</h4>
                       <p className={"text-xs leading-relaxed max-w-2xl " + t.textMuted}>
-                        A practical alert workflow for reviewing network evidence, identifying the source of hostile web traffic, and documenting containment actions.
+                        A synthetic exercise for reviewing sample network records, identifying a suspicious request pattern, and documenting reasonable follow-up checks.
                       </p>
                     </div>
                     <div className={"rounded-lg border px-3 py-2 font-mono text-[10px] " + (isDarkMode ? "border-red-900/70 bg-red-950/20 text-red-300" : "border-red-200 bg-red-50 text-red-700")}>
-                      SEV-2 / Web Attack
+                      Sample Traffic · No Production Data
                     </div>
                   </div>
 
@@ -1343,7 +1222,7 @@ export default function App() {
                     {[
                       ["Signal", "SQL injection pattern"],
                       ["Target", "Web service segment"],
-                      ["Status", triageStep === "resolved" ? "Contained" : selectedIp === "198.51.100.22" ? "Confirmed" : "Needs review"]
+                      ["Status", triageStep === "resolved" ? "Review complete" : selectedIp === "198.51.100.22" ? "Flagged" : "Needs review"]
                     ].map(([label, value]) => (
                       <div key={label} className={"rounded-lg border p-3 " + (isDarkMode ? "bg-zinc-950/60 border-zinc-800" : "bg-zinc-50 border-zinc-200")}>
                         <div className="text-[10px] font-mono uppercase text-zinc-500">{label}</div>
@@ -1403,7 +1282,7 @@ export default function App() {
                         <div>
                           <div className={"text-xs font-semibold " + t.textTitle}>Review the alert evidence</div>
                           <p className={"mt-1 text-xs leading-relaxed " + t.textMuted}>
-                            Select the high-risk HTTP row to populate detection rationale and containment actions.
+                            Select the high-risk HTTP row to review the rationale and suggested follow-up steps for this simulation.
                           </p>
                         </div>
                       </div>
@@ -1413,19 +1292,19 @@ export default function App() {
                       <div className="space-y-4">
                         <div className="flex items-center gap-2 text-xs font-semibold text-red-400">
                           <AlertTriangle className="h-4 w-4" />
-                          <span>Confirmed hostile web request from 198.51.100.22</span>
+                          <span>Sample request flagged for review: 198.51.100.22</span>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                           <div className={"rounded border p-3 " + (isDarkMode ? "border-zinc-800 bg-zinc-900/50" : "border-zinc-200 bg-white")}>
                             <div className="font-mono text-[10px] uppercase text-zinc-500">Detection rationale</div>
                             <p className={"mt-1 leading-relaxed " + t.textMuted}>
-                              HTTP request targets an authentication path and includes a classic SQL injection condition. Source should be blocked and logged for follow-up.
+                              The sample request targets an authentication path and includes a common SQL injection pattern, which warrants closer log review.
                             </p>
                           </div>
                           <div className={"rounded border p-3 " + (isDarkMode ? "border-zinc-800 bg-zinc-900/50" : "border-zinc-200 bg-white")}>
                             <div className="font-mono text-[10px] uppercase text-zinc-500">Recommended action</div>
                             <p className={"mt-1 leading-relaxed " + t.textMuted}>
-                              Add temporary edge block, document the source, review web logs, and validate no successful authentication or database error occurred.
+                              Document the source, consider a temporary block, review relevant web and authentication logs, and verify whether the request produced an error or successful access.
                             </p>
                           </div>
                         </div>
@@ -1433,7 +1312,7 @@ export default function App() {
                           onClick={handleMitigateThreat}
                           className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white text-xs font-semibold font-mono rounded transition flex items-center justify-center gap-1.5"
                         >
-                          <Lock className="h-3.5 w-3.5" /> Apply Containment Plan
+                          <Lock className="h-3.5 w-3.5" /> Document Review Steps
                         </button>
                       </div>
                     )}
@@ -1442,7 +1321,7 @@ export default function App() {
                       <div className="space-y-3">
                         <div className={"flex items-center gap-1.5 text-xs font-semibold " + (isDarkMode ? "text-emerald-400" : "text-emerald-700")}>
                           <CheckCircle className="h-4 w-4" />
-                          <span>Incident contained and response notes generated</span>
+                          <span>Educational review completed and sample notes generated</span>
                         </div>
                         <div className={"p-3 rounded text-[10px] font-mono max-h-[96px] overflow-y-auto space-y-1 border " + t.codeBlock}>
                           {mitigationLogs.map((l, lIdx) => (
@@ -1461,7 +1340,7 @@ export default function App() {
                     {isMitigating && (
                       <div className="text-center py-4 space-y-2">
                         <RefreshCw className={"h-5 w-5 animate-spin mx-auto " + t.iconAccent} />
-                        <span className="text-zinc-400 text-[11px] font-mono">Applying containment and writing response notes...</span>
+                        <span className="text-zinc-400 text-[11px] font-mono">Writing simulated review notes...</span>
                       </div>
                     )}
                   </div>
@@ -1471,7 +1350,7 @@ export default function App() {
                 <div className={"p-5 rounded-xl flex flex-col space-y-3 order-2 lg:order-3 " + t.smallCard}>
                   <div className="space-y-1.5">
                     <span className={"text-[10px] font-mono uppercase px-2 py-0.5 rounded-sm border " + (isDarkMode ? "bg-emerald-950/50 text-emerald-400 border-emerald-900" : "bg-sky-50 text-sky-700 border-sky-200")}>
-                      Lab Module 2: Universal Subtitle Translator Mock
+                      Portfolio Lab · Educational Demo
                     </span>
                     <h4 className={"text-base font-semibold " + t.textTitle}>Batch Subtitle Automation Console</h4>
                     <p className={"text-xs leading-relaxed " + t.textMuted}>
@@ -1567,10 +1446,6 @@ export default function App() {
                     </a>
                   </div>
 
-                </div>
-
-                <div className="order-4">
-                  {voxaLabCard}
                 </div>
 
               </div>
