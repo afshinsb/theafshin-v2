@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
-
+Disallow: /api/
 Sitemap: https://theafshin.com/sitemap.xml

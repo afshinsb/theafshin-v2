@@ -1,0 +1,12 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "theafshin-portfolio-local",
+  "pages_build_output_dir": "./dist/public",
+  "compatibility_date": "2026-11-19",
+  "kv_namespaces": [{ "binding": "PORTFOLIO_RATE_LIMIT_KV", "id": "00000000000000000000000000000001" }],
+  "d1_databases": [{
+    "binding": "PORTFOLIO_AI_BUDGET",
+    "database_name": "portfolio-ai-budget-local",
+    "database_id": "00000000-0000-4000-8000-000000000001"
+  }]
+}

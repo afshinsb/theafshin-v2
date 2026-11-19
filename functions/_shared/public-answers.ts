@@ -1,0 +1,24 @@
+export const answers = {
+  overview: "**Afshin Saberi** is a Toronto software developer working on practical LLM applications, Python backends and engineering automation. His systems background informs how he designs deployments, builds validation and troubleshoots failures. [Read about his background](/#about).",
+  subtitle: "The **Universal Subtitle Translator** uses FastAPI, FFmpeg, OpenAI and SQLite. It reads a sidecar or extracts a compatible text track, then batches non-empty cues with stable IDs for translation. It validates the returned IDs and text, retries or repairs incomplete batches within set limits, and exports UTF-8 SRT with the original dialogue timing. [See the architecture](/projects/universal-subtitle-translator/).",
+  subtitleTesting: "The translator’s 1.8.2 report records 79 passing tests on both Python 3.10 and Python 3.12. A smoke test with real FFmpeg and SQLite used a mocked model transport, selected the full subtitle track, and verified exact dialogue timing. [Read the verification report](https://github.com/afshinsb/universal-subtitle-translator/blob/16422fb80fe9e6578d0953684e09d9009140dc16/docs/AUDIT-1.8.2.md).",
+  rail: "**AI Rail** is a local Python CLI for working from one GitHub issue at a time. It assembles prompts for the developer’s chosen AI tool and creates review packs, records verification against repository state, and checks that state before the developer ships. [Read the AI Rail case study](/projects/ai-rail/).",
+  model: "**Model Frontier** is a React and TypeScript dashboard for comparing AI model configurations. It validates datasets, synchronizes filters across multiple views, and tracks the provenance and compatibility of comparisons. [Read the Model Frontier case study](/projects/model-frontier/).",
+  tikbomb: "**TIKBOMB** is a native C#/.NET Windows widget that displays Codex usage allowances. It collects data asynchronously, keeps readings separate by account, and represents unavailable values explicitly. [Read the TIKBOMB case study](/projects/tikbomb/).",
+  docshape: "**DocShape** is a TypeScript document workspace that keeps source files authoritative. It supports revision-aware edits, derives an index from saved files, and opens the persisted document in a browser for inspection or PDF export. [Read the DocShape case study](/projects/docshape/).",
+  blushtime: "**Blushtime** is project-based work on a booking and administration application. Afshin built workflows with TypeScript, Next.js and PostgreSQL, including booking, authentication, payments and notifications. [Read the Blushtime case study](/projects/blushtime/).",
+  assistant: "Cloudflare Pages Functions validate queries and apply request budgets before calling OpenAI. The model selects an answer topic, and the server maps that topic to a reviewed public response. [Read the assistant case study](/projects/recruiter-assistant/).",
+  python: "Afshin’s **Python** work includes a FastAPI service with media processing, OpenAI integration and SQLite job state, plus a local CLI that coordinates Git, GitHub Issues and verification. [Subtitle Translator](/projects/universal-subtitle-translator/) and [AI Rail](/projects/ai-rail/) are the public examples.",
+  reliability: "Afshin brings systems administration and networking experience to application development. In the subtitle translator, that shows up in bounded recovery, progress tracking, Docker packaging and tests that verify original dialogue timing. [See the implementation evidence](/projects/universal-subtitle-translator/).",
+  roles: "Afshin is looking for applied AI, LLM application development, Python backend, AI software and AI platform roles in Toronto or remotely across Canada. For professional inquiries, email [contact@theafshin.com](mailto:contact@theafshin.com).",
+  education: "Afshin holds a **Master of Engineering in Information Systems Security** from Concordia University and a **Bachelor of Engineering in Information Technology**. His academic ML work included supervised classification with Gaussian Naive Bayes and decision trees.",
+  limitations: "Afshin’s applied AI experience is in software that integrates model APIs, validates outputs and handles failures. His classification work was academic. His projects provide evidence for LLM application development and backend engineering.",
+  contact: "You can reach Afshin at [contact@theafshin.com](mailto:contact@theafshin.com), on [LinkedIn](https://linkedin.com/in/theafshin), or through the [contact form](/#contact).",
+  unavailable: "I can answer questions about Afshin’s public projects, engineering skills, education, and role interests. [Browse the project case studies](/#work).",
+} as const;
+
+export type Topic = keyof typeof answers;
+export const topics = Object.keys(answers) as Topic[];
+export function isTopic(value: unknown): value is Topic {
+  return typeof value === "string" && Object.hasOwn(answers, value);
+}
