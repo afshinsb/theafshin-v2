@@ -1,35 +1,25 @@
 import React, { useState, useRef, useEffect } from "react";
-import { 
-  Shield, 
-  Lock, 
-  Server, 
-  Terminal, 
-  Mail, 
-  MapPin, 
-  Github, 
-  Linkedin, 
-  ExternalLink, 
-  Send, 
-  Activity, 
-  CheckCircle, 
-  AlertCircle, 
-  AlertTriangle, 
-  Code, 
-  Briefcase, 
-  GraduationCap, 
-  Sparkles, 
-  RefreshCw, 
-  Play, 
-  Trash2, 
-  Search, 
-  Layers,
+import {
+  Shield,
+  Server,
+  Terminal,
+  Mail,
+  MapPin,
+  Github,
+  Linkedin,
+  Send,
+  CheckCircle,
+  AlertCircle,
+  Code,
+  GraduationCap,
+  Sparkles,
+  RefreshCw,
   Sun,
   Moon
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import Markdown from "react-markdown";
 
-import AiRailWorkflowLab from "./components/AiRailWorkflowLab";
 import { EDUCATION, PERSONAL_INFO, WORK_EXPERIENCE, PROJECTS, SKILL_CATEGORIES, SUGGESTED_QUESTIONS } from "./data";
 import type { ChatMessage, ProjectData } from "./types";
 
@@ -85,7 +75,7 @@ function safeMarkdownUrl(url: string) {
 
 export default function App() {
   // Navigation State
-  const [activeTab, setActiveTab] = useState<"overview" | "chat" | "experience" | "labs">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "chat" | "experience">("overview");
 
   // Theme Management
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
@@ -109,20 +99,15 @@ export default function App() {
   const t = {
     bg: isDarkMode ? "min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-emerald-500/30 selection:text-emerald-400 transition-colors duration-200" : "min-h-screen bg-zinc-50 text-zinc-900 font-sans selection:bg-sky-100 selection:text-sky-900 transition-colors duration-200",
     header: isDarkMode ? "border-b border-zinc-800 bg-zinc-900/50 sticky top-0 z-50 backdrop-blur-md" : "border-b border-zinc-200 bg-white/90 sticky top-0 z-50 backdrop-blur-md shadow-xs",
-    headerText: isDarkMode ? "text-white" : "text-zinc-900",
     card: isDarkMode ? "border border-zinc-800 bg-linear-to-b from-zinc-900 to-zinc-950" : "border border-zinc-200 bg-linear-to-b from-white to-zinc-100/70 shadow-xs",
     smallCard: isDarkMode ? "bg-zinc-900/50 border border-zinc-800" : "bg-white border border-zinc-200/60 shadow-2xs",
-    subCard: isDarkMode ? "bg-zinc-900/40 p-5 rounded-xl border border-zinc-800" : "bg-white p-5 rounded-xl border border-zinc-200/60 shadow-sm",
     subCardOverlay: isDarkMode ? "bg-zinc-950/95 border-emerald-500/30" : "bg-white/98 border-sky-300/30 shadow-md",
     textMuted: isDarkMode ? "text-zinc-400" : "text-zinc-600",
     textTitle: isDarkMode ? "text-white" : "text-zinc-900",
     badge: isDarkMode ? "bg-zinc-800 text-zinc-300 border border-zinc-700/60" : "bg-zinc-100 text-zinc-800 border border-zinc-300/75",
     tabBg: isDarkMode ? "bg-zinc-950 p-1 border border-zinc-800" : "bg-zinc-200/90 p-1 border border-zinc-300/85",
     input: isDarkMode ? "bg-zinc-950 border border-zinc-800 focus:border-zinc-700 text-zinc-200" : "bg-white border border-zinc-300 focus:border-sky-500 text-zinc-900 focus:ring-1 focus:ring-sky-500",
-    codeBlock: isDarkMode ? "bg-zinc-950 border border-zinc-800 text-zinc-300 text-[10px]" : "bg-zinc-100 border border-zinc-300 text-zinc-800 text-[10px]",
-    terminalInput: isDarkMode ? "bg-zinc-950 border border-zinc-800 focus:border-zinc-700 text-zinc-200 placeholder:text-zinc-500" : "bg-zinc-100 border border-zinc-300 focus:border-sky-500 text-zinc-800 placeholder:text-zinc-500",
     bullet: isDarkMode ? "text-emerald-500" : "text-[#0284c7]",
-    textHeading: isDarkMode ? "text-zinc-400" : "text-zinc-700",
     divider: isDarkMode ? "bg-zinc-800" : "bg-zinc-200",
     btnSec: isDarkMode ? "bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-800" : "bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border border-zinc-300",
     tabAct: isDarkMode ? "bg-zinc-800 text-white border-zinc-700" : "bg-white text-zinc-900 border-zinc-300/80 shadow-xs",
@@ -132,9 +117,7 @@ export default function App() {
     iconAccent: isDarkMode ? "text-emerald-500" : "text-[#0284c7]",
     subTextAccent: isDarkMode ? "text-emerald-400" : "text-[#0284c7] font-semibold",
     textLinkHover: isDarkMode ? "hover:text-emerald-400" : "hover:text-sky-700",
-    borderLinkHover: isDarkMode ? "hover:border-emerald-900/40" : "hover:border-sky-400",
     pinger: isDarkMode ? "bg-emerald-500" : "bg-[#0284c7]",
-    bgLinkAccent: isDarkMode ? "bg-emerald-500 hover:bg-emerald-400 text-zinc-950" : "bg-[#0284c7] hover:bg-[#0369a1] text-white"
   };
 
   // AI Chat States
@@ -149,21 +132,6 @@ export default function App() {
   const [inputText, setInputText] = useState("");
   const [isAiTyping, setIsAiTyping] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
-
-  // Subtitle Translator Lab States
-  const [subtitleText, setSubtitleText] = useState<string>(
-    `1\n00:00:01,500 --> 00:00:04,800\nWe review firewall rules and routine system maintenance.\n\n2\n00:00:05,100 --> 00:00:09,200\nDocker containers support repeatable service deployment.`
-  );
-  const [targetLang, setTargetLang] = useState("French");
-  const [translationLogs, setTranslationLogs] = useState<string[]>([]);
-  const [isTranslating, setIsTranslating] = useState(false);
-  const [translatedResult, setTranslatedResult] = useState<string>("");
-
-  // Wireshark Incident Lab States
-  const [selectedIp, setSelectedIp] = useState<string | null>(null);
-  const [triageStep, setTriageStep] = useState<"select" | "investigate" | "mitigate" | "resolved">("select");
-  const [mitigationLogs, setMitigationLogs] = useState<string[]>([]);
-  const [isMitigating, setIsMitigating] = useState(false);
 
   const [contactForm, setContactForm] = useState({ name: "", email: "", company: "", message: "", website: "" });
   const [contactStatus, setContactStatus] = useState<"idle" | "success" | "error">("idle");
@@ -247,89 +215,6 @@ export default function App() {
     } finally {
       setIsAiTyping(false);
     }
-  };
-
-  // Run Subtitle Translation Call with simulation log pacing
-  const handleTranslateSubtitle = async () => {
-    if (!subtitleText.trim() || isTranslating) return;
-    setIsTranslating(true);
-    setTranslationLogs([]);
-    setTranslatedResult("");
-
-    const logs = [
-      "🔄 Initializing container workload environment...",
-      "🐳 Docker worker container ID [sub-9428-fasp] provisioned dynamically",
-      "🔑 Validating default environment authentication parameters: PASSED",
-      "📝 SQLite history state record instantiated",
-      "📂 Injecting raw SRT subtitle buffers into container pipeline...",
-      "🤖 Executing secure translation API pipeline with server-side AI..."
-    ];
-
-    logs.splice(
-      0,
-      logs.length,
-      "Starting Universal Subtitle Translator mock job",
-      "Checking auth gate and session settings",
-      "Inspecting source with ffprobe subtitle stream scan",
-      "External .srt priority check: preferred when available",
-      "Preparing OpenAI translation batch with target locale: " + targetLang,
-      "Writing job state to SQLite history",
-      "Streaming logs, progress, cancellation token, and report metadata"
-    );
-
-    // Simulated staggered logs for visual realism
-    for (let i = 0; i < logs.length; i++) {
-      await new Promise(resolve => setTimeout(resolve, 600));
-      setTranslationLogs(prev => [...prev, logs[i]]);
-    }
-
-    setTranslationLogs(prev => [...prev, "Sample translation complete. Download report and translated .srt would be attached to the job."]);
-    setTranslatedResult(
-      targetLang === "Persian"
-        ? `1\n00:00:01,500 --> 00:00:04,800\nما قوانین فایروال و نگهداری معمول سیستم را بررسی می‌کنیم.\n\n2\n00:00:05,100 --> 00:00:09,200\nکانتینرهای Docker از استقرار تکرارپذیر سرویس پشتیبانی می‌کنند.`
-        : `1\n00:00:01,500 --> 00:00:04,800\n[${targetLang}] We review firewall rules and routine system maintenance.\n\n2\n00:00:05,100 --> 00:00:09,200\n[${targetLang}] Docker containers support repeatable service deployment.`
-    );
-    setIsTranslating(false);
-  };
-
-  // Wireshark Incident Lab Logic
-  const handleSelectIP = (ip: string) => {
-    setSelectedIp(ip);
-    if (ip === "198.51.100.22") {
-      setTriageStep("investigate");
-    } else {
-      setTriageStep("select");
-    }
-  };
-
-  const handleMitigateThreat = async () => {
-    if (isMitigating) return;
-    setIsMitigating(true);
-    setMitigationLogs([]);
-
-    const steps = [
-      "Reviewing synthetic network records...",
-      "Flagging the sample HTTP request for closer inspection...",
-      "Comparing the request pattern with the provided context...",
-      "Drafting a temporary-block recommendation for the exercise...",
-      "Noting follow-up checks for web and authentication logs...",
-      "Recording the educational review steps...",
-      "Simulation complete. No production system was changed."
-    ];
-
-    for (let i = 0; i < steps.length; i++) {
-      await new Promise(resolve => setTimeout(resolve, 750));
-      setMitigationLogs(prev => [...prev, steps[i]]);
-    }
-
-    setIsMitigating(false);
-    setTriageStep("resolved");
-  };
-
-  const handleResetIncident = () => {
-    setSelectedIp(null);
-    setTriageStep("select");
-    setMitigationLogs([]);
   };
 
   // Send contact form through the server-side email endpoint.
@@ -434,13 +319,6 @@ export default function App() {
               Experience
             </button>
             <button 
-              id="tab-labs"
-              onClick={() => setActiveTab("labs")} 
-              className={"px-4 py-1.5 text-xs font-medium rounded-md transition " + (activeTab === "labs" ? t.tabAct : t.tabInact)}
-            >
-              Labs
-            </button>
-            <button 
               id="tab-chat"
               onClick={() => setActiveTab("chat")} 
               className={"px-4 py-1.5 text-xs font-medium rounded-md transition flex items-center gap-1.5 " + (activeTab === "chat" ? t.tabAct : t.tabInact)}
@@ -499,9 +377,6 @@ export default function App() {
           </button>
           <button onClick={() => setActiveTab("experience")} className={"flex-1 py-1 text-center text-[10px] uppercase font-mono tracking-wider " + (activeTab === "experience" ? t.tabAct + " rounded" : t.tabInact)}>
             Experience
-          </button>
-          <button onClick={() => setActiveTab("labs")} className={"flex-1 py-1 text-center text-[10px] uppercase font-mono tracking-wider " + (activeTab === "labs" ? t.tabAct + " rounded" : t.tabInact)}>
-            Labs
           </button>
           <button onClick={() => setActiveTab("chat")} className={"flex-1 py-1 text-center text-[10px] uppercase font-mono tracking-wider flex justify-center items-center gap-0.5 " + (activeTab === "chat" ? t.tabAct + " rounded" : t.tabInact)}>
             <Sparkles className={"h-2 w-2 " + t.iconAccent} /> Q&A
@@ -604,7 +479,7 @@ export default function App() {
                     <Sparkles className={"h-4 w-4 " + t.iconAccent} />
                   </div>
                   <div>
-                    <div className={"text-xl font-bold font-sans mb-1 " + t.textTitle}>LLM Applications</div>
+                    <div className={"break-words text-base sm:text-xl font-bold font-sans mb-1 " + t.textTitle}>LLM Applications</div>
                     <span className={t.textMuted + " text-xs"}>Subtitle translation and recruiter Q&A</span>
                   </div>
                 </div>
@@ -615,7 +490,7 @@ export default function App() {
                     <Code className="h-4 w-4 text-cyan-500" />
                   </div>
                   <div>
-                    <div className={"text-xl font-bold font-sans mb-1 " + t.textTitle}>Python &amp; APIs</div>
+                    <div className={"break-words text-base sm:text-xl font-bold font-sans mb-1 " + t.textTitle}>Python &amp; APIs</div>
                     <span className={t.textMuted + " text-xs"}>FastAPI, batch jobs, and automation</span>
                   </div>
                 </div>
@@ -626,7 +501,7 @@ export default function App() {
                     <Server className="h-4 w-4 text-amber-500" />
                   </div>
                   <div>
-                    <div className={"text-xl font-bold font-sans mb-1 " + t.textTitle}>Tests &amp; Deployment</div>
+                    <div className={"break-words text-base sm:text-xl font-bold font-sans mb-1 " + t.textTitle}>Tests &amp; Deployment</div>
                     <span className={t.textMuted + " text-xs"}>Verification, Docker, and Cloudflare</span>
                   </div>
                 </div>
@@ -637,7 +512,7 @@ export default function App() {
                     <Shield className="h-4 w-4 text-rose-500" />
                   </div>
                   <div>
-                    <div className={"text-xl font-bold font-sans mb-1 " + t.textTitle}>Systems Administration</div>
+                    <div className={"break-words text-base sm:text-xl font-bold font-sans mb-1 " + t.textTitle}>Systems Administration</div>
                     <span className={t.textMuted + " text-xs"}>Linux, Windows, and networking</span>
                   </div>
                 </div>
@@ -679,12 +554,7 @@ export default function App() {
                 
                 {/* Featured Projects Column */}
                 <div id="projects" className="lg:col-span-8 space-y-6 scroll-mt-24">
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-sm font-mono text-zinc-500 uppercase tracking-lighter">Selected Projects</h2>
-                    <button onClick={() => setActiveTab("labs")} className={"text-xs font-mono hover:underline transition cursor-pointer " + t.subTextAccent + " " + t.textLinkHover}>
-                      View Interactive Labs
-                    </button>
-                  </div>
+                  <h2 className="text-sm font-mono text-zinc-500 uppercase tracking-lighter">Selected Projects</h2>
 
                   <div className="grid grid-cols-1 gap-6">
                     {Object.values(PROJECTS).map((project: ProjectData) => (
@@ -702,19 +572,10 @@ export default function App() {
                             <li key={tech} className={"px-2 py-0.5 rounded border text-[11px] font-mono " + t.badge}>{tech}</li>
                           ))}
                         </ul>
-                        {(project.githubUrl || project.liveUrl) && (
-                          <div className="flex flex-wrap gap-2">
-                            {project.githubUrl && (
-                              <a href={project.githubUrl} target="_blank" rel="noreferrer" aria-label={`${project.title} on GitHub`} className={"inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-xs " + t.btnSec}>
-                                <Github className="h-4 w-4" /> GitHub
-                              </a>
-                            )}
-                            {project.liveUrl && (
-                              <a href={project.liveUrl} target="_blank" rel="noreferrer" className={"inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-xs " + t.btnSec}>
-                                <Play className="h-3 w-3" /> Launch Live Demo
-                              </a>
-                            )}
-                          </div>
+                        {project.githubUrl && (
+                          <a href={project.githubUrl} target="_blank" rel="noreferrer" aria-label={`${project.title} on GitHub`} className={"inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-xs " + t.btnSec}>
+                            <Github className="h-4 w-4" /> GitHub
+                          </a>
                         )}
                       </article>
                     ))}
@@ -860,28 +721,6 @@ export default function App() {
                         {contactError}
                       </div>
                     )}
-                  </div>
-                  {/* Chat and labs helper */}
-                  <div className={t.smallCard + " p-5 rounded-xl space-y-3 font-mono text-xs"}>
-                    <h4 className="text-[10px] text-zinc-500 dark:text-zinc-400 uppercase tracking-widest font-bold">Chat / Labs</h4>
-                    <div className={"space-y-2 text-[11px] leading-tight " + t.textMuted}>
-                      <div className="flex items-center gap-1.5">
-                        <span className={t.bullet}>-</span>
-                        <span>Ask focused questions about role fit, projects, and experience.</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <span className={t.bullet}>-</span>
-                        <span>Run safe interactive demos based on selected projects.</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <span className={t.bullet}>-</span>
-                        <span>Some actions are simulated for privacy, security, and cost control.</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <span className={t.bullet}>-</span>
-                        <span>Use these as optional demos, not the main portfolio path.</span>
-                      </div>
-                    </div>
                   </div>
                 </div>
 
@@ -1139,284 +978,6 @@ export default function App() {
             </motion.div>
           )}
 
-          {/* Interactive Lab Center */}
-          {activeTab === "labs" && (
-            <motion.div 
-              id="content-labs"
-              initial={{ opacity: 0, y: 15 }} 
-              animate={{ opacity: 1, y: 0 }} 
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.3 }}
-              className="space-y-8"
-            >
-              
-              {/* Introduction header */}
-              <div className={"p-5 rounded-xl flex flex-wrap justify-between items-center gap-4 " + t.smallCard}>
-                <div>
-                  <h3 className={"text-lg font-semibold " + t.textTitle}>Interactive Labs</h3>
-                  <p className={"text-xs mt-1 " + t.textMuted}>
-                    Explore selected project workflows through demos with simulated inputs, scenarios, and logs.
-                  </p>
-                </div>
-                <div className={"text-xs font-mono px-2.5 py-1.5 rounded border flex items-center gap-2 " + t.badge}>
-                  <Activity className={"h-4 w-4 " + t.iconAccent} />
-                  <span>Portfolio Labs · Simulations</span>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <AiRailWorkflowLab isDarkMode={isDarkMode} className={t.smallCard + " order-1"} />
-
-                {/* Educational network evidence review simulation */}
-                <div className={"p-5 rounded-xl flex flex-col space-y-4 order-3 lg:order-2 " + t.smallCard}>
-                  <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                    <div className="space-y-1.5">
-                      <span className={"text-[10px] font-mono uppercase px-2 py-0.5 rounded-sm border " + (isDarkMode ? "bg-red-950/50 text-red-400 border-red-900" : "bg-red-50 text-red-700 border-red-200")}>
-                        Educational Demo · Simulation
-                      </span>
-                      <h4 className={"text-base font-semibold " + t.textTitle}>Network Evidence Review</h4>
-                      <p className={"text-xs leading-relaxed max-w-2xl " + t.textMuted}>
-                        A synthetic exercise for reviewing sample network records, identifying a suspicious request pattern, and documenting reasonable follow-up checks.
-                      </p>
-                    </div>
-                    <div className={"rounded-lg border px-3 py-2 font-mono text-[10px] " + (isDarkMode ? "border-red-900/70 bg-red-950/20 text-red-300" : "border-red-200 bg-red-50 text-red-700")}>
-                      Sample Traffic · No Production Data
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    {[
-                      ["Signal", "SQL injection pattern"],
-                      ["Target", "Web service segment"],
-                      ["Status", triageStep === "resolved" ? "Review complete" : selectedIp === "198.51.100.22" ? "Flagged" : "Needs review"]
-                    ].map(([label, value]) => (
-                      <div key={label} className={"rounded-lg border p-3 " + (isDarkMode ? "bg-zinc-950/60 border-zinc-800" : "bg-zinc-50 border-zinc-200")}>
-                        <div className="text-[10px] font-mono uppercase text-zinc-500">{label}</div>
-                        <div className={"mt-1 text-xs font-semibold " + t.textTitle}>{value}</div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className={"rounded-lg border overflow-hidden " + (isDarkMode ? "bg-zinc-950 border-zinc-800" : "bg-zinc-100 border-zinc-300")}>
-                    <div className={"grid grid-cols-[1.25fr_1.05fr_0.65fr_0.7fr] gap-2 border-b px-3 py-2 text-[10px] font-mono uppercase " + (isDarkMode ? "border-zinc-800 text-zinc-500" : "border-zinc-300 text-zinc-500")}>
-                      <span>Source</span>
-                      <span>Dest</span>
-                      <span>Proto</span>
-                      <span>Risk</span>
-                    </div>
-                    <div>
-                      {[
-                        ["192.168.1.10", "10.0.0.5", "TLS", "Normal", "Successful TLS handshake to service endpoint."],
-                        ["198.51.100.22", "10.0.0.55", "HTTP", "High", "GET /wp-login.php with OR 1=1 injection payload."],
-                        ["192.168.1.12", "8.8.8.8", "DNS", "Normal", "Resolver query for external domain."],
-                        ["192.168.1.15", "10.0.0.5", "SSH", "Normal", "Authorized SSH key exchange from admin subnet."]
-                      ].map(([source, dest, proto, risk, evidence]) => {
-                        const isThreat = source === "198.51.100.22";
-                        const isSelected = selectedIp === source;
-                        return (
-                          <button
-                            key={source}
-                            type="button"
-                            onClick={() => handleSelectIP(source)}
-                            className={"w-full px-3 py-2 text-left text-[11px] font-mono transition border-b last:border-b-0 " + (isDarkMode ? "border-zinc-900" : "border-zinc-200") + " " + (
-                              isSelected
-                                ? isThreat
-                                  ? "bg-red-500/10 text-red-300"
-                                  : "bg-sky-500/10"
-                                : isDarkMode
-                                  ? "text-zinc-300 hover:bg-zinc-900"
-                                  : "text-zinc-800 hover:bg-white"
-                            )}
-                          >
-                            <div className="grid grid-cols-[1.25fr_1.05fr_0.65fr_0.7fr] gap-2 items-center">
-                              <span className={"truncate " + (isThreat ? "text-red-400 font-semibold" : "text-cyan-500")}>{source}</span>
-                              <span className="truncate">{dest}</span>
-                              <span className={proto === "HTTP" ? "text-red-400 font-semibold" : proto === "SSH" ? "text-amber-500" : "text-emerald-500"}>{proto}</span>
-                              <span className={isThreat ? "text-red-400 font-semibold" : "text-zinc-500"}>{risk}</span>
-                            </div>
-                            <div className={"mt-1 whitespace-normal leading-relaxed " + (isThreat ? "text-red-300" : t.textMuted)}>{evidence}</div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  <div className={"rounded-lg border p-4 min-h-[192px] " + (isDarkMode ? "bg-zinc-950 border-zinc-800" : "bg-zinc-50 border-zinc-200")}>
-                    {triageStep === "select" && (
-                      <div className="grid gap-3 md:grid-cols-[auto_1fr] md:items-center">
-                        <Search className="h-5 w-5 text-zinc-500" />
-                        <div>
-                          <div className={"text-xs font-semibold " + t.textTitle}>Review the alert evidence</div>
-                          <p className={"mt-1 text-xs leading-relaxed " + t.textMuted}>
-                            Select the high-risk HTTP row to review the rationale and suggested follow-up steps for this simulation.
-                          </p>
-                        </div>
-                      </div>
-                    )}
-
-                    {triageStep === "investigate" && (
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-2 text-xs font-semibold text-red-400">
-                          <AlertTriangle className="h-4 w-4" />
-                          <span>Sample request flagged for review: 198.51.100.22</span>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                          <div className={"rounded border p-3 " + (isDarkMode ? "border-zinc-800 bg-zinc-900/50" : "border-zinc-200 bg-white")}>
-                            <div className="font-mono text-[10px] uppercase text-zinc-500">Detection rationale</div>
-                            <p className={"mt-1 leading-relaxed " + t.textMuted}>
-                              The sample request targets an authentication path and includes a common SQL injection pattern, which warrants closer log review.
-                            </p>
-                          </div>
-                          <div className={"rounded border p-3 " + (isDarkMode ? "border-zinc-800 bg-zinc-900/50" : "border-zinc-200 bg-white")}>
-                            <div className="font-mono text-[10px] uppercase text-zinc-500">Recommended action</div>
-                            <p className={"mt-1 leading-relaxed " + t.textMuted}>
-                              Document the source, consider a temporary block, review relevant web and authentication logs, and verify whether the request produced an error or successful access.
-                            </p>
-                          </div>
-                        </div>
-                        <button
-                          onClick={handleMitigateThreat}
-                          className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white text-xs font-semibold font-mono rounded transition flex items-center justify-center gap-1.5"
-                        >
-                          <Lock className="h-3.5 w-3.5" /> Document Review Steps
-                        </button>
-                      </div>
-                    )}
-
-                    {triageStep === "resolved" && (
-                      <div className="space-y-3">
-                        <div className={"flex items-center gap-1.5 text-xs font-semibold " + (isDarkMode ? "text-emerald-400" : "text-emerald-700")}>
-                          <CheckCircle className="h-4 w-4" />
-                          <span>Educational review completed and sample notes generated</span>
-                        </div>
-                        <div className={"p-3 rounded text-[10px] font-mono max-h-[96px] overflow-y-auto space-y-1 border " + t.codeBlock}>
-                          {mitigationLogs.map((l, lIdx) => (
-                            <div key={lIdx}>{l}</div>
-                          ))}
-                        </div>
-                        <button
-                          onClick={handleResetIncident}
-                          className={"px-3 py-1.5 text-[10px] font-mono rounded border transition " + t.btnSec}
-                        >
-                          Reset Workbench
-                        </button>
-                      </div>
-                    )}
-
-                    {isMitigating && (
-                      <div className="text-center py-4 space-y-2">
-                        <RefreshCw className={"h-5 w-5 animate-spin mx-auto " + t.iconAccent} />
-                        <span className="text-zinc-400 text-[11px] font-mono">Writing simulated review notes...</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Lab 2: Universal Subtitle Translator Live Test Frame */}
-                <div className={"p-5 rounded-xl flex flex-col space-y-3 order-2 lg:order-3 " + t.smallCard}>
-                  <div className="space-y-1.5">
-                    <span className={"text-[10px] font-mono uppercase px-2 py-0.5 rounded-sm border " + (isDarkMode ? "bg-emerald-950/50 text-emerald-400 border-emerald-900" : "bg-sky-50 text-sky-700 border-sky-200")}>
-                      Portfolio Lab · Educational Demo
-                    </span>
-                    <h4 className={"text-base font-semibold " + t.textTitle}>Batch Subtitle Automation Console</h4>
-                    <p className={"text-xs leading-relaxed " + t.textMuted}>
-                      This mirrors my real FastAPI + Docker subtitle tool. It scans SRT or video sources, prioritizes external subtitles, falls back to ffmpeg extraction, translates with OpenAI, and records progress in SQLite job history.
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {/* Input Subtitle block */}
-                    <div>
-                      <span className="block text-[10px] font-mono text-zinc-500 uppercase mb-1">Source SRT / Extracted Track Preview</span>
-                      <textarea
-                        value={subtitleText}
-                        onChange={(e) => setSubtitleText(e.target.value)}
-                        rows={4}
-                        className={"w-full rounded px-2.5 py-1.5 text-[11px] font-mono resize-none leading-normal transition " + t.terminalInput}
-                      ></textarea>
-                    </div>
-
-                    {/* Output translation block */}
-                    <div>
-                      <span className="block text-[10px] font-mono text-zinc-500 uppercase mb-1">Translated .srt Output Preview</span>
-                      <div className={"w-full h-[94px] rounded p-2.5 text-[11px] font-mono overflow-y-auto whitespace-pre-wrap leading-normal " + t.terminalInput}>
-                        {isTranslating ? (
-                          <div className={"flex items-center space-x-1 justify-center h-full text-[10px] " + (isDarkMode ? "text-zinc-500" : "text-zinc-600")}>
-                            <span className="animate-spin">⏳</span>
-                          <span>Awaiting batch worker output...</span>
-                          </div>
-                        ) : translatedResult ? (
-                          translatedResult
-                        ) : (
-                          <span className={(isDarkMode ? "text-zinc-500" : "text-zinc-600") + " block text-[10px] text-center pt-8"}>Run a sample to preview translated subtitles</span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Operational Settings Console */}
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] text-zinc-500 font-mono uppercase">Target Language:</span>
-                      <select 
-                        value={targetLang}
-                        onChange={(e) => setTargetLang(e.target.value)}
-                        className={"border p-1 text-[11px] font-mono rounded " + t.input}
-                      >
-                        <option value="Persian">Persian (FA)</option>
-                        <option value="Spanish">Spanish (ES)</option>
-                        <option value="German">German (DE)</option>
-                        <option value="French">French (FR)</option>
-                        <option value="Italian">Italian (IT)</option>
-                      </select>
-                    </div>
-
-                    <button
-                      onClick={handleTranslateSubtitle}
-                      disabled={isTranslating || !subtitleText.trim()}
-                      className={"px-4 py-2 text-xs font-semibold rounded cursor-pointer transition flex items-center justify-center gap-1.5 disabled:opacity-50 " + 
-                        (isDarkMode 
-                          ? "bg-emerald-500 hover:bg-emerald-400 text-zinc-950" 
-                          : "bg-[#0284c7] hover:bg-[#0369a1] text-white")}
-                    >
-                      <Play className="h-3.5 w-3.5 fill-current" /> Run Sample
-                    </button>
-                  </div>
-
-                  <div className="flex flex-wrap gap-1.5">
-                    <span className={"px-2 py-1 rounded border text-[10px] font-mono " + t.badge}>FastAPI</span>
-                    <span className={"px-2 py-1 rounded border text-[10px] font-mono " + t.badge}>Docker Compose</span>
-                    <span className={"px-2 py-1 rounded border text-[10px] font-mono " + t.badge}>FFmpeg</span>
-                    <span className={"px-2 py-1 rounded border text-[10px] font-mono " + t.badge}>SQLite Jobs</span>
-                    <span className={"px-2 py-1 rounded border text-[10px] font-mono " + t.badge}>Auth + Reports</span>
-                  </div>
-
-                  {/* Console telemetry readout */}
-                  <div className={"p-3 rounded border text-[10px] font-mono h-[84px] overflow-y-auto space-y-1 select-all " + t.codeBlock}>
-                    <span className="text-zinc-500 block">SUBTITLE TRANSLATOR JOB LOG:</span>
-                    {translationLogs.length === 0 ? (
-                      <span className="text-zinc-500 italic block pt-2">Run a sample to initialize scan, extraction, translation, and report telemetry.</span>
-                    ) : (
-                      translationLogs.map((log, index) => (
-                        <div key={index}>{log}</div>
-                      ))
-                    )}
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-3">
-                    <a href="https://translate.theafshin.com/" target="_blank" referrerPolicy="no-referrer" className={"px-3 py-2 text-xs font-semibold rounded transition flex items-center justify-center gap-1.5 " + (isDarkMode ? "bg-emerald-500 hover:bg-emerald-400 text-zinc-950" : "bg-[#0284c7] hover:bg-[#0369a1] text-white")}>
-                      <ExternalLink className="h-3.5 w-3.5" /> Live Demo
-                    </a>
-                    <a href="https://github.com/afshinsb/universal-subtitle-translator" target="_blank" referrerPolicy="no-referrer" className={"px-3 py-2 text-xs font-semibold rounded border transition flex items-center justify-center gap-1.5 " + t.btnSec}>
-                      <Github className="h-3.5 w-3.5" /> Source
-                    </a>
-                  </div>
-
-                </div>
-
-              </div>
-            </motion.div>
-          )}
         </AnimatePresence>
 
       </main>

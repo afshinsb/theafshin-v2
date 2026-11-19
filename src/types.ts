@@ -14,7 +14,6 @@ export interface ProjectData {
   details?: string;
   tech: string[];
   githubUrl?: string;
-  liveUrl?: string;
 }
 
 export interface SkillCategory {

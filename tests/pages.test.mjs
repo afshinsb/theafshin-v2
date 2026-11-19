@@ -93,7 +93,8 @@ test("provider gets only the current question and can select verified project an
   const { text } = await response.json();
   assert.match(text, /FastAPI|SQLite/);
   assert.match(text, /cue IDs/);
-  assert.match(text, /https:\/\/translate\.theafshin\.com\//);
+  assert.ok(text.includes("https://github.com/afshinsb/universal-subtitle-translator"));
+  assert.doesNotMatch(text, /translate\.theafshin\.com|live demo/i);
   const [, options] = provider.mock.calls[0].arguments;
   const request = JSON.parse(options.body);
   assert.deepEqual(request.input, [{ role: "user", content: message }]);

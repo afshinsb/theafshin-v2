@@ -7,7 +7,6 @@ function projectAnswer(project: ProjectData) {
     `**${project.title}**. ${project.description}`,
     project.details,
     project.githubUrl ? `[GitHub source](${project.githubUrl})` : undefined,
-    project.liveUrl ? `[Live demo](${project.liveUrl})` : undefined,
   ].filter(Boolean).join("\n\n");
 }
 
@@ -18,12 +17,12 @@ const answers = {
   },
   ai_projects: {
     topic: "Which AI or software projects he has built, and where to explore them",
-    text: `- **[Universal Subtitle Translator](${PROJECTS.subtitleTranslator.githubUrl})** extracts and translates subtitles with Python, FastAPI, and the OpenAI API. Try the [live demo](${PROJECTS.subtitleTranslator.liveUrl}).
+    text: `- **[Universal Subtitle Translator](${PROJECTS.subtitleTranslator.githubUrl})** extracts and translates subtitles with Python, FastAPI, and the OpenAI API.
 - **[AI Rail](${PROJECTS.aiRail.githubUrl})** is a Python CLI for scoped AI-assisted development, GitHub workflows, and release verification.
 - **[Portfolio AI Recruiter Chatbot](${PROJECTS.recruiterChat.githubUrl})** uses the OpenAI Responses API and Cloudflare Pages Functions to answer common recruiter questions.`,
   },
   subtitle_translator: {
-    topic: "Universal Subtitle Translator, LLM translation, cue alignment, batch jobs, and the translator demo",
+    topic: "Universal Subtitle Translator, LLM translation, cue alignment, and batch jobs",
     text: projectAnswer(PROJECTS.subtitleTranslator),
   },
   ai_rail: {

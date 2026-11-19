@@ -56,7 +56,6 @@ export const PROJECTS = {
     details: "Validates structured replies against source cue IDs to catch missing, duplicate, or misaligned translations. Retries failed batches and records interrupted jobs in SQLite. Includes automated tests and Docker deployment.",
     tech: ["Python", "FastAPI", "OpenAI API", "FFmpeg", "SQLite", "Docker", "pytest"],
     githubUrl: "https://github.com/afshinsb/universal-subtitle-translator",
-    liveUrl: "https://translate.theafshin.com/",
   },
   aiRail: {
     title: "AI Rail",
