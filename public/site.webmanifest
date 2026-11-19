@@ -3,7 +3,7 @@
   "short_name": "Afshin",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f7f8fd",
-  "theme_color": "#4936c4",
+  "background_color": "#09090b",
+  "theme_color": "#22c55e",
   "description": "Afshin Saberi is a Toronto software developer building applied AI and LLM applications, Python backends, and engineering automation."
 }

@@ -8,7 +8,10 @@ export const PERSONAL_INFO = {
   linkedin: "https://linkedin.com/in/theafshin",
   github: "https://github.com/afshinsb",
   portfolio: "https://theafshin.com",
-  summary: "I’m Afshin. I built a FastAPI subtitle translator that checks and repairs OpenAI output, and a Python CLI that ties AI-assisted changes to GitHub issues and review checks.",
+  summary: [
+    "I’m a Toronto-based software developer focused on Python applications, LLM integrations, backend systems, and engineering automation.",
+    "I build AI features into software with validation, automated tests, and deployment in mind. My systems administration background informs how I design for reliability, security, and maintainability.",
+  ],
 };
 
 export const EDUCATION = {
@@ -49,17 +52,16 @@ export const PROJECTS = {
   subtitleTranslator: {
     title: "Universal Subtitle Translator",
     subtitle: "Python backend and LLM integration",
-    description: "This FastAPI service extracts text tracks with FFmpeg, sends batches of cues to OpenAI, and writes translated SRT files with the original dialogue timing.",
-    details: "The service checks each reply against the original cue IDs, retries or repairs incomplete results, and tracks jobs in SQLite. The 1.8.2 report records 79 passing tests on each of Python 3.10 and 3.12, plus a real FFmpeg smoke test using a mocked model transport.",
+    description: "A FastAPI service that extracts subtitles with FFmpeg and translates subtitle files or media folders in batches through the OpenAI API.",
+    details: "Validates structured replies against source cue IDs to catch missing, duplicate, or misaligned translations. Retries failed batches and records interrupted jobs in SQLite. Includes automated tests and Docker deployment.",
     tech: ["Python", "FastAPI", "OpenAI API", "FFmpeg", "SQLite", "Docker", "pytest"],
     githubUrl: "https://github.com/afshinsb/universal-subtitle-translator",
-    evidence: { label: "Read the verification report", url: "https://github.com/afshinsb/universal-subtitle-translator/blob/16422fb80fe9e6578d0953684e09d9009140dc16/docs/AUDIT-1.8.2.md" },
   },
   aiRail: {
     title: "AI Rail",
     subtitle: "Python CLI and engineering automation",
-    description: "This local Python CLI turns one GitHub issue into a scoped handoff and gathers the working diff into a review pack.",
-    details: "It records a verified snapshot of the repository state that passed local checks and flags changes made before release.",
+    description: "A local Python CLI that scopes AI-assisted coding to one GitHub issue at a time and prepares prompts and review packs for existing coding tools.",
+    details: "Runs project checks and records a verified snapshot so the release step can detect changes made after verification.",
     tech: ["Python", "Git", "GitHub Issues", "GitHub CLI", "pytest", "pipx"],
     githubUrl: "https://github.com/afshinsb/ai-rail",
   },
@@ -74,22 +76,22 @@ export const PROJECTS = {
   modelFrontier: {
     title: "Model Frontier",
     subtitle: "AI model comparison dashboard",
-    description: "This React and TypeScript dashboard keeps the scatter plot, results table, and comparison tray on the same filtered set of model configurations.",
-    details: "It validates imported records and shows the sources and compatibility rules behind each comparison.",
+    description: "A React and TypeScript dashboard for exploring published AI model measurements with filters, plots, and side-by-side comparisons.",
+    details: "Uses validated data schemas and retains source provenance so readers can see which measurements are comparable.",
     tech: ["React", "TypeScript", "Zod"],
   },
   docShape: {
     title: "DocShape",
     subtitle: "Document rendering and export",
-    description: "This document workspace tracks source file revisions and opens saved HTML and CSS in a browser for inspection and PDF export.",
+    description: "A document layout and export tool with a React editor and a server-side browser renderer for PDF output.",
     details: "Separates the editing view from the export renderer and tests the layout and rendering behavior.",
     tech: ["React", "TypeScript", "Cloudflare Workers", "Vitest"],
   },
   blushtime: {
     title: "Blushtime",
     subtitle: "Booking and administration software",
-    description: "This project uses Next.js and PostgreSQL for appointment booking and administration.",
-    details: "The app validates booking requests and keeps appointment changes in an authenticated admin workflow.",
+    description: "A Next.js and TypeScript application for booking and appointment administration.",
+    details: "Validates booking requests and supports authenticated administration and appointment status changes with PostgreSQL.",
     tech: ["Next.js", "TypeScript", "Supabase", "PostgreSQL", "Cloudflare"],
   },
   homelab: {
