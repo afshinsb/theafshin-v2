@@ -20,8 +20,10 @@ import {
 import { motion, AnimatePresence } from "motion/react";
 import Markdown from "react-markdown";
 
-import { EDUCATION, PERSONAL_INFO, WORK_EXPERIENCE, PROJECTS, SKILL_CATEGORIES, SUGGESTED_QUESTIONS } from "./data";
-import type { ChatMessage, ProjectData } from "./types";
+import { ProjectCards } from "./components/ProjectCards";
+import { SubtitlePipeline } from "./components/SubtitlePipeline";
+import { EDUCATION, PERSONAL_INFO, WORK_EXPERIENCE, SKILL_CATEGORIES, SUGGESTED_QUESTIONS } from "./data";
+import type { ChatMessage } from "./types";
 
 const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY || "";
 const PUBLIC_EMAIL_LINK = `mailto:${PERSONAL_INFO.email}`;
@@ -389,12 +391,8 @@ export default function App() {
         
         {/* Core Profile Banner - displayed on top level of Overview */}
         {activeTab === "overview" && (
-          <div className={"mb-8 p-6 sm:p-8 rounded-2xl relative overflow-hidden " + t.card}>
-            <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
-              <Terminal className={"h-64 w-64 " + t.iconAccent} />
-            </div>
-            
-            <div className="w-full flex flex-col items-start">
+          <div className={"mb-8 grid items-center gap-6 rounded-2xl p-4 sm:p-8 lg:grid-cols-2 lg:gap-8 xl:gap-12 " + t.card}>
+            <div className="min-w-0">
               <h1 className={"max-w-4xl text-3xl sm:text-4xl font-semibold tracking-tight mb-2 " + t.textTitle}>
                 Building Practical AI Applications &amp; Reliable Software
               </h1>
@@ -406,7 +404,7 @@ export default function App() {
                 {PERSONAL_INFO.summary.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
               </div>
 
-              <div className="flex w-full flex-col gap-4 md:flex-row md:items-end md:justify-between">
+              <div className="flex w-full flex-col gap-4">
                 <div className={"rounded-lg border overflow-hidden w-full max-w-[368px] " + (isDarkMode ? "bg-zinc-950/85 border-zinc-800" : "bg-zinc-100 border-zinc-300")}>
                   <div className={"flex items-center justify-between border-b px-3 py-1.5 " + (isDarkMode ? "border-zinc-800" : "border-zinc-300")}>
                     <div className="flex items-center gap-1.5">
@@ -437,10 +435,10 @@ export default function App() {
                     </div>
                   </div>
                 </div>
-                <div className="flex w-full flex-col gap-3 md:ml-auto md:w-[250px] md:items-stretch">
+                <div className="flex w-full flex-col flex-wrap gap-3 sm:flex-row">
                   <button 
                     onClick={() => setActiveTab("chat")} 
-                    className={"w-full px-5 py-2.5 text-xs font-semibold rounded-lg transition duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-lg " + 
+                    className={"w-full px-5 py-2.5 text-xs font-semibold rounded-lg transition duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-lg sm:w-auto " +
                       (isDarkMode 
                         ? "bg-emerald-500 hover:bg-emerald-400 text-zinc-950 shadow-emerald-500/25" 
                         : "bg-[#0284c7] hover:bg-[#0369a1] text-white shadow-sky-600/15")}
@@ -449,13 +447,14 @@ export default function App() {
                   </button>
                   <a
                     href="#projects"
-                    className={"w-full px-5 py-2.5 text-xs font-semibold rounded-lg transition duration-200 flex items-center justify-center gap-2 cursor-pointer " + t.btnSec}
+                    className={"w-full px-5 py-2.5 text-xs font-semibold rounded-lg transition duration-200 flex items-center justify-center gap-2 cursor-pointer sm:w-auto " + t.btnSec}
                   >
                     <Terminal className="h-4 w-4" /> View Selected Projects
                   </a>
                 </div>
               </div>
             </div>
+            <SubtitlePipeline />
           </div>
         )}
 
@@ -556,30 +555,7 @@ export default function App() {
                 <div id="projects" className="lg:col-span-8 space-y-6 scroll-mt-24">
                   <h2 className="text-sm font-mono text-zinc-500 uppercase tracking-lighter">Selected Projects</h2>
 
-                  <div className="grid grid-cols-1 gap-6">
-                    {Object.values(PROJECTS).map((project: ProjectData) => (
-                      <article key={project.title} className={"p-6 rounded-xl space-y-4 " + t.smallCard}>
-                        <div>
-                          <h3 className={"text-lg font-semibold leading-snug " + t.textTitle}>{project.title}</h3>
-                          <p className={"text-xs font-mono " + t.subTextAccent}>{project.subtitle}</p>
-                        </div>
-                        <div className={"space-y-2 text-sm leading-relaxed " + t.textMuted}>
-                          <p>{project.description}</p>
-                          {project.details && <p>{project.details}</p>}
-                        </div>
-                        <ul aria-label="Technologies" className="flex flex-wrap gap-1.5">
-                          {project.tech.map((tech) => (
-                            <li key={tech} className={"px-2 py-0.5 rounded border text-[11px] font-mono " + t.badge}>{tech}</li>
-                          ))}
-                        </ul>
-                        {project.githubUrl && (
-                          <a href={project.githubUrl} target="_blank" rel="noreferrer" aria-label={`${project.title} on GitHub`} className={"inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-xs " + t.btnSec}>
-                            <Github className="h-4 w-4" /> GitHub
-                          </a>
-                        )}
-                      </article>
-                    ))}
-                  </div>
+                  <ProjectCards />
                 </div>
 
                 {/* Secure Contact Portal Column */}
