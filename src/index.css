@@ -255,115 +255,49 @@
   }
 }
 
-.portfolio-project-grid {
+.portfolio-project-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
-  gap: 1rem;
+  gap: .8rem;
 }
 
 .portfolio-project-card {
-  display: flex;
+  display: grid;
   min-width: 0;
-  flex-direction: column;
-  overflow: hidden;
+  gap: .65rem;
+  padding: clamp(.9rem, 2vw, 1.15rem);
   border: 1px solid var(--panel-border);
-  border-radius: 14px;
+  border-radius: 12px;
   background: var(--panel-surface);
   color: var(--panel-ink);
   box-shadow: var(--panel-shadow);
-  transition: border-color .18s;
 }
 
-.portfolio-project-card:is(:hover, :focus-within) {
-  border-color: var(--panel-accent);
-}
-
-.portfolio-project-diagram {
-  --diagram-accent: var(--color-sky-300);
-  --diagram-bg: var(--color-zinc-950);
-  position: relative;
-  isolation: isolate;
+.portfolio-project-heading {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  align-items: start;
-  min-height: 7.8rem;
-  padding: 1.15rem .75rem .9rem;
-  border-bottom: 1px solid var(--panel-border);
-  background: radial-gradient(ellipse at 50% 60%, color-mix(in srgb, var(--panel-accent) 17%, var(--diagram-bg)), var(--diagram-bg) 82%);
-  list-style: none;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  column-gap: .8rem;
 }
 
-:root[data-theme="dark"] .portfolio-project-diagram {
-  --diagram-accent: var(--panel-accent-ink);
-}
-
-.portfolio-project-diagram::before {
-  position: absolute;
-  z-index: -1;
-  inset: 0;
-  background-image: radial-gradient(#ffffff31 1px, transparent 1px);
-  background-size: 13px 13px;
-  mask-image: linear-gradient(90deg, #0007, #000);
-  content: "";
-}
-
-.portfolio-project-diagram li {
-  position: relative;
-  display: grid;
-  justify-items: center;
-  gap: .45rem;
-  padding-inline: .15rem;
-  color: var(--color-zinc-100);
-  font-size: .78rem;
-  line-height: 1.25;
-  text-align: center;
-}
-
-.portfolio-project-diagram li + li::before {
-  position: absolute;
-  inset: 21px calc(50% + 21px) auto calc(-50% + 21px);
-  border-top: 1px dashed var(--diagram-accent);
-  opacity: .7;
-  content: "";
-}
-
-.portfolio-project-diagram svg {
-  width: 43px;
-  height: 43px;
-  padding: 10px;
-  border: 1px solid var(--diagram-accent);
-  border-radius: 10px;
-  background: var(--diagram-bg);
-  color: var(--diagram-accent);
-}
-
-.portfolio-project-copy {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: .7rem;
-  padding: 1.15rem;
-}
-
-.portfolio-project-discipline {
-  color: var(--panel-accent-ink);
-  font-size: .75rem;
-  font-weight: 700;
-  letter-spacing: .045em;
-  text-transform: uppercase;
-}
-
-.portfolio-project-copy h3 {
-  font-size: 1.35rem;
+.portfolio-project-heading h3 {
+  grid-column: 1;
+  font-size: 1.25rem;
   font-weight: 650;
   letter-spacing: -.025em;
   line-height: 1.2;
 }
 
+.portfolio-project-heading p {
+  grid-column: 1 / -1;
+  margin-top: .2rem;
+  color: var(--panel-muted);
+  font-size: .85rem;
+  line-height: 1.4;
+}
+
 .portfolio-project-description {
   display: grid;
-  gap: .5rem;
+  gap: .4rem;
   color: var(--panel-muted);
   font-size: .94rem;
   line-height: 1.55;
@@ -373,7 +307,6 @@
   display: flex;
   flex-wrap: wrap;
   gap: .36rem;
-  margin-top: .2rem;
 }
 
 .portfolio-project-stack li {
@@ -386,24 +319,27 @@
 }
 
 .portfolio-project-link {
-  display: inline-flex;
-  align-items: center;
-  gap: .45rem;
-  margin-top: auto;
-  padding-top: .35rem;
+  grid-column: 2;
+  grid-row: 1;
   color: var(--panel-accent-ink);
-  font-size: .88rem;
+  font-size: .85rem;
   font-weight: 650;
-  text-underline-offset: .25em;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, currentColor 50%, transparent);
+  text-underline-offset: .2em;
 }
 
 .portfolio-project-link:is(:hover, :focus-visible) {
-  text-decoration: underline;
+  text-decoration-color: currentColor;
+}
+
+.portfolio-project-link:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .subtitle-pipeline__icon,
-  .portfolio-project-card {
+  .subtitle-pipeline__icon {
     transition: none;
   }
 }
