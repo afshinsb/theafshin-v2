@@ -1,28 +1,26 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback, lazy, Suspense } from "react";
 import {
   Shield,
-  Server,
   Terminal,
   Mail,
-  MapPin,
   Github,
-  Linkedin,
   Send,
   CheckCircle,
   AlertCircle,
   Code,
   GraduationCap,
   Sparkles,
-  RefreshCw,
-  Sun,
-  Moon
+  RefreshCw
 } from "lucide-react";
-import { motion, AnimatePresence } from "motion/react";
-import Markdown from "react-markdown";
+import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 
 import { EDUCATION, PERSONAL_INFO, WORK_EXPERIENCE, PROJECTS, SKILL_CATEGORIES, SUGGESTED_QUESTIONS } from "./data";
 import type { ChatMessage, ProjectData } from "./types";
+import { OverviewHero } from "./components/OverviewHero";
+import { PortfolioHeader, type PortfolioTab } from "./components/PortfolioHeader";
+import { usePortfolioTheme } from "./usePortfolioTheme";
 
+const Markdown = lazy(() => import("react-markdown"));
 const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY || "";
 const PUBLIC_EMAIL_LINK = `mailto:${PERSONAL_INFO.email}`;
 const CHAT_WELCOME = "Ask about Afshin’s applied AI projects, Python and backend development, systems background, or fit for roles in Toronto and across Canada.";
@@ -30,15 +28,16 @@ const SKILL_ICONS = [Sparkles, Code, Terminal, Shield];
 
 function TurnstileWidget({
   onVerify,
-  enabled,
+  theme,
 }: {
   onVerify: (token: string) => void;
-  enabled: boolean;
+  theme: "light" | "dark";
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!enabled || !containerRef.current) return;
+    if (!TURNSTILE_SITE_KEY || !containerRef.current) return;
+    onVerify("");
 
     let widgetId = "";
     const interval = window.setInterval(() => {
@@ -46,7 +45,10 @@ function TurnstileWidget({
       widgetId = window.turnstile.render(containerRef.current, {
         sitekey: TURNSTILE_SITE_KEY,
         callback: onVerify,
-        theme: "auto",
+        theme,
+        size: containerRef.current.clientWidth < 300 ? "compact" : "flexible",
+        "expired-callback": () => onVerify(""),
+        "error-callback": () => onVerify(""),
       });
       window.clearInterval(interval);
     }, 250);
@@ -55,10 +57,10 @@ function TurnstileWidget({
       window.clearInterval(interval);
       if (widgetId) window.turnstile?.remove(widgetId);
     };
-  }, [enabled, onVerify]);
+  }, [theme, onVerify]);
 
-  if (!enabled) {
-    return <div className="text-[10px] font-mono text-amber-500">Turnstile site key is not configured.</div>;
+  if (!TURNSTILE_SITE_KEY) {
+    return <p className="text-sm text-muted">The form is unavailable here. You can <a className="text-accent underline" href={PUBLIC_EMAIL_LINK}>email Afshin directly</a>.</p>;
   }
 
   return <div ref={containerRef} className="min-h-[65px]" />;
@@ -73,52 +75,38 @@ function safeMarkdownUrl(url: string) {
   return ["http", "https"].includes(protocol) || trimmed === PUBLIC_EMAIL_LINK ? trimmed : "";
 }
 
+const t = {
+  bg: "min-h-screen bg-page text-ink font-sans selection:bg-accent-soft",
+  smallCard: "border border-line bg-surface shadow-panel",
+  subCardOverlay: "bg-surface border-accent/50 shadow-panel",
+  textMuted: "text-muted",
+  textTitle: "text-ink",
+  badge: "bg-surface-soft text-muted border-line",
+  input: "bg-page border-field-line text-ink focus:border-accent placeholder:text-muted",
+  bullet: "text-accent",
+  divider: "bg-line",
+  btnSec: "bg-surface hover:bg-surface-soft text-ink border-line",
+  iconAccent: "text-accent",
+  subTextAccent: "text-accent font-semibold",
+  pinger: "bg-accent",
+};
+
 export default function App() {
-  // Navigation State
-  const [activeTab, setActiveTab] = useState<"overview" | "chat" | "experience">("overview");
-
-  // Theme Management
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
-    const saved = localStorage.getItem("portfolio-theme");
-    return saved !== null ? saved === "dark" : true;
-  });
-
-  const toggleTheme = () => {
-    setIsDarkMode(prev => {
-      const next = !prev;
-      localStorage.setItem("portfolio-theme", next ? "dark" : "light");
-      return next;
-    });
+  const [activeTab, setActiveTab] = useState<PortfolioTab>("overview");
+  const { dark, toggleTheme } = usePortfolioTheme();
+  const reduceMotion = useReducedMotion();
+  const panelMotion = {
+    initial: { opacity: 0, y: reduceMotion ? 0 : 9 },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0 },
+    transition: { duration: reduceMotion ? 0 : 0.18 },
   };
 
-  useEffect(() => {
-    document.documentElement.dataset.theme = isDarkMode ? "dark" : "light";
-    document.documentElement.style.colorScheme = isDarkMode ? "dark" : "light";
-  }, [isDarkMode]);
-
-  const t = {
-    bg: isDarkMode ? "min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-emerald-500/30 selection:text-emerald-400 transition-colors duration-200" : "min-h-screen bg-zinc-50 text-zinc-900 font-sans selection:bg-sky-100 selection:text-sky-900 transition-colors duration-200",
-    header: isDarkMode ? "border-b border-zinc-800 bg-zinc-900/50 sticky top-0 z-50 backdrop-blur-md" : "border-b border-zinc-200 bg-white/90 sticky top-0 z-50 backdrop-blur-md shadow-xs",
-    card: isDarkMode ? "border border-zinc-800 bg-linear-to-b from-zinc-900 to-zinc-950" : "border border-zinc-200 bg-linear-to-b from-white to-zinc-100/70 shadow-xs",
-    smallCard: isDarkMode ? "bg-zinc-900/50 border border-zinc-800" : "bg-white border border-zinc-200/60 shadow-2xs",
-    subCardOverlay: isDarkMode ? "bg-zinc-950/95 border-emerald-500/30" : "bg-white/98 border-sky-300/30 shadow-md",
-    textMuted: isDarkMode ? "text-zinc-400" : "text-zinc-600",
-    textTitle: isDarkMode ? "text-white" : "text-zinc-900",
-    badge: isDarkMode ? "bg-zinc-800 text-zinc-300 border border-zinc-700/60" : "bg-zinc-100 text-zinc-800 border border-zinc-300/75",
-    tabBg: isDarkMode ? "bg-zinc-950 p-1 border border-zinc-800" : "bg-zinc-200/90 p-1 border border-zinc-300/85",
-    input: isDarkMode ? "bg-zinc-950 border border-zinc-800 focus:border-zinc-700 text-zinc-200" : "bg-white border border-zinc-300 focus:border-sky-500 text-zinc-900 focus:ring-1 focus:ring-sky-500",
-    bullet: isDarkMode ? "text-emerald-500" : "text-[#0284c7]",
-    divider: isDarkMode ? "bg-zinc-800" : "bg-zinc-200",
-    btnSec: isDarkMode ? "bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-800" : "bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border border-zinc-300",
-    tabAct: isDarkMode ? "bg-zinc-800 text-white border-zinc-700" : "bg-white text-zinc-900 border-zinc-300/80 shadow-xs",
-    tabInact: isDarkMode ? "text-zinc-400 hover:text-zinc-200" : "text-zinc-500 hover:text-zinc-900",
-
-    // Responsive Accents
-    iconAccent: isDarkMode ? "text-emerald-500" : "text-[#0284c7]",
-    subTextAccent: isDarkMode ? "text-emerald-400" : "text-[#0284c7] font-semibold",
-    textLinkHover: isDarkMode ? "hover:text-emerald-400" : "hover:text-sky-700",
-    pinger: isDarkMode ? "bg-emerald-500" : "bg-[#0284c7]",
-  };
+  function navigate(tab: PortfolioTab) {
+    if (tab !== activeTab) setActiveTab(tab);
+    if (window.location.hash) window.history.replaceState(window.history.state, "", window.location.pathname + window.location.search);
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }
 
   // AI Chat States
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -131,13 +119,18 @@ export default function App() {
   ]);
   const [inputText, setInputText] = useState("");
   const [isAiTyping, setIsAiTyping] = useState(false);
-  const chatEndRef = useRef<HTMLDivElement>(null);
+  const chatLogRef = useRef<HTMLDivElement>(null);
+  const setChatLog = useCallback((node: HTMLDivElement | null) => {
+    chatLogRef.current = node;
+    if (node) node.scrollTop = node.scrollHeight;
+  }, []);
 
   const [contactForm, setContactForm] = useState({ name: "", email: "", company: "", message: "", website: "" });
   const [contactStatus, setContactStatus] = useState<"idle" | "success" | "error">("idle");
   const [contactError, setContactError] = useState("");
   const [isContactSubmitting, setIsContactSubmitting] = useState(false);
   const [contactTurnstileToken, setContactTurnstileToken] = useState("");
+  const [contactChallenge, setContactChallenge] = useState(0);
 
   useEffect(() => {
     if (TURNSTILE_SITE_KEY && !document.querySelector('script[src*="challenges.cloudflare.com/turnstile"]')) {
@@ -151,7 +144,8 @@ export default function App() {
 
   // Autoscroll Chat
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const log = chatLogRef.current;
+    if (log) log.scrollTop = log.scrollHeight;
   }, [messages, isAiTyping]);
 
   // Handle Send Chat
@@ -195,14 +189,14 @@ export default function App() {
       if (!response.ok) {
         throw new Error(data.error || "The AI chat is temporarily unavailable.");
       }
-      
+
       const botMessage: ChatMessage = {
         id: Math.random().toString(),
         sender: "ai",
         text: data.text || `You can reach Afshin through the contact form or at [${PERSONAL_INFO.email}](${PUBLIC_EMAIL_LINK}).`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
-      
+
       setMessages((prev) => [...prev, botMessage]);
     } catch (err: any) {
       const errorMessage: ChatMessage = {
@@ -274,493 +268,263 @@ export default function App() {
       setContactError(err.message || "Unable to send the message.");
     } finally {
       setContactTurnstileToken("");
-      window.turnstile?.reset();
+      setContactChallenge((attempt) => attempt + 1);
       setIsContactSubmitting(false);
     }
   };
 
   return (
     <div className={t.bg + " flex flex-col"}>
-      
-      {/* Structural Minimal Top Navbar */}
-      <header className={t.header}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
-          
-          <div className="flex min-w-0 items-center space-x-3">
-            <div className={"h-10 w-10 shrink-0 rounded-lg border flex items-center justify-center font-mono " + 
-              (isDarkMode 
-                ? "bg-emerald-950/80 border-emerald-800/60 text-emerald-400" 
-                : "bg-cyan-50 border border-cyan-200 text-[#0284c7] font-semibold text-base")}>
-              <Terminal className="h-5 w-5" />
-            </div>
-            <div className="min-w-0">
-              <div className={"truncate whitespace-nowrap text-sm sm:text-lg font-semibold tracking-tight font-sans " + t.textTitle}>{PERSONAL_INFO.name.toUpperCase()}</div>
-              <span className="hidden text-xs text-zinc-400 font-mono sm:flex min-w-0 items-center gap-1.5 leading-none">
-                <span className={"h-2 w-2 shrink-0 rounded-full inline-block animate-pulse " + (isDarkMode ? "bg-emerald-500" : "bg-[#0284c7]")}></span>
-                <span>Software Developer · Applied AI</span>
-              </span>
-            </div>
-          </div>
 
-          {/* Desktop Tabs */}
-          <nav className={"hidden md:flex space-x-1 p-1 rounded-lg " + t.tabBg}>
-            <button 
-              id="tab-overview"
-              onClick={() => setActiveTab("overview")} 
-              className={"px-4 py-1.5 text-xs font-medium rounded-md transition " + (activeTab === "overview" ? t.tabAct : t.tabInact)}
-            >
-              Overview
-            </button>
-            <button 
-              id="tab-experience"
-              onClick={() => setActiveTab("experience")} 
-              className={"px-4 py-1.5 text-xs font-medium rounded-md transition " + (activeTab === "experience" ? t.tabAct : t.tabInact)}
-            >
-              Experience
-            </button>
-            <button 
-              id="tab-chat"
-              onClick={() => setActiveTab("chat")} 
-              className={"px-4 py-1.5 text-xs font-medium rounded-md transition flex items-center gap-1.5 " + (activeTab === "chat" ? t.tabAct : t.tabInact)}
-            >
-              <Sparkles className={"h-3 w-3 " + t.iconAccent} /> Recruiter Q&A
-            </button>
-          </nav>
-
-          {/* Contact Fast-link panel & Theme Toggle */}
-          <div className="flex shrink-0 items-center space-x-1.5 sm:space-x-2">
-            <button 
-              id="theme-toggle"
-              onClick={toggleTheme}
-              className={"p-1.5 sm:p-2 rounded-lg border transition cursor-pointer " + (isDarkMode ? "text-zinc-400 border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 hover:text-zinc-200" : "text-zinc-500 border-zinc-300 bg-zinc-100 hover:bg-zinc-200 hover:text-zinc-800")}
-              title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-            >
-              {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            </button>
-
-            <a 
-              id="link-email"
-              href={PUBLIC_EMAIL_LINK}
-              className={"p-1.5 sm:p-2 rounded-lg border transition " + (isDarkMode ? "text-zinc-400 border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 hover:text-white" : "text-zinc-600 border-zinc-300 bg-zinc-100/80 hover:bg-zinc-200 hover:text-zinc-950")} 
-              title={`Email ${PERSONAL_INFO.email}`}
-            >
-              <Mail className="h-4 w-4" />
-            </a>
-            <a 
-              id="link-github"
-              href={PERSONAL_INFO.github} 
-              target="_blank" 
-              referrerPolicy="no-referrer" 
-              className={"p-1.5 sm:p-2 rounded-lg border transition " + (isDarkMode ? "text-zinc-400 border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 hover:text-white" : "text-zinc-600 border-zinc-300 bg-zinc-100/80 hover:bg-zinc-200 hover:text-zinc-950")}
-              title="GitHub Profile"
-            >
-              <Github className="h-4 w-4" />
-            </a>
-            <a 
-              id="link-linkedin"
-              href={PERSONAL_INFO.linkedin} 
-              target="_blank" 
-              referrerPolicy="no-referrer" 
-              className={"p-1.5 sm:p-2 rounded-lg border transition " + (isDarkMode ? "text-zinc-400 border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 hover:text-white" : "text-zinc-600 border-zinc-300 bg-zinc-100/80 hover:bg-zinc-200 hover:text-zinc-950")}
-              title="LinkedIn Profile"
-            >
-              <Linkedin className="h-4 w-4" />
-            </a>
-          </div>
-
-        </div>
-
-        {/* Mobile Navigation Bar */}
-        <div className={"md:hidden flex space-x-1 justify-around px-2 py-2 border-t border-b " + (isDarkMode ? "bg-zinc-900 border-zinc-800 text-zinc-300" : "bg-zinc-200 border-zinc-300 text-zinc-800")}>
-          <button onClick={() => setActiveTab("overview")} className={"flex-1 py-1 text-center text-[10px] uppercase font-mono tracking-wider " + (activeTab === "overview" ? t.tabAct + " rounded" : t.tabInact)}>
-            Overview
-          </button>
-          <button onClick={() => setActiveTab("experience")} className={"flex-1 py-1 text-center text-[10px] uppercase font-mono tracking-wider " + (activeTab === "experience" ? t.tabAct + " rounded" : t.tabInact)}>
-            Experience
-          </button>
-          <button onClick={() => setActiveTab("chat")} className={"flex-1 py-1 text-center text-[10px] uppercase font-mono tracking-wider flex justify-center items-center gap-0.5 " + (activeTab === "chat" ? t.tabAct + " rounded" : t.tabInact)}>
-            <Sparkles className={"h-2 w-2 " + t.iconAccent} /> Q&A
-          </button>
-        </div>
-      </header>
-
-      {/* Main Container */}
-      <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1">
-        
-        {/* Core Profile Banner - displayed on top level of Overview */}
-        {activeTab === "overview" && (
-          <div className={"mb-8 p-6 sm:p-8 rounded-2xl relative overflow-hidden " + t.card}>
-            <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
-              <Terminal className={"h-64 w-64 " + t.iconAccent} />
-            </div>
-            
-            <div className="w-full flex flex-col items-start">
-              <h1 className={"max-w-4xl text-3xl sm:text-4xl font-semibold tracking-tight mb-2 " + t.textTitle}>
-                Building Practical AI Applications &amp; Reliable Software
-              </h1>
-              <p className={"text-base font-medium mb-4 " + t.subTextAccent}>{PERSONAL_INFO.title}</p>
-              <p className={"flex items-center gap-1.5 mb-4 text-sm " + t.textMuted}>
-                <MapPin className="h-4 w-4" aria-hidden="true" /> {PERSONAL_INFO.location}
-              </p>
-              <div className={"max-w-3xl space-y-2 text-sm leading-relaxed mb-6 " + t.textMuted}>
-                {PERSONAL_INFO.summary.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
-              </div>
-
-              <div className="flex w-full flex-col gap-4 md:flex-row md:items-end md:justify-between">
-                <div className={"rounded-lg border overflow-hidden w-full max-w-[368px] " + (isDarkMode ? "bg-zinc-950/85 border-zinc-800" : "bg-zinc-100 border-zinc-300")}>
-                  <div className={"flex items-center justify-between border-b px-3 py-1.5 " + (isDarkMode ? "border-zinc-800" : "border-zinc-300")}>
-                    <div className="flex items-center gap-1.5">
-                      <span className="h-2 w-2 rounded-full bg-red-500/80"></span>
-                      <span className="h-2 w-2 rounded-full bg-amber-400/80"></span>
-                      <span className="h-2 w-2 rounded-full bg-emerald-500/80"></span>
-                    </div>
-                    <span className={"text-[10px] font-mono " + t.textMuted}>engineering focus</span>
-                  </div>
-                  <div className="p-2.5 font-mono text-[10px] leading-relaxed break-words">
-                    <div className={t.textMuted}>
-                      <span className={t.subTextAccent}>portfolio</span>:~$ ./profile --focus applied-ai
-                      <span className={"ml-1 inline-block h-3 w-1 translate-y-0.5 animate-pulse " + (isDarkMode ? "bg-emerald-400" : "bg-sky-600")}></span>
-                    </div>
-                    <div className={"mt-2 space-y-0.5 " + t.textTitle}>
-                      {[
-                        ["backend", "Python / FastAPI"],
-                        ["llm", "API integration / output validation"],
-                        ["data", "PostgreSQL / SQLite"],
-                        ["delivery", "Automated tests / Docker / Cloudflare"],
-                      ].map(([label, value]) => (
-                        <div key={label}>
-                          <span className={t.subTextAccent}>{label}</span>
-                          <span className={t.textMuted}> = </span>
-                          <span>{value}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                <div className="flex w-full flex-col gap-3 md:ml-auto md:w-[250px] md:items-stretch">
-                  <button 
-                    onClick={() => setActiveTab("chat")} 
-                    className={"w-full px-5 py-2.5 text-xs font-semibold rounded-lg transition duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-lg " + 
-                      (isDarkMode 
-                        ? "bg-emerald-500 hover:bg-emerald-400 text-zinc-950 shadow-emerald-500/25" 
-                        : "bg-[#0284c7] hover:bg-[#0369a1] text-white shadow-sky-600/15")}
-                  >
-                    <Sparkles className="h-4 w-4" /> Open Recruiter Q&A
-                  </button>
-                  <a
-                    href="#projects"
-                    className={"w-full px-5 py-2.5 text-xs font-semibold rounded-lg transition duration-200 flex items-center justify-center gap-2 cursor-pointer " + t.btnSec}
-                  >
-                    <Terminal className="h-4 w-4" /> View Selected Projects
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        <AnimatePresence mode="wait">
+      <a className="skip-to-content" href="#main-content">Skip to content</a>
+      <PortfolioHeader activeTab={activeTab} onNavigate={navigate} dark={dark} onToggleTheme={toggleTheme} />
+      <main id="main-content" className="flex-1" tabIndex={-1}>
+        <AnimatePresence mode="wait" initial={false}>
           {/* Overview Content */}
           {activeTab === "overview" && (
-            <motion.div 
-              id="content-overview"
-              initial={{ opacity: 0, y: 15 }} 
-              animate={{ opacity: 1, y: 0 }} 
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.3 }}
-              className="space-y-8"
-            >
-              {/* Performance Metrics Bento */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                
-                <div className={t.smallCard + " p-5 rounded-xl flex flex-col justify-between"}>
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-zinc-500 text-[10px] font-mono uppercase tracking-wider">Applied AI</span>
-                    <Sparkles className={"h-4 w-4 " + t.iconAccent} />
-                  </div>
-                  <div>
-                    <div className={"break-words text-base sm:text-xl font-bold font-sans mb-1 " + t.textTitle}>LLM Applications</div>
-                    <span className={t.textMuted + " text-xs"}>Subtitle translation and recruiter Q&A</span>
-                  </div>
-                </div>
+            <motion.div key="overview" id="content-overview" {...panelMotion}>
+              <OverviewHero onOpenChat={() => {
+                navigate("chat");
+                document.getElementById("tab-chat")?.focus({ preventScroll: true });
+              }} />
+              <div className="portfolio-shell overview-content">
+                {/* Featured projects and recruiter contact */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-                <div className={t.smallCard + " p-5 rounded-xl flex flex-col justify-between"}>
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-zinc-500 text-[10px] font-mono uppercase tracking-wider">Backend</span>
-                    <Code className="h-4 w-4 text-cyan-500" />
-                  </div>
-                  <div>
-                    <div className={"break-words text-base sm:text-xl font-bold font-sans mb-1 " + t.textTitle}>Python &amp; APIs</div>
-                    <span className={t.textMuted + " text-xs"}>FastAPI, batch jobs, and automation</span>
-                  </div>
-                </div>
-
-                <div className={t.smallCard + " p-5 rounded-xl flex flex-col justify-between"}>
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-zinc-500 text-[10px] font-mono uppercase tracking-wider">Delivery</span>
-                    <Server className="h-4 w-4 text-amber-500" />
-                  </div>
-                  <div>
-                    <div className={"break-words text-base sm:text-xl font-bold font-sans mb-1 " + t.textTitle}>Tests &amp; Deployment</div>
-                    <span className={t.textMuted + " text-xs"}>Verification, Docker, and Cloudflare</span>
-                  </div>
-                </div>
-
-                <div className={t.smallCard + " p-5 rounded-xl flex flex-col justify-between"}>
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-zinc-500 text-[10px] font-mono uppercase tracking-wider">Professional background</span>
-                    <Shield className="h-4 w-4 text-rose-500" />
-                  </div>
-                  <div>
-                    <div className={"break-words text-base sm:text-xl font-bold font-sans mb-1 " + t.textTitle}>Systems Administration</div>
-                    <span className={t.textMuted + " text-xs"}>Linux, Windows, and networking</span>
-                  </div>
-                </div>
-
-              </div>
-
-              {/* Skill Matrix Segment */}
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-sm font-mono uppercase text-zinc-500 tracking-wider">Technical Skills</h2>
-                  <div className={"h-px flex-1 ml-4 " + t.divider}></div>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-                  {SKILL_CATEGORIES.map((cat, idx) => {
-                    const Icon = SKILL_ICONS[idx];
-                    return (
-                    <div key={cat.title} className={t.smallCard + " p-5 rounded-xl transition duration-200 " + (isDarkMode ? "hover:border-emerald-500/50" : "hover:border-[#0284c7]/40")}>
-                      <div className="flex items-center gap-2 mb-3">
-                        <Icon className={"h-4 w-4 " + t.iconAccent} />
-                        <h3 className={"text-sm font-semibold " + t.textTitle}>{cat.title}</h3>
-                      </div>
-                      <ul className="space-y-1.5 text-xs">
-                        {cat.skills.map((skill, sIdx) => (
-                          <li key={sIdx} className="flex items-start gap-1.5">
-                            <span className={t.bullet + " mt-0.5"}>•</span>
-                            <span className={t.textMuted}>{skill}</span>
-                          </li>
-                        ))}
-                      </ul>
+                  {/* Featured Projects Column */}
+                  <section id="projects" aria-labelledby="projects-title" className="lg:col-span-8 min-w-0 space-y-5">
+                    <div>
+                      <h2 id="projects-title" className="section-title">Selected projects</h2>
+                      <p className="text-muted mt-2">How I handle model output, build backend workflows, and verify changes.</p>
                     </div>
-                    );
-                  })}
-                </div>
-              </div>
 
-              {/* Featured projects and recruiter contact */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                
-                {/* Featured Projects Column */}
-                <div id="projects" className="lg:col-span-8 space-y-6 scroll-mt-24">
-                  <h2 className="text-sm font-mono text-zinc-500 uppercase tracking-lighter">Selected Projects</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {Object.entries(PROJECTS).map(([key, project]: [string, ProjectData]) => (
+                        <article key={key} id={key === "subtitleTranslator" ? "subtitle-translator" : undefined} className={"p-5 sm:p-6 rounded-xl space-y-4 min-w-0 " + t.smallCard + (key === "subtitleTranslator" ? " sm:col-span-2" : "")}>
+                          <div>
+                            <h3 className={"text-lg font-semibold leading-snug " + t.textTitle}>{project.title}</h3>
+                            <p className={"text-xs font-mono " + t.subTextAccent}>{project.subtitle}</p>
+                          </div>
+                          <div className={"space-y-2 text-[.94rem] leading-relaxed " + t.textMuted}>
+                            <p>{project.description}</p>
+                            {project.details && <p>{project.details}</p>}
+                          </div>
+                          <ul aria-label="Technologies" className="flex flex-wrap gap-1.5">
+                            {project.tech.map((tech) => (
+                              <li key={tech} className={"px-2 py-0.5 rounded border text-[11px] font-mono " + t.badge}>{tech}</li>
+                            ))}
+                          </ul>
+                          {(project.githubUrl || project.evidence) && <div className="flex flex-wrap gap-3">
+                            {project.githubUrl && <a href={project.githubUrl} className="project-link" aria-label={"GitHub for " + project.title}><Github size={17} aria-hidden="true" /> GitHub</a>}
+                            {project.evidence && <a className="project-link" href={project.evidence.url}>{project.evidence.label}</a>}
+                          </div>}
+                        </article>
+                      ))}
+                    </div>
+                  </section>
 
-                  <div className="grid grid-cols-1 gap-6">
-                    {Object.values(PROJECTS).map((project: ProjectData) => (
-                      <article key={project.title} className={"p-6 rounded-xl space-y-4 " + t.smallCard}>
+                  {/* Recruiter contact */}
+                  <section aria-labelledby="contact-title" className="lg:col-span-4 min-w-0 space-y-5">
+                    <h2 id="contact-title" className="section-title contact-title">Recruiter contact</h2>
+                    <div className={"p-5 rounded-xl space-y-4 relative " + t.smallCard}>
+                      <p className="text-muted text-sm">I’m looking for applied AI and Python roles in Toronto or remotely across Canada.</p>
+                      <a href={PUBLIC_EMAIL_LINK} className={"inline-block text-sm hover:underline " + t.subTextAccent}>{PERSONAL_INFO.email}</a>
+
+                      <form onSubmit={handleContactSubmit} className="space-y-3.5">
                         <div>
-                          <h3 className={"text-lg font-semibold leading-snug " + t.textTitle}>{project.title}</h3>
-                          <p className={"text-xs font-mono " + t.subTextAccent}>{project.subtitle}</p>
+                          <label htmlFor="contact-name" className="block text-sm font-semibold text-ink mb-1">Name</label>
+                          <input
+                            id="contact-name"
+                            type="text"
+                            autoComplete="name"
+                            required
+                            maxLength={80}
+                            value={contactForm.name}
+                            onChange={(e) => {
+                              setContactStatus("idle");
+                              setContactForm({ ...contactForm, name: e.target.value });
+                            }}
+                            className={"w-full min-w-0 border rounded-lg px-3 py-2 text-base transition " + t.input}
+                            placeholder="Your name"
+                          />
                         </div>
-                        <div className={"space-y-2 text-sm leading-relaxed " + t.textMuted}>
-                          <p>{project.description}</p>
-                          {project.details && <p>{project.details}</p>}
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-3">
+                          <div>
+                            <label htmlFor="contact-email" className="block text-sm font-semibold text-ink mb-1">Email</label>
+                            <input
+                              id="contact-email"
+                              type="email"
+                              autoComplete="email"
+                              required
+                              maxLength={120}
+                              value={contactForm.email}
+                              onChange={(e) => {
+                                setContactStatus("idle");
+                                setContactForm({ ...contactForm, email: e.target.value });
+                              }}
+                              className={"w-full min-w-0 border rounded-lg px-3 py-2 text-base transition " + t.input}
+                              placeholder="Your work email"
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor="contact-company" className="block text-sm font-semibold text-ink mb-1">Company <span className="font-normal text-muted">(optional)</span></label>
+                            <input
+                              id="contact-company"
+                              type="text"
+                              autoComplete="organization"
+                              maxLength={120}
+                              value={contactForm.company}
+                              onChange={(e) => {
+                                setContactStatus("idle");
+                                setContactForm({ ...contactForm, company: e.target.value });
+                              }}
+                              className={"w-full min-w-0 border rounded-lg px-3 py-2 text-base transition " + t.input}
+                              placeholder="Company name"
+                            />
+                          </div>
                         </div>
-                        <ul aria-label="Technologies" className="flex flex-wrap gap-1.5">
-                          {project.tech.map((tech) => (
-                            <li key={tech} className={"px-2 py-0.5 rounded border text-[11px] font-mono " + t.badge}>{tech}</li>
+
+                        <div>
+                          <label htmlFor="contact-message" className="block text-sm font-semibold text-ink mb-1">Message</label>
+                          <textarea
+                            id="contact-message"
+                            rows={3}
+                            required
+                            maxLength={1500}
+                            value={contactForm.message}
+                            onChange={(e) => {
+                              setContactStatus("idle");
+                              setContactForm({ ...contactForm, message: e.target.value });
+                            }}
+                            className={"w-full border rounded px-3 py-2 text-base transition resize-none " + t.input}
+                            placeholder="Tell me about the role or what you would like to discuss..."
+                          ></textarea>
+                        </div>
+
+                        <div className="hidden" aria-hidden="true">
+                          <label>
+                            Website
+                            <input
+                              type="text"
+                              tabIndex={-1}
+                              autoComplete="off"
+                              value={contactForm.website}
+                              onChange={(e) => setContactForm({ ...contactForm, website: e.target.value })}
+                            />
+                          </label>
+                        </div>
+
+                        <TurnstileWidget key={contactChallenge} onVerify={setContactTurnstileToken} theme={dark ? "dark" : "light"} />
+
+                        <p className={"text-[10px] leading-relaxed " + t.textMuted}>
+                          To prevent abuse, this form may use basic technical metadata such as IP address, request timing, and verification status.
+                        </p>
+
+                        <button
+                          type="submit"
+                          disabled={isContactSubmitting || !contactTurnstileToken}
+                          className="w-full site-button site-button-primary disabled:opacity-60"
+                        >
+                          {isContactSubmitting ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+                          {isContactSubmitting ? "Sending..." : "Send Hiring Inquiry"}
+                        </button>
+                      </form>
+
+                      <AnimatePresence>
+                        {contactStatus === "success" && (
+                          <motion.div
+                            {...panelMotion}
+                            role="status"
+                            className={"absolute inset-0 flex flex-col items-center justify-center p-4 rounded-xl text-center space-y-2 border " + t.subCardOverlay}
+                          >
+                            <CheckCircle className={"h-8 w-8 " + t.iconAccent} />
+                            <h5 className={"text-sm font-semibold " + t.textTitle}>Message Sent</h5>
+                            <p className={"text-xs max-w-xs leading-relaxed " + t.textMuted}>
+                              Your inquiry has been sent. You can also reach Afshin at <a href={PUBLIC_EMAIL_LINK} className="underline">{PERSONAL_INFO.email}</a>.
+                            </p>
+                            <button
+                              type="button"
+                              onClick={() => setContactStatus("idle")}
+                              className={"px-3 py-1.5 rounded text-[10px] font-mono border " + t.btnSec}
+                            >
+                              Close
+                            </button>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                      {contactStatus === "error" && (
+                        <div role="alert" className="p-3 rounded border text-sm leading-relaxed form-error">
+                          {contactError}
+                        </div>
+                      )}
+                    </div>
+                  </section>
+                </div>
+
+                {/* Skill Matrix Segment */}
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-sm font-mono uppercase text-muted tracking-wider">Technical Skills</h2>
+                    <div className={"h-px flex-1 ml-4 " + t.divider}></div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                    {SKILL_CATEGORIES.map((cat, idx) => {
+                      const Icon = SKILL_ICONS[idx];
+                      return (
+                      <div key={cat.title} className={t.smallCard + " p-5 rounded-xl transition duration-200 hover:border-accent/50"}>
+                        <div className="flex items-center gap-2 mb-3">
+                          <Icon className={"h-4 w-4 " + t.iconAccent} />
+                          <h3 className={"text-sm font-semibold " + t.textTitle}>{cat.title}</h3>
+                        </div>
+                        <ul className="space-y-1.5 text-xs">
+                          {cat.skills.map((skill, sIdx) => (
+                            <li key={sIdx} className="flex items-start gap-1.5">
+                              <span className={t.bullet + " mt-0.5"}>•</span>
+                              <span className={t.textMuted}>{skill}</span>
+                            </li>
                           ))}
                         </ul>
-                        {project.githubUrl && (
-                          <a href={project.githubUrl} target="_blank" rel="noreferrer" aria-label={`${project.title} on GitHub`} className={"inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-xs " + t.btnSec}>
-                            <Github className="h-4 w-4" /> GitHub
-                          </a>
-                        )}
-                      </article>
-                    ))}
+                      </div>
+                      );
+                    })}
                   </div>
                 </div>
-
-                {/* Secure Contact Portal Column */}
-                <div className="lg:col-span-4 space-y-6">
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-sm font-mono uppercase text-zinc-500 tracking-wider">Recruiter Contact</h2>
-                  </div>
-
-                  <div className={"p-5 rounded-xl space-y-4 relative " + t.smallCard}>
-                    <h4 className="text-xs font-mono text-zinc-500 dark:text-zinc-400 uppercase tracking-widest flex items-center gap-1.5">
-                      <span className={"h-1.5 w-1.5 rounded-full inline-block animate-ping " + t.pinger}></span>
-                      Send Hiring Inquiry
-                    </h4>
-                    <a href={PUBLIC_EMAIL_LINK} className={"inline-block text-sm hover:underline " + t.subTextAccent}>{PERSONAL_INFO.email}</a>
-                    
-                    <form onSubmit={handleContactSubmit} className="space-y-3.5">
-                      <div>
-                        <label htmlFor="contact-name" className="block text-[10px] font-mono text-zinc-500 uppercase mb-1">Name</label>
-                        <input 
-                          id="contact-name"
-                          type="text" 
-                          required
-                          maxLength={80}
-                          value={contactForm.name}
-                          onChange={(e) => {
-                            setContactStatus("idle");
-                            setContactForm({ ...contactForm, name: e.target.value });
-                          }}
-                          className={"w-full border rounded px-3 py-2 text-xs transition " + t.input} 
-                          placeholder="Your name"
-                        />
-                      </div>
-                      
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <label htmlFor="contact-email" className="block text-[10px] font-mono text-zinc-500 uppercase mb-1">Email</label>
-                          <input 
-                            id="contact-email"
-                            type="email" 
-                            required
-                            maxLength={120}
-                            value={contactForm.email}
-                            onChange={(e) => {
-                              setContactStatus("idle");
-                              setContactForm({ ...contactForm, email: e.target.value });
-                            }}
-                            className={"w-full border rounded px-3 py-2 text-xs transition " + t.input} 
-                            placeholder="Your work email"
-                          />
-                        </div>
-                        <div>
-                          <label htmlFor="contact-company" className="block text-[10px] font-mono text-zinc-500 uppercase mb-1">Company</label>
-                          <input 
-                            id="contact-company"
-                            type="text" 
-                            maxLength={120}
-                            value={contactForm.company}
-                            onChange={(e) => {
-                              setContactStatus("idle");
-                              setContactForm({ ...contactForm, company: e.target.value });
-                            }}
-                            className={"w-full border rounded px-3 py-2 text-xs transition " + t.input} 
-                            placeholder="Company name"
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label htmlFor="contact-message" className="block text-[10px] font-mono text-zinc-500 uppercase mb-1">Message</label>
-                        <textarea 
-                          id="contact-message"
-                          rows={3}
-                          required
-                          maxLength={1500}
-                          value={contactForm.message}
-                          onChange={(e) => {
-                            setContactStatus("idle");
-                            setContactForm({ ...contactForm, message: e.target.value });
-                          }}
-                          className={"w-full border rounded px-3 py-2 text-xs transition resize-none " + t.input} 
-                          placeholder="Tell me about the role or what you would like to discuss..."
-                        ></textarea>
-                      </div>
-
-                      <div className="hidden" aria-hidden="true">
-                        <label>
-                          Website
-                          <input
-                            type="text"
-                            tabIndex={-1}
-                            autoComplete="off"
-                            value={contactForm.website}
-                            onChange={(e) => setContactForm({ ...contactForm, website: e.target.value })}
-                          />
-                        </label>
-                      </div>
-
-                      <TurnstileWidget onVerify={setContactTurnstileToken} enabled={Boolean(TURNSTILE_SITE_KEY)} />
-
-                      <p className={"text-[10px] leading-relaxed " + t.textMuted}>
-                        To prevent abuse, this form may use basic technical metadata such as IP address, request timing, and verification status.
-                      </p>
-
-                      <button 
-                        type="submit" 
-                        disabled={isContactSubmitting || !contactTurnstileToken}
-                        className={"w-full py-2.5 rounded text-xs font-mono transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 " + (isDarkMode ? "bg-zinc-800 hover:bg-zinc-800 text-white border border-zinc-700/60" : "bg-[#0284c7] hover:bg-[#0369a1] text-white shadow-xs")}
-                      >
-                        {isContactSubmitting ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
-                        {isContactSubmitting ? "Sending..." : "Send Hiring Inquiry"}
-                      </button>
-                    </form>
-
-                    <AnimatePresence>
-                      {contactStatus === "success" && (
-                        <motion.div 
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 10 }}
-                          className={"absolute inset-0 flex flex-col items-center justify-center p-4 rounded-xl text-center space-y-2 border " + t.subCardOverlay}
-                        >
-                          <CheckCircle className={"h-8 w-8 " + t.iconAccent} />
-                          <h5 className={"text-sm font-semibold " + t.textTitle}>Message Sent</h5>
-                          <p className={"text-xs max-w-xs leading-relaxed " + t.textMuted}>
-                            Your inquiry has been sent. You can also reach Afshin at <a href={PUBLIC_EMAIL_LINK} className="underline">{PERSONAL_INFO.email}</a>.
-                          </p>
-                          <button
-                            type="button"
-                            onClick={() => setContactStatus("idle")}
-                            className={"px-3 py-1.5 rounded text-[10px] font-mono border " + t.btnSec}
-                          >
-                            Close
-                          </button>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                    {contactStatus === "error" && (
-                      <div className={"p-3 rounded border text-xs leading-relaxed " + (isDarkMode ? "bg-rose-950/20 border-rose-900/50 text-rose-300" : "bg-rose-50 border-rose-200 text-rose-700")}>
-                        {contactError}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
               </div>
-
             </motion.div>
           )}
 
            {/* AI Chat View */}
           {activeTab === "chat" && (
-            <motion.div 
+            <motion.div
+              key="chat"
               id="content-chat"
-              initial={{ opacity: 0, y: 15 }} 
-              animate={{ opacity: 1, y: 0 }} 
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.3 }}
-              className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:h-[calc(100vh-14rem)] lg:min-h-[500px]"
+              {...panelMotion}
+              className="portfolio-shell tab-content chat-layout grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8"
             >
               {/* Suggestion Sidebar panel */}
               <div className={"order-2 lg:order-1 lg:col-span-4 p-5 rounded-xl flex flex-col justify-between space-y-4 " + t.smallCard}>
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     <Sparkles className={"h-4.5 w-4.5 " + t.iconAccent} />
-                    <h3 className={"text-sm font-semibold " + t.textTitle}>Ask About Afshin</h3>
+                    <h1 className={"text-lg font-semibold " + t.textTitle}>Ask about Afshin</h1>
                   </div>
                   <p className={"text-xs leading-relaxed mb-6 " + t.textMuted}>
-                    Ask about AI applications, Python backends, engineering automation, or how Afshin’s systems background informs his software work.
+                    Ask how the subtitle translator recovers missing cues, how AI Rail verifies changes, or what Afshin learned troubleshooting Windows and Linux systems.
                   </p>
 
-                    <h4 className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider mb-2">Suggested Questions</h4>
+                    <h4 className="text-[10px] font-mono text-muted uppercase tracking-wider mb-2">Suggested Questions</h4>
                   <div className="space-y-2">
                     {SUGGESTED_QUESTIONS.map((q, qidx) => (
                       <button
                         key={qidx}
                         onClick={() => handleSendChat(q)}
                         disabled={isAiTyping}
-                        className={"w-full text-left p-2.5 text-[11px] font-sans border rounded-sm transition duration-150 flex items-center justify-between cursor-pointer disabled:opacity-50 " + t.input}
+                        className={"w-full min-h-11 text-left p-2.5 text-sm font-sans border rounded-md transition duration-150 flex items-center justify-between cursor-pointer disabled:opacity-50 " + t.input}
                       >
                         <span>{q}</span>
-                        <Send className={"h-2.5 w-2.5 text-zinc-500 transition " + t.textLinkHover} />
+                        <Send className={"h-2.5 w-2.5 text-muted transition"} />
                       </button>
                     ))}
                   </div>
@@ -769,15 +533,15 @@ export default function App() {
               </div>
 
               {/* Central Chat Node */}
-              <div className={"order-1 lg:order-2 lg:col-span-8 flex min-h-[560px] flex-col rounded-xl overflow-hidden border lg:min-h-0 " + (isDarkMode ? "bg-zinc-900/20 border-zinc-800" : "bg-white border-zinc-200 shadow-sm")}>
-                
+              <div className={"order-1 lg:order-2 lg:col-span-8 flex flex-col rounded-xl min-w-0 overflow-hidden chat-panel " + t.smallCard}>
+
                 {/* Chat Panel Header */}
-                <div className={"px-4 py-3 border-b flex items-center justify-between " + (isDarkMode ? "bg-zinc-900/50 border-zinc-800/60" : "bg-zinc-100 border-zinc-200")}>
+                <div className="px-4 py-3 border-b flex items-center justify-between bg-surface-soft border-line">
                   <div className="flex items-center space-x-2.5">
-                    <div className={"h-2.5 w-2.5 rounded-full animate-pulse " + (isDarkMode ? "bg-emerald-500" : "bg-[#0284c7]")}></div>
-                    <span className={"text-xs font-mono uppercase tracking-wider " + (isDarkMode ? "text-zinc-300" : "text-zinc-700")}>Recruiter Q&A</span>
+                    <div className="h-2.5 w-2.5 rounded-full animate-pulse bg-accent"></div>
+                    <span className="text-xs font-mono uppercase tracking-wider text-muted">Recruiter Q&A</span>
                   </div>
-                  <button 
+                  <button
                     onClick={() => setMessages([
                       {
                         id: "welcome",
@@ -793,27 +557,29 @@ export default function App() {
                 </div>
 
                 {/* Messages Hub */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                <div ref={setChatLog} role="log" aria-label="Conversation" tabIndex={0} className="chat-log flex-1 min-h-0 overflow-y-auto p-3 sm:p-4 space-y-4">
                   {messages.map((m) => (
-                    <div 
-                      key={m.id} 
+                    <div
+                      key={m.id}
                       className={"flex " + (m.sender === "user" ? "justify-end" : "justify-start")}
                     >
-                      <div className={"max-w-[85%] rounded-xl px-4 py-3 text-xs leading-relaxed " + (
-                        m.sender === "user" 
-                          ? (isDarkMode ? "bg-zinc-800 text-white" : "bg-[#0284c7] text-white") 
-                          : (isDarkMode ? "bg-zinc-900/60 text-zinc-300 border border-zinc-800" : "bg-zinc-100/90 text-zinc-900 border border-zinc-200") + " select-text"
+                      <div className={"max-w-[85%] rounded-xl px-4 py-3 text-sm leading-relaxed " + (
+                        m.sender === "user"
+                          ? "bg-accent-soft text-ink"
+                          : "bg-page text-ink border border-line" + " select-text"
                       )}>
-                        
-                        <div className={"font-mono text-[9px] mb-1 leading-none uppercase tracking-wider " + (m.sender === "user" ? (isDarkMode ? "text-zinc-400" : "text-sky-100") : "text-zinc-500")}>
+
+                        <div className={"font-mono text-[9px] mb-1 leading-none uppercase tracking-wider " + (m.sender === "user" ? "text-accent" : "text-muted")}>
                           {m.sender === "user" ? "You" : "Portfolio Assistant"} • {m.timestamp}
                         </div>
-                        
+
                         {m.sender === "user" ? (
-                          <p className="whitespace-pre-wrap break-words">{m.text}</p>
+                          <p className="whitespace-pre-wrap wrap-anywhere">{m.text}</p>
                         ) : (
-                          <div className="markdown-body select-text">
-                            <Markdown urlTransform={safeMarkdownUrl}>{m.text}</Markdown>
+                          <div className="markdown-body select-text wrap-anywhere">
+                            <Suspense fallback={<p>{m.text}</p>}>
+                              <Markdown urlTransform={safeMarkdownUrl}>{m.text}</Markdown>
+                            </Suspense>
                           </div>
                         )}
 
@@ -823,8 +589,8 @@ export default function App() {
 
                   {isAiTyping && (
                     <div className="flex justify-start">
-                      <div className={"rounded-xl px-4 py-3 text-xs border flex items-center space-x-2 " + (isDarkMode ? "bg-zinc-900/30 text-zinc-400 border-zinc-800/60" : "bg-zinc-100 text-zinc-700 border-zinc-200")}>
-                        <span className="text-[10px] font-mono text-zinc-500 uppercase">Finding an answer</span>
+                      <div className="rounded-xl px-4 py-3 text-xs border flex items-center space-x-2 bg-page text-muted border-line">
+                        <span className="text-[10px] font-mono text-muted uppercase">Finding an answer</span>
                         <span className="flex space-x-1">
                           <span className={"h-1.5 w-1.5 rounded-full animate-bounce " + t.pinger} style={{ animationDelay: '0ms' }}></span>
                           <span className={"h-1.5 w-1.5 rounded-full animate-bounce " + t.pinger} style={{ animationDelay: '150ms' }}></span>
@@ -833,31 +599,27 @@ export default function App() {
                       </div>
                     </div>
                   )}
-                  <div ref={chatEndRef} />
                 </div>
 
                 {/* Bottom Input Area */}
-                <div className={"p-3.5 border-t " + (isDarkMode ? "bg-zinc-900/40 border-zinc-800" : "bg-zinc-100/90 border-zinc-200")}>
+                <div className="p-3.5 border-t bg-surface-soft border-line">
                   <div className="flex space-x-2">
-                    <input 
+                    <input
                       type="text"
                       value={inputText}
                       onChange={(e) => setInputText(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleSendChat()}
                       disabled={isAiTyping}
                       maxLength={700}
-                      className={"min-w-0 flex-1 border rounded px-3 py-2 text-xs transition disabled:opacity-50 " + t.input}
+                      className={"min-w-0 flex-1 border rounded-lg px-3 py-2 text-base transition disabled:opacity-50 " + t.input}
                       aria-label="Question"
                       placeholder="Ask about Python projects, LLMs, or role fit"
                     />
-                    <button 
+                    <button
                       onClick={() => handleSendChat()}
                       disabled={isAiTyping || !inputText.trim()}
                       aria-label="Send question"
-                      className={"p-2 px-3.5 rounded text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer disabled:opacity-50 " + 
-                        (isDarkMode 
-                          ? "bg-emerald-500 hover:bg-emerald-400 text-zinc-950" 
-                          : "bg-[#0284c7] hover:bg-[#0369a1] text-white")}
+                      className="site-button site-button-primary shrink-0 disabled:opacity-50"
                     >
                       <Send className="h-3.5 w-3.5" />
                     </button>
@@ -870,17 +632,15 @@ export default function App() {
 
           {/* Career Path Timeline */}
           {activeTab === "experience" && (
-            <motion.div 
+            <motion.div
+              key="experience"
               id="content-experience"
-              initial={{ opacity: 0, y: 15 }} 
-              animate={{ opacity: 1, y: 0 }} 
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.3 }}
-              className="grid grid-cols-1 lg:grid-cols-12 gap-8"
+              {...panelMotion}
+              className="portfolio-shell tab-content grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8"
             >
               {/* Credentials / Education profile column */}
               <div className="lg:col-span-4 space-y-6">
-                
+
                 <div className={t.smallCard + " p-5 rounded-xl space-y-4"}>
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-2">
@@ -900,24 +660,24 @@ export default function App() {
                       ["INSE 6630", "Blockchain Technology"],
                       ["INSE 6150", "Security Evaluation Methodologies"]
                     ].map(([code, title]) => (
-                      <div key={code} className={"flex items-center justify-between gap-3 rounded border px-3 py-2 " + (isDarkMode ? "bg-zinc-950/60 border-zinc-800" : "bg-zinc-50 border-zinc-200")}>
+                      <div key={code} className="flex items-center justify-between gap-3 rounded border px-3 py-2 bg-page border border-line">
                         <span className={"text-[10px] font-mono " + t.subTextAccent}>{code}</span>
                         <span className={"text-[11px] text-right " + t.textMuted}>{title}</span>
                       </div>
                     ))}
                   </div>
 
-                  <p className={"text-xs leading-relaxed pt-2 border-t " + (isDarkMode ? "border-zinc-800" : "border-zinc-200") + " " + t.textMuted}>
+                  <p className="text-xs leading-relaxed pt-2 border-t border-line text-muted">
                     {EDUCATION.focus}
                   </p>
                 </div>
 
                 <div className={t.smallCard + " p-5 rounded-xl space-y-4"}>
-                  <h3 className="text-xs font-mono uppercase text-zinc-500 tracking-wider">Transferable Skills</h3>
-                  
+                  <h3 className="text-xs font-mono uppercase text-muted tracking-wider">Transferable Skills</h3>
+
                   {SKILL_CATEGORIES.slice(3).map((cat, sidx) => (
                     <div key={sidx} className="space-y-4">
-                      <h4 className={"text-xs font-bold flex items-center gap-1.5 uppercase " + (isDarkMode ? "text-zinc-300" : "text-zinc-700")}>
+                      <h4 className="text-xs font-bold flex items-center gap-1.5 uppercase text-muted">
                         {cat.title}
                       </h4>
                       <div className="flex flex-wrap gap-1.5">
@@ -936,20 +696,20 @@ export default function App() {
               {/* Dynamic work history timelining */}
               <div className="lg:col-span-8 space-y-6">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-mono text-zinc-500 uppercase tracking-widest">Professional Experience</h3>
-                  <span className={"text-[10px] font-mono tracking-wider " + t.subTextAccent}>Systems and networking foundation</span>
+                  <h1 className="section-title">Professional experience</h1>
                 </div>
 
-                <div className={"space-y-8 relative before:absolute before:inset-y-0 before:left-3.5 before:w-px " + (isDarkMode ? "before:bg-zinc-800" : "before:bg-zinc-400")}>
+                <p className="text-muted">I managed Microsoft 365 access, investigated incidents through logs, and maintained Windows and Linux systems. That work shapes how I build applications that are easier to diagnose and recover.</p>
+                <div className="space-y-8 relative before:absolute before:inset-y-0 before:left-3.5 before:w-px before:bg-line">
                   {WORK_EXPERIENCE.map((job) => (
                     <div key={job.id} className="relative pl-10 group">
-                      
+
                       {/* Timeline Node Selector */}
-                      <span className={"absolute left-1.5 top-1.5 h-4 w-4 rounded-full border flex items-center justify-center transition group-hover:scale-110 duration-200 " + (isDarkMode ? "bg-zinc-950 border-emerald-500 group-hover:bg-emerald-500" : "bg-white border-sky-500 group-hover:bg-[#0284c7]")}>
-                        <span className={"h-1.5 w-1.5 rounded-full transition " + (isDarkMode ? "bg-emerald-500 group-hover:bg-zinc-950" : "bg-[#0284c7] group-hover:bg-white")}></span>
+                      <span className="absolute left-1.5 top-1.5 h-4 w-4 rounded-full border flex items-center justify-center transition group-hover:scale-110 duration-200 bg-surface border-accent">
+                        <span className="h-1.5 w-1.5 rounded-full transition bg-accent"></span>
                       </span>
 
-                      <div className={t.smallCard + " p-5 rounded-xl space-y-3 transition " + (isDarkMode ? "hover:border-emerald-500/50" : "hover:border-sky-500/40")}>
+                      <div className={t.smallCard + " p-5 rounded-xl space-y-3 transition hover:border-accent/50"}>
                         <div className="flex flex-wrap items-center justify-between gap-2">
                           <div>
                             <h4 className={"text-base font-semibold " + t.textTitle}>{job.role}</h4>
@@ -983,11 +743,15 @@ export default function App() {
       </main>
 
       {/* Modern Professional Footer */}
-      <footer className={"mt-auto border-t " + (isDarkMode ? "bg-zinc-950 border-zinc-900 text-zinc-500" : "bg-zinc-100 border-zinc-200 text-zinc-600")}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-xs">
-          <div className="flex flex-col gap-2 text-center text-[11px] font-mono sm:flex-row sm:items-center sm:justify-between sm:text-left">
+      <footer className="mt-auto border-t bg-surface border-line text-muted">
+        <div className="portfolio-shell py-6 text-xs">
+          <div className="flex flex-col gap-2 text-center text-xs sm:flex-row sm:items-center sm:justify-between sm:text-left">
             <span>© {new Date().getFullYear()} {PERSONAL_INFO.name}. All rights reserved.</span>
-            <a href={PUBLIC_EMAIL_LINK} className="hover:underline">{PERSONAL_INFO.email}</a>
+            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+              <a href={PUBLIC_EMAIL_LINK} className="hover:underline">{PERSONAL_INFO.email}</a>
+              <a href={PERSONAL_INFO.github} className="hover:underline">GitHub</a>
+              <a href={PERSONAL_INFO.linkedin} className="hover:underline">LinkedIn</a>
+            </div>
           </div>
         </div>
       </footer>
@@ -995,4 +759,3 @@ export default function App() {
     </div>
   );
 }
-

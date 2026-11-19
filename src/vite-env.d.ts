@@ -16,6 +16,9 @@ interface Window {
         sitekey: string;
         callback: (token: string) => void;
         theme?: "auto" | "light" | "dark";
+        size?: "compact" | "flexible";
+        "expired-callback"?: () => void;
+        "error-callback"?: () => void;
       },
     ) => string;
     reset: (widget?: string | HTMLElement) => void;
