@@ -1,13 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import { 
   Shield, 
-  ShieldAlert, 
   Lock, 
-  Network, 
   Server, 
   Terminal, 
   Mail, 
-  Phone, 
   MapPin, 
   Github, 
   Linkedin, 
@@ -33,10 +30,13 @@ import { motion, AnimatePresence } from "motion/react";
 import Markdown from "react-markdown";
 
 import AiRailWorkflowLab from "./components/AiRailWorkflowLab";
-import { PERSONAL_INFO, WORK_EXPERIENCE, PROJECTS, SKILL_CATEGORIES, SUGGESTED_QUESTIONS } from "./data";
-import { ChatMessage } from "./types";
+import { EDUCATION, PERSONAL_INFO, WORK_EXPERIENCE, PROJECTS, SKILL_CATEGORIES, SUGGESTED_QUESTIONS } from "./data";
+import type { ChatMessage, ProjectData } from "./types";
 
 const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY || "";
+const PUBLIC_EMAIL_LINK = `mailto:${PERSONAL_INFO.email}`;
+const CHAT_WELCOME = "Ask about Afshin’s applied AI projects, Python and backend development, systems background, or fit for roles in Toronto and across Canada.";
+const SKILL_ICONS = [Sparkles, Code, Terminal, Shield];
 
 function TurnstileWidget({
   onVerify,
@@ -80,7 +80,7 @@ function safeMarkdownUrl(url: string) {
   if (!protocolMatch) return trimmed;
 
   const protocol = protocolMatch[1].toLowerCase();
-  return ["http", "https", "mailto"].includes(protocol) ? trimmed : "";
+  return ["http", "https"].includes(protocol) || trimmed === PUBLIC_EMAIL_LINK ? trimmed : "";
 }
 
 export default function App() {
@@ -142,7 +142,7 @@ export default function App() {
     {
       id: "welcome",
       sender: "ai",
-      text: `Hello. I can answer questions about Afshin's infrastructure, networking, security operations, education, and projects. \n\nAsk about his technical background, project details, or role fit, or use one of the suggested questions below.`,
+      text: CHAT_WELCOME,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
   ]);
@@ -231,7 +231,7 @@ export default function App() {
       const botMessage: ChatMessage = {
         id: Math.random().toString(),
         sender: "ai",
-        text: data.text || data.error || "I processed your request, but did not receive structured feedback. Please connect directly at contact@theafshin.com.",
+        text: data.text || `You can reach Afshin through the contact form or at [${PERSONAL_INFO.email}](${PUBLIC_EMAIL_LINK}).`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       
@@ -240,7 +240,7 @@ export default function App() {
       const errorMessage: ChatMessage = {
         id: Math.random().toString(),
         sender: "ai",
-        text: err?.message || "**Connection Offline**: There was a network issue querying the AI system. You can connect with Afshin directly at **contact@theafshin.com**.",
+        text: `${err?.message || "The AI chat is temporarily unavailable."}\n\nFor professional inquiries, email [${PERSONAL_INFO.email}](${PUBLIC_EMAIL_LINK}).`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       setMessages((prev) => [...prev, errorMessage]);
@@ -406,13 +406,13 @@ export default function App() {
               (isDarkMode 
                 ? "bg-emerald-950/80 border-emerald-800/60 text-emerald-400" 
                 : "bg-cyan-50 border border-cyan-200 text-[#0284c7] font-semibold text-base")}>
-              <Shield className="h-5 w-5" />
+              <Terminal className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <h1 className={"truncate whitespace-nowrap text-lg font-semibold tracking-tight font-sans " + t.textTitle}>{PERSONAL_INFO.name}</h1>
+              <div className={"truncate whitespace-nowrap text-sm sm:text-lg font-semibold tracking-tight font-sans " + t.textTitle}>{PERSONAL_INFO.name}</div>
               <span className="hidden text-xs text-zinc-400 font-mono sm:flex min-w-0 items-center gap-1.5 leading-none">
                 <span className={"h-2 w-2 shrink-0 rounded-full inline-block animate-pulse " + (isDarkMode ? "bg-emerald-500" : "bg-[#0284c7]")}></span>
-                <span>{PERSONAL_INFO.title}</span>
+                <span>Software Developer · Applied AI</span>
               </span>
             </div>
           </div>
@@ -438,14 +438,14 @@ export default function App() {
               onClick={() => setActiveTab("labs")} 
               className={"px-4 py-1.5 text-xs font-medium rounded-md transition " + (activeTab === "labs" ? t.tabAct : t.tabInact)}
             >
-              Projects / Labs
+              Labs
             </button>
             <button 
               id="tab-chat"
               onClick={() => setActiveTab("chat")} 
               className={"px-4 py-1.5 text-xs font-medium rounded-md transition flex items-center gap-1.5 " + (activeTab === "chat" ? t.tabAct : t.tabInact)}
             >
-              <Sparkles className={"h-3 w-3 " + t.iconAccent} /> Ask About My Background
+              <Sparkles className={"h-3 w-3 " + t.iconAccent} /> Recruiter Q&A
             </button>
           </nav>
 
@@ -462,9 +462,9 @@ export default function App() {
 
             <a 
               id="link-email"
-              href={"mailto:" + PERSONAL_INFO.email} 
+              href={PUBLIC_EMAIL_LINK}
               className={"p-1.5 sm:p-2 rounded-lg border transition " + (isDarkMode ? "text-zinc-400 border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 hover:text-white" : "text-zinc-600 border-zinc-300 bg-zinc-100/80 hover:bg-zinc-200 hover:text-zinc-950")} 
-              title="Send Direct Email"
+              title={`Email ${PERSONAL_INFO.email}`}
             >
               <Mail className="h-4 w-4" />
             </a>
@@ -501,7 +501,7 @@ export default function App() {
             Experience
           </button>
           <button onClick={() => setActiveTab("labs")} className={"flex-1 py-1 text-center text-[10px] uppercase font-mono tracking-wider " + (activeTab === "labs" ? t.tabAct + " rounded" : t.tabInact)}>
-            Projects
+            Labs
           </button>
           <button onClick={() => setActiveTab("chat")} className={"flex-1 py-1 text-center text-[10px] uppercase font-mono tracking-wider flex justify-center items-center gap-0.5 " + (activeTab === "chat" ? t.tabAct + " rounded" : t.tabInact)}>
             <Sparkles className={"h-2 w-2 " + t.iconAccent} /> Q&A
@@ -516,16 +516,20 @@ export default function App() {
         {activeTab === "overview" && (
           <div className={"mb-8 p-6 sm:p-8 rounded-2xl relative overflow-hidden " + t.card}>
             <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
-              <Shield className={"h-64 w-64 " + t.iconAccent} />
+              <Terminal className={"h-64 w-64 " + t.iconAccent} />
             </div>
             
             <div className="w-full flex flex-col items-start">
-              <h2 className={"max-w-3xl text-3xl sm:text-4xl font-semibold tracking-tight mb-4 " + t.textTitle}>
-                Security Operations &amp; Infrastructure Security
-              </h2>
-              <p className={"max-w-3xl text-sm leading-relaxed mb-6 " + t.textMuted}>
-                Systems and infrastructure professional with a networking foundation, hands-on Linux/Windows operations, secure access, VPN/firewall/DNS troubleshooting, and an MEng in Information Systems Security—now focused on moving deeper into Security Operations and Infrastructure Security.
+              <h1 className={"max-w-4xl text-3xl sm:text-4xl font-semibold tracking-tight mb-2 " + t.textTitle}>
+                Building Practical AI Applications &amp; Reliable Software
+              </h1>
+              <p className={"text-base font-medium mb-4 " + t.subTextAccent}>{PERSONAL_INFO.title}</p>
+              <p className={"flex items-center gap-1.5 mb-4 text-sm " + t.textMuted}>
+                <MapPin className="h-4 w-4" aria-hidden="true" /> {PERSONAL_INFO.location}
               </p>
+              <div className={"max-w-3xl space-y-2 text-sm leading-relaxed mb-6 " + t.textMuted}>
+                {PERSONAL_INFO.summary.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+              </div>
 
               <div className="flex w-full flex-col gap-4 md:flex-row md:items-end md:justify-between">
                 <div className={"rounded-lg border overflow-hidden w-full max-w-[368px] " + (isDarkMode ? "bg-zinc-950/85 border-zinc-800" : "bg-zinc-100 border-zinc-300")}>
@@ -535,22 +539,19 @@ export default function App() {
                       <span className="h-2 w-2 rounded-full bg-amber-400/80"></span>
                       <span className="h-2 w-2 rounded-full bg-emerald-500/80"></span>
                     </div>
-                    <span className={"text-[9px] font-mono " + t.textMuted}>ops-fit</span>
+                    <span className={"text-[10px] font-mono " + t.textMuted}>engineering focus</span>
                   </div>
                   <div className="p-2.5 font-mono text-[10px] leading-relaxed break-words">
                     <div className={t.textMuted}>
-                      <span className={t.subTextAccent}>afshin@portfolio</span>:~$ ./role-fit --target security-operations
+                      <span className={t.subTextAccent}>portfolio</span>:~$ ./profile --focus applied-ai
                       <span className={"ml-1 inline-block h-3 w-1 translate-y-0.5 animate-pulse " + (isDarkMode ? "bg-emerald-400" : "bg-sky-600")}></span>
                     </div>
                     <div className={"mt-2 space-y-0.5 " + t.textTitle}>
                       {[
-                        ["target", "Security Operations / Infrastructure Security"],
-                        ["systems", "Linux / Windows"],
-                        ["identity", "Microsoft 365 / MFA / access"],
-                        ["network", "VPN / firewall / DNS"],
-                        ["containers", "Docker / Compose"],
-                        ["troubleshooting", "logs / network diagnostics"],
-                        ["automation", "Git / GitHub / Python"]
+                        ["backend", "Python / FastAPI"],
+                        ["llm", "API integration / output validation"],
+                        ["data", "PostgreSQL / SQLite"],
+                        ["delivery", "Automated tests / Docker / Cloudflare"],
                       ].map(([label, value]) => (
                         <div key={label}>
                           <span className={t.subTextAccent}>{label}</span>
@@ -569,14 +570,14 @@ export default function App() {
                         ? "bg-emerald-500 hover:bg-emerald-400 text-zinc-950 shadow-emerald-500/25" 
                         : "bg-[#0284c7] hover:bg-[#0369a1] text-white shadow-sky-600/15")}
                   >
-                    <Sparkles className="h-4 w-4" /> Ask About My Background
+                    <Sparkles className="h-4 w-4" /> Open Recruiter Q&A
                   </button>
-                  <button 
-                    onClick={() => setActiveTab("labs")} 
+                  <a
+                    href="#projects"
                     className={"w-full px-5 py-2.5 text-xs font-semibold rounded-lg transition duration-200 flex items-center justify-center gap-2 cursor-pointer " + t.btnSec}
                   >
-                    <Terminal className="h-4 w-4" /> View Projects &amp; Labs
-                  </button>
+                    <Terminal className="h-4 w-4" /> View Selected Projects
+                  </a>
                 </div>
               </div>
             </div>
@@ -599,45 +600,45 @@ export default function App() {
                 
                 <div className={t.smallCard + " p-5 rounded-xl flex flex-col justify-between"}>
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-zinc-500 text-[10px] font-mono uppercase tracking-wider">Security Focus</span>
-                    <Activity className={"h-4 w-4 " + t.iconAccent} />
+                    <span className="text-zinc-500 text-[10px] font-mono uppercase tracking-wider">Applied AI</span>
+                    <Sparkles className={"h-4 w-4 " + t.iconAccent} />
                   </div>
                   <div>
-                    <div className={"text-xl font-bold font-sans mb-1 " + t.textTitle}>Security Operations</div>
-                    <span className={t.textMuted + " text-xs"}>Infrastructure Security</span>
+                    <div className={"text-xl font-bold font-sans mb-1 " + t.textTitle}>LLM Applications</div>
+                    <span className={t.textMuted + " text-xs"}>Subtitle translation and recruiter Q&A</span>
                   </div>
                 </div>
 
                 <div className={t.smallCard + " p-5 rounded-xl flex flex-col justify-between"}>
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-zinc-500 text-[10px] font-mono uppercase tracking-wider">Security Education</span>
-                    <GraduationCap className="h-4 w-4 text-cyan-500" />
+                    <span className="text-zinc-500 text-[10px] font-mono uppercase tracking-wider">Backend</span>
+                    <Code className="h-4 w-4 text-cyan-500" />
                   </div>
                   <div>
-                    <div className={"text-xl font-bold font-sans mb-1 " + t.textTitle}>MEng</div>
-                    <span className={t.textMuted + " text-xs"}>Information Systems Security</span>
+                    <div className={"text-xl font-bold font-sans mb-1 " + t.textTitle}>Python &amp; APIs</div>
+                    <span className={t.textMuted + " text-xs"}>FastAPI, batch jobs, and automation</span>
                   </div>
                 </div>
 
                 <div className={t.smallCard + " p-5 rounded-xl flex flex-col justify-between"}>
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-zinc-500 text-[10px] font-mono uppercase tracking-wider">Systems</span>
+                    <span className="text-zinc-500 text-[10px] font-mono uppercase tracking-wider">Delivery</span>
                     <Server className="h-4 w-4 text-amber-500" />
                   </div>
                   <div>
-                    <div className={"text-xl font-bold font-sans mb-1 " + t.textTitle}>Linux / Windows</div>
-                    <span className={t.textMuted + " text-xs"}>Microsoft 365, Docker, maintenance</span>
+                    <div className={"text-xl font-bold font-sans mb-1 " + t.textTitle}>Tests &amp; Deployment</div>
+                    <span className={t.textMuted + " text-xs"}>Verification, Docker, and Cloudflare</span>
                   </div>
                 </div>
 
                 <div className={t.smallCard + " p-5 rounded-xl flex flex-col justify-between"}>
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-zinc-500 text-[10px] font-mono uppercase tracking-wider">Network &amp; Secure Access</span>
-                    <Lock className="h-4 w-4 text-rose-500" />
+                    <span className="text-zinc-500 text-[10px] font-mono uppercase tracking-wider">Professional background</span>
+                    <Shield className="h-4 w-4 text-rose-500" />
                   </div>
                   <div>
-                    <div className={"text-xl font-bold font-sans mb-1 " + t.textTitle}>VPN / Firewalls / DNS</div>
-                    <span className={t.textMuted + " text-xs"}>Connectivity and access troubleshooting</span>
+                    <div className={"text-xl font-bold font-sans mb-1 " + t.textTitle}>Systems Administration</div>
+                    <span className={t.textMuted + " text-xs"}>Linux, Windows, and networking</span>
                   </div>
                 </div>
 
@@ -646,21 +647,18 @@ export default function App() {
               {/* Skill Matrix Segment */}
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-mono uppercase text-zinc-500 tracking-wider">Core Role Fit</h3>
+                  <h2 className="text-sm font-mono uppercase text-zinc-500 tracking-wider">Technical Skills</h2>
                   <div className={"h-px flex-1 ml-4 " + t.divider}></div>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-                  {[
-                    { ...SKILL_CATEGORIES[1], title: "Security Operations & Access" },
-                    SKILL_CATEGORIES[0],
-                    { ...SKILL_CATEGORIES[2], title: "Networking" },
-                    { ...SKILL_CATEGORIES[3], title: "Automation & Engineering Tools" }
-                  ].map((cat, idx) => (
-                    <div key={idx} className={t.smallCard + " p-5 rounded-xl transition duration-200 " + (isDarkMode ? "hover:border-emerald-500/50" : "hover:border-[#0284c7]/40")}>
+                  {SKILL_CATEGORIES.map((cat, idx) => {
+                    const Icon = SKILL_ICONS[idx];
+                    return (
+                    <div key={cat.title} className={t.smallCard + " p-5 rounded-xl transition duration-200 " + (isDarkMode ? "hover:border-emerald-500/50" : "hover:border-[#0284c7]/40")}>
                       <div className="flex items-center gap-2 mb-3">
-                        {idx === 0 ? <Server className={"h-4 w-4 " + t.iconAccent} /> : idx === 1 ? <ShieldAlert className="h-4 w-4 text-cyan-500" /> : idx === 2 ? <Network className="h-4 w-4 text-amber-500" /> : idx === 3 ? <Activity className="h-4 w-4 text-rose-500" /> : <Terminal className="h-4 w-4 text-violet-500" />}
-                        <h4 className={"text-sm font-semibold " + t.textTitle}>{cat.title}</h4>
+                        <Icon className={"h-4 w-4 " + t.iconAccent} />
+                        <h3 className={"text-sm font-semibold " + t.textTitle}>{cat.title}</h3>
                       </div>
                       <ul className="space-y-1.5 text-xs">
                         {cat.skills.map((skill, sIdx) => (
@@ -671,7 +669,8 @@ export default function App() {
                         ))}
                       </ul>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
@@ -679,92 +678,53 @@ export default function App() {
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 
                 {/* Featured Projects Column */}
-                <div className="lg:col-span-8 space-y-6">
+                <div id="projects" className="lg:col-span-8 space-y-6 scroll-mt-24">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-mono text-zinc-500 uppercase tracking-lighter">Project Work</h3>
-                    <span onClick={() => setActiveTab("labs")} className={"text-xs font-mono hover:underline transition cursor-pointer flex items-center gap-1 " + t.subTextAccent + " " + t.textLinkHover}>
-                      View Portfolio Labs <ExternalLink className="h-3 w-3" />
-                    </span>
+                    <h2 className="text-sm font-mono text-zinc-500 uppercase tracking-lighter">Selected Projects</h2>
+                    <button onClick={() => setActiveTab("labs")} className={"text-xs font-mono hover:underline transition cursor-pointer " + t.subTextAccent + " " + t.textLinkHover}>
+                      View Interactive Labs
+                    </button>
                   </div>
 
                   <div className="grid grid-cols-1 gap-6">
-                  {PROJECTS.map((proj) => {
-                    const isCoreProject = proj.id === "secure-infra";
-
-                    return (
-                    <div
-                      key={proj.id}
-                      className={"p-6 rounded-xl space-y-5 transition " + t.smallCard + " " + (
-                        isCoreProject
-                          ? (isDarkMode ? "border-emerald-500/30" : "border-sky-300")
-                          : ""
-                      )}
-                    >
-                      <div>
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="flex items-center gap-2">
-                            <h4 className={"text-lg font-semibold leading-snug " + t.textTitle}>{proj.title}</h4>
-                            {isCoreProject && (
-                              <span className={"shrink-0 px-1.5 py-0.5 rounded border text-[9px] font-mono uppercase " + t.badge}>Primary Project</span>
-                            )}
-                            {proj.id === "blushtime" && (
-                              <span className={"shrink-0 px-1.5 py-0.5 rounded border text-[9px] font-mono uppercase " + t.badge}>Family Business Project</span>
-                            )}
-                          </div>
-                          {proj.repositoryVisibility === "public" && proj.githubUrl && (
-                          <span className={"shrink-0 p-1 text-zinc-500 transition cursor-pointer " + t.textLinkHover}>
-                            <Github className="h-4 w-4" onClick={() => window.open(proj.githubUrl, "_blank", "noopener,noreferrer")} />
-                          </span>
-                          )}
-                        </div>
-                        <p className={"text-xs font-mono " + t.subTextAccent}>{proj.subtitle}</p>
-                        <div className="mt-2 flex flex-wrap gap-1.5">
-                          {proj.period && <span className={"px-2 py-0.5 rounded border text-[9px] font-mono " + t.badge}>{proj.period}</span>}
-                          <span className={"px-2 py-0.5 rounded border text-[9px] font-mono " + t.badge}>
-                            {proj.repositoryVisibility === "private" ? "Private repository · sanitized case study" : "Public project"}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="space-y-3 text-xs leading-relaxed">
-                        {[
-                          ["Purpose", proj.purpose || proj.description],
-                          ["Built", proj.built || proj.features[0]],
-                          ["Demonstrates", proj.demonstrates || proj.features[1]]
-                        ].map(([label, value]) => (
-                          <div key={label}>
-                            <span className={"font-mono text-[10px] uppercase " + t.subTextAccent}>{label}: </span>
-                            <span className={t.textMuted}>{value}</span>
-                          </div>
-                        ))}
+                    {Object.values(PROJECTS).map((project: ProjectData) => (
+                      <article key={project.title} className={"p-6 rounded-xl space-y-4 " + t.smallCard}>
                         <div>
-                          <span className={"font-mono text-[10px] uppercase " + t.subTextAccent}>Stack: </span>
-                          <span className={t.textMuted}>{proj.tech.join(", ")}.</span>
+                          <h3 className={"text-lg font-semibold leading-snug " + t.textTitle}>{project.title}</h3>
+                          <p className={"text-xs font-mono " + t.subTextAccent}>{project.subtitle}</p>
                         </div>
-                      </div>
-
-                      {proj.liveUrl && (
-                        <button
-                          onClick={() => window.open(proj.liveUrl, "_blank", "noopener,noreferrer")}
-                          className={"w-full py-2 px-3 text-[11px] font-mono font-semibold rounded-lg transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer border " + 
-                            (isDarkMode 
-                              ? "bg-emerald-950/20 hover:bg-emerald-950/40 text-emerald-400 border-emerald-900/50 hover:border-emerald-500/30" 
-                              : "bg-sky-50 hover:bg-sky-100 text-[#0284c7] border-sky-200 hover:border-sky-300")}
-                        >
-                          <Play className="h-3 w-3 fill-current" /> Launch Live Demo
-                        </button>
-                      )}
-
-                    </div>
-                    );
-                  })}
+                        <div className={"space-y-2 text-sm leading-relaxed " + t.textMuted}>
+                          <p>{project.description}</p>
+                          {project.details && <p>{project.details}</p>}
+                        </div>
+                        <ul aria-label="Technologies" className="flex flex-wrap gap-1.5">
+                          {project.tech.map((tech) => (
+                            <li key={tech} className={"px-2 py-0.5 rounded border text-[11px] font-mono " + t.badge}>{tech}</li>
+                          ))}
+                        </ul>
+                        {(project.githubUrl || project.liveUrl) && (
+                          <div className="flex flex-wrap gap-2">
+                            {project.githubUrl && (
+                              <a href={project.githubUrl} target="_blank" rel="noreferrer" aria-label={`${project.title} on GitHub`} className={"inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-xs " + t.btnSec}>
+                                <Github className="h-4 w-4" /> GitHub
+                              </a>
+                            )}
+                            {project.liveUrl && (
+                              <a href={project.liveUrl} target="_blank" rel="noreferrer" className={"inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-xs " + t.btnSec}>
+                                <Play className="h-3 w-3" /> Launch Live Demo
+                              </a>
+                            )}
+                          </div>
+                        )}
+                      </article>
+                    ))}
                   </div>
                 </div>
 
                 {/* Secure Contact Portal Column */}
                 <div className="lg:col-span-4 space-y-6">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-mono uppercase text-zinc-500 tracking-wider">Recruiter Contact</h3>
+                    <h2 className="text-sm font-mono uppercase text-zinc-500 tracking-wider">Recruiter Contact</h2>
                   </div>
 
                   <div className={"p-5 rounded-xl space-y-4 relative " + t.smallCard}>
@@ -772,11 +732,13 @@ export default function App() {
                       <span className={"h-1.5 w-1.5 rounded-full inline-block animate-ping " + t.pinger}></span>
                       Send Hiring Inquiry
                     </h4>
+                    <a href={PUBLIC_EMAIL_LINK} className={"inline-block text-sm hover:underline " + t.subTextAccent}>{PERSONAL_INFO.email}</a>
                     
                     <form onSubmit={handleContactSubmit} className="space-y-3.5">
                       <div>
-                        <label className="block text-[10px] font-mono text-zinc-500 uppercase mb-1">Name</label>
+                        <label htmlFor="contact-name" className="block text-[10px] font-mono text-zinc-500 uppercase mb-1">Name</label>
                         <input 
+                          id="contact-name"
                           type="text" 
                           required
                           maxLength={80}
@@ -792,8 +754,9 @@ export default function App() {
                       
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-[10px] font-mono text-zinc-500 uppercase mb-1">Email</label>
+                          <label htmlFor="contact-email" className="block text-[10px] font-mono text-zinc-500 uppercase mb-1">Email</label>
                           <input 
+                            id="contact-email"
                             type="email" 
                             required
                             maxLength={120}
@@ -803,12 +766,13 @@ export default function App() {
                               setContactForm({ ...contactForm, email: e.target.value });
                             }}
                             className={"w-full border rounded px-3 py-2 text-xs transition " + t.input} 
-                            placeholder="recruiter@company.com"
+                            placeholder="Your work email"
                           />
                         </div>
                         <div>
-                          <label className="block text-[10px] font-mono text-zinc-500 uppercase mb-1">Company</label>
+                          <label htmlFor="contact-company" className="block text-[10px] font-mono text-zinc-500 uppercase mb-1">Company</label>
                           <input 
+                            id="contact-company"
                             type="text" 
                             maxLength={120}
                             value={contactForm.company}
@@ -823,8 +787,9 @@ export default function App() {
                       </div>
 
                       <div>
-                        <label className="block text-[10px] font-mono text-zinc-500 uppercase mb-1">Message</label>
+                        <label htmlFor="contact-message" className="block text-[10px] font-mono text-zinc-500 uppercase mb-1">Message</label>
                         <textarea 
+                          id="contact-message"
                           rows={3}
                           required
                           maxLength={1500}
@@ -878,7 +843,7 @@ export default function App() {
                           <CheckCircle className={"h-8 w-8 " + t.iconAccent} />
                           <h5 className={"text-sm font-semibold " + t.textTitle}>Message Sent</h5>
                           <p className={"text-xs max-w-xs leading-relaxed " + t.textMuted}>
-                            Your interview request was emailed to {PERSONAL_INFO.email}.
+                            Your inquiry has been sent. You can also reach Afshin at <a href={PUBLIC_EMAIL_LINK} className="underline">{PERSONAL_INFO.email}</a>.
                           </p>
                           <button
                             type="button"
@@ -940,10 +905,10 @@ export default function App() {
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     <Sparkles className={"h-4.5 w-4.5 " + t.iconAccent} />
-                    <h3 className={"text-sm font-semibold " + t.textTitle}>Interactive Technical Profile</h3>
+                    <h3 className={"text-sm font-semibold " + t.textTitle}>Ask About Afshin</h3>
                   </div>
                   <p className={"text-xs leading-relaxed mb-6 " + t.textMuted}>
-                    Ask focused questions about my infrastructure, security operations, automation work, projects, education, or location availability.
+                    Ask about AI applications, Python backends, engineering automation, or how Afshin’s systems background informs his software work.
                   </p>
 
                     <h4 className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider mb-2">Suggested Questions</h4>
@@ -962,11 +927,6 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className={"p-3.5 rounded border font-mono text-[10px] text-zinc-500 space-y-1 " + t.codeBlock}>
-                  <div>ENDPOINT: /api/chat</div>
-                  <div>MODEL: server-side OpenAI</div>
-                  <div>EDGE RUNTIME: Cloudflare</div>
-                </div>
               </div>
 
               {/* Central Chat Node */}
@@ -976,20 +936,20 @@ export default function App() {
                 <div className={"px-4 py-3 border-b flex items-center justify-between " + (isDarkMode ? "bg-zinc-900/50 border-zinc-800/60" : "bg-zinc-100 border-zinc-200")}>
                   <div className="flex items-center space-x-2.5">
                     <div className={"h-2.5 w-2.5 rounded-full animate-pulse " + (isDarkMode ? "bg-emerald-500" : "bg-[#0284c7]")}></div>
-                    <span className={"text-xs font-mono uppercase tracking-wider " + (isDarkMode ? "text-zinc-300" : "text-zinc-700")}>Technical_QA_Profile</span>
+                    <span className={"text-xs font-mono uppercase tracking-wider " + (isDarkMode ? "text-zinc-300" : "text-zinc-700")}>Recruiter Q&A</span>
                   </div>
                   <button 
                     onClick={() => setMessages([
                       {
                         id: "welcome",
                         sender: "ai",
-                        text: "Hello. What would you like to know about my infrastructure, networking, security operations, or project work?",
+                        text: CHAT_WELCOME,
                         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                       }
                     ])}
                     className={"p-1 px-2 text-[10px] uppercase font-mono rounded border transition cursor-pointer " + t.btnSec}
                   >
-                    Clear Slate
+                    Clear Chat
                   </button>
                 </div>
 
@@ -1007,12 +967,16 @@ export default function App() {
                       )}>
                         
                         <div className={"font-mono text-[9px] mb-1 leading-none uppercase tracking-wider " + (m.sender === "user" ? (isDarkMode ? "text-zinc-400" : "text-sky-100") : "text-zinc-500")}>
-                          {m.sender === "user" ? "Recruiter" : "Technical Profile"} • {m.timestamp}
+                          {m.sender === "user" ? "You" : "Portfolio Assistant"} • {m.timestamp}
                         </div>
                         
-                        <div className="markdown-body select-text">
-                          <Markdown urlTransform={safeMarkdownUrl}>{m.text}</Markdown>
-                        </div>
+                        {m.sender === "user" ? (
+                          <p className="whitespace-pre-wrap break-words">{m.text}</p>
+                        ) : (
+                          <div className="markdown-body select-text">
+                            <Markdown urlTransform={safeMarkdownUrl}>{m.text}</Markdown>
+                          </div>
+                        )}
 
                       </div>
                     </div>
@@ -1021,7 +985,7 @@ export default function App() {
                   {isAiTyping && (
                     <div className="flex justify-start">
                       <div className={"rounded-xl px-4 py-3 text-xs border flex items-center space-x-2 " + (isDarkMode ? "bg-zinc-900/30 text-zinc-400 border-zinc-800/60" : "bg-zinc-100 text-zinc-700 border-zinc-200")}>
-                        <span className="text-[10px] font-mono text-zinc-500 uppercase">Consulting resume telemetry data</span>
+                        <span className="text-[10px] font-mono text-zinc-500 uppercase">Finding an answer</span>
                         <span className="flex space-x-1">
                           <span className={"h-1.5 w-1.5 rounded-full animate-bounce " + t.pinger} style={{ animationDelay: '0ms' }}></span>
                           <span className={"h-1.5 w-1.5 rounded-full animate-bounce " + t.pinger} style={{ animationDelay: '150ms' }}></span>
@@ -1043,12 +1007,14 @@ export default function App() {
                       onKeyDown={(e) => e.key === "Enter" && handleSendChat()}
                       disabled={isAiTyping}
                       maxLength={700}
-                      className={"flex-1 border rounded px-3 py-2 text-xs transition disabled:opacity-50 " + t.input}
-                      placeholder="Type a custom query (e.g., Explain my Docker setup...)"
+                      className={"min-w-0 flex-1 border rounded px-3 py-2 text-xs transition disabled:opacity-50 " + t.input}
+                      aria-label="Question"
+                      placeholder="Ask about Python projects, LLMs, or role fit"
                     />
                     <button 
                       onClick={() => handleSendChat()}
                       disabled={isAiTyping || !inputText.trim()}
+                      aria-label="Send question"
                       className={"p-2 px-3.5 rounded text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer disabled:opacity-50 " + 
                         (isDarkMode 
                           ? "bg-emerald-500 hover:bg-emerald-400 text-zinc-950" 
@@ -1081,8 +1047,8 @@ export default function App() {
                     <div className="flex items-center gap-2">
                       <GraduationCap className={"h-5 w-5 " + t.iconAccent} />
                       <div>
-                        <h3 className={"text-sm font-semibold " + t.textTitle}>MEng — Information Systems Security</h3>
-                        <p className={"text-[11px] font-mono " + t.subTextAccent}>Concordia University · May 2022 - Dec 2023</p>
+                        <h3 className={"text-sm font-semibold " + t.textTitle}>{EDUCATION.degree}</h3>
+                        <p className={"text-[11px] font-mono " + t.subTextAccent}>{EDUCATION.institution} · {EDUCATION.period}</p>
                       </div>
                     </div>
                     <span className={"px-2 py-1 rounded border text-[10px] font-mono shrink-0 " + t.badge}>ISS</span>
@@ -1103,12 +1069,12 @@ export default function App() {
                   </div>
 
                   <p className={"text-xs leading-relaxed pt-2 border-t " + (isDarkMode ? "border-zinc-800" : "border-zinc-200") + " " + t.textMuted}>
-                    My ISS coursework centered on cryptographic primitives, protocol and network attack surfaces, and OS-level controls such as isolation, authentication, access control, and secure system design.
+                    {EDUCATION.focus}
                   </p>
                 </div>
 
                 <div className={t.smallCard + " p-5 rounded-xl space-y-4"}>
-                  <h3 className="text-xs font-mono uppercase text-zinc-500 tracking-wider">Auxiliary Competency Matrix</h3>
+                  <h3 className="text-xs font-mono uppercase text-zinc-500 tracking-wider">Transferable Skills</h3>
                   
                   {SKILL_CATEGORIES.slice(3).map((cat, sidx) => (
                     <div key={sidx} className="space-y-4">
@@ -1147,7 +1113,7 @@ export default function App() {
                       <div className={t.smallCard + " p-5 rounded-xl space-y-3 transition " + (isDarkMode ? "hover:border-emerald-500/50" : "hover:border-sky-500/40")}>
                         <div className="flex flex-wrap items-center justify-between gap-2">
                           <div>
-                            <h4 className={"text-base font-semibold " + t.textTitle}>{job.id === "private-employer" ? "Systems Administrator" : job.role}</h4>
+                            <h4 className={"text-base font-semibold " + t.textTitle}>{job.role}</h4>
                             <p className={"text-xs font-mono " + t.subTextAccent}>{job.company}{job.location ? " — " + job.location : ""}</p>
                           </div>
                           <span className={"px-2.5 py-1 text-[10px] font-mono font-medium rounded-md border " + t.badge}>
@@ -1187,9 +1153,9 @@ export default function App() {
               {/* Introduction header */}
               <div className={"p-5 rounded-xl flex flex-wrap justify-between items-center gap-4 " + t.smallCard}>
                 <div>
-                  <h3 className={"text-lg font-semibold " + t.textTitle}>Projects / Labs</h3>
+                  <h3 className={"text-lg font-semibold " + t.textTitle}>Interactive Labs</h3>
                   <p className={"text-xs mt-1 " + t.textMuted}>
-                    Secondary portfolio labs and educational demos. Scenarios, inputs, and logs are synthetic and are not presented as production incident experience.
+                    Explore selected project workflows through demos with simulated inputs, scenarios, and logs.
                   </p>
                 </div>
                 <div className={"text-xs font-mono px-2.5 py-1.5 rounded border flex items-center gap-2 " + t.badge}>
@@ -1460,7 +1426,7 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-xs">
           <div className="flex flex-col gap-2 text-center text-[11px] font-mono sm:flex-row sm:items-center sm:justify-between sm:text-left">
             <span>© {new Date().getFullYear()} {PERSONAL_INFO.name}. All rights reserved.</span>
-            <span>Secure contact: {PERSONAL_INFO.email}</span>
+            <a href={PUBLIC_EMAIL_LINK} className="hover:underline">{PERSONAL_INFO.email}</a>
           </div>
         </div>
       </footer>

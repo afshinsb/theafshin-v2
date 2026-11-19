@@ -6,6 +6,8 @@ coverage/
 *.log
 .env*
 !.env.example
+.dev.vars*
+.wrangler/
 
 # Private Codex context files
 .codex/

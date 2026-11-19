@@ -10,8 +10,8 @@ import {
   stripCrlf,
   todayKey,
   validateTurnstile,
-} from "../_shared/security";
-import type { PagesContext } from "../_shared/security";
+} from "../_shared/security.ts";
+import type { PagesContext } from "../_shared/security.ts";
 import { z } from "zod";
 
 const contactSchema = z.object({
@@ -213,11 +213,9 @@ export const onRequestPost = async ({ request, env }: PagesContext) => {
     });
 
     if (!response.ok) {
-      const responseBody = await response.text();
       console.error("contact_email_send_error", {
         provider: "resend",
         status: response.status,
-        responseBody: responseBody.slice(0, 1000),
       });
       return genericError(502);
     }

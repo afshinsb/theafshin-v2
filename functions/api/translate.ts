@@ -7,8 +7,8 @@ import {
   readJson,
   todayKey,
   validateTurnstile,
-} from "../_shared/security";
-import type { PagesContext } from "../_shared/security";
+} from "../_shared/security.ts";
+import type { PagesContext } from "../_shared/security.ts";
 import { z } from "zod";
 
 const translateSchema = z.object({

@@ -1,153 +1,134 @@
-import { WorkExperience, ProjectData, SkillCategory } from "./types";
+import type { WorkExperience, ProjectData, SkillCategory } from "./types";
 
 export const PERSONAL_INFO = {
-  name: "AFSHIN SABERI",
-  title: "Security Operations | Infrastructure Security",
-  location: "Montreal, QC",
+  name: "Afshin Saberi",
+  title: "Software Developer | Applied AI, LLM Applications & Python Backend Engineering",
+  location: "Toronto, Ontario, Canada",
   email: "contact@theafshin.com",
-  phone: "Available upon request",
   linkedin: "https://linkedin.com/in/theafshin",
   github: "https://github.com/afshinsb",
   portfolio: "https://theafshin.com",
-  summary: "Security and infrastructure professional with a networking foundation, systems administration experience, and hands-on security-focused infrastructure project work. Focused on identity and access, secure connectivity, Windows/Linux operations, log-based troubleshooting, and resilient self-hosted services."
+  summary: [
+    "I’m a Toronto-based software developer focused on Python applications, LLM integrations, backend systems, and engineering automation.",
+    "I build AI features into software with validation, automated tests, and deployment in mind. My systems administration background informs how I design for reliability, security, and maintainability.",
+  ],
+};
+
+export const EDUCATION = {
+  degree: "MEng in Information Systems Security",
+  institution: "Concordia University",
+  period: "May 2022 – Dec 2023",
+  focus: "Coursework covered cryptographic protocols, network and operating system security, and security evaluation.",
 };
 
 export const WORK_EXPERIENCE: WorkExperience[] = [
   {
     id: "private-employer",
     company: "Private Employer",
-    role: "Systems Administrator — Infrastructure & Security Operations",
+    role: "Systems Administrator",
     location: "Montreal, QC",
-    period: "Jan 2023 - Jan 2025",
+    period: "Jan 2023 – Jan 2025",
     bullets: [
-      "Microsoft 365 & Identity: Managed user accounts, permissions, MFA, and authentication/access issues.",
-      "Network & Secure Access: Supported VPN connectivity, firewall rules, DNS, and remote-access troubleshooting.",
-      "Windows/Linux Operations: Performed patching, service checks, backup/restore, and general systems maintenance.",
-      "Troubleshooting: Investigated system, network, and application incidents using logs."
-    ]
+      "Managed Microsoft 365 accounts, permissions, and MFA, and resolved authentication and access issues.",
+      "Supported VPN, firewall, and DNS troubleshooting for remote access.",
+      "Maintained Windows and Linux systems through patching, health checks, and backup and restore work.",
+      "Used logs to investigate system, network, and application incidents.",
+    ],
   },
   {
     id: "airin-pars-media",
     company: "Airin Pars Media",
     role: "Network Technician",
     location: "Shiraz, Iran",
-    period: "Sep 2017 - Feb 2021",
+    period: "Sep 2017 – Feb 2021",
     bullets: [
-      "Supported multi-site LAN/WAN infrastructure across routing, switching, VPNs, firewall policies, network segmentation, and access-control changes using Ubiquiti and MikroTik equipment.",
-      "Diagnosed outages, connectivity, and access issues with Wireshark, logs, firewall-rule reviews, and network diagnostics; documented configuration changes and resolutions."
-    ]
-  }
+      "Supported routing, switching, VPNs, firewall policies, segmentation, and access control across multiple sites.",
+      "Diagnosed connectivity and access issues with Wireshark and logs, and documented configuration changes and resolutions.",
+    ],
+  },
 ];
 
-export const PROJECTS: ProjectData[] = [
-  {
-    id: "secure-infra",
-    title: "Security & Infrastructure Homelab",
-    subtitle: "Primary security and infrastructure project",
-    period: "Feb 2025 - Present",
-    repositoryVisibility: "private",
-    description: "Build and operate a Linux-based self-hosted environment with controlled service exposure and private remote access.",
-    purpose: "Develop deeper hands-on security and infrastructure operations experience in a private lab environment.",
-    built: "A Linux-based self-hosted environment using Docker, DNS, reverse proxying, VPN/private remote access, monitoring, backup and recovery, and security-focused service configuration.",
-    demonstrates: "Service exposure management, network access control, credential handling, system updates, troubleshooting, monitoring, and recovery documentation.",
-    tech: ["Linux", "Docker", "DNS", "Reverse proxy", "VPN", "Monitoring", "Backup and recovery"],
-    features: []
-  },
-  {
-    id: "blushtime",
-    title: "Blushtime — Family Business Technology Project",
-    subtitle: "Private family-business project work",
-    period: "Feb 2025 - Aug 2026",
-    repositoryVisibility: "private",
-    description: "Built and supported a booking and administration platform while helping with operational setup during the business launch.",
-    purpose: "Support a family business launch with a practical booking and administration platform.",
-    built: "A Next.js and TypeScript platform using Supabase/PostgreSQL, authentication, payments, notifications, integrations, and Cloudflare deployment.",
-    demonstrates: "Applied platform development, access-aware workflows, integrations, deployment, troubleshooting, and operational launch support.",
-    tech: ["Next.js", "TypeScript", "Supabase", "PostgreSQL", "Authentication", "Payments", "Cloudflare"],
-    features: []
-  },
-  {
-    id: "ai-rail",
-    title: "AI Rail",
-    subtitle: "Supporting public project",
-    repositoryVisibility: "public",
-    description: "Make AI-assisted coding safer and more controlled by forcing one scoped issue at a time.",
-    purpose: "Make AI-assisted coding safer by forcing one scoped issue at a time.",
-    built: "A Python CLI for GitHub Issue workflows with project memory, review packs, safety checks, release validation, and pipx install.",
-    demonstrates: "Python automation, CLI design, Git/GitHub workflow control, safety checks, and release-ready packaging.",
-    tech: ["Python", "GitHub Issues", "Git", "pipx", "CLI tooling", "CI/testing", "Markdown workflows"],
-    features: [],
-    githubUrl: "https://github.com/afshinsb/ai-rail"
-  },
-  {
-    id: "subtitle-translator",
+export const PROJECTS = {
+  subtitleTranslator: {
     title: "Universal Subtitle Translator",
-    subtitle: "Supporting public project",
-    repositoryVisibility: "public",
-    description: "Translate subtitle files and media-folder subtitles in a controlled Dockerized workflow.",
-    purpose: "Translate subtitle files and media-folder subtitles in a controlled Dockerized workflow.",
-    built: "A FastAPI app using FFmpeg/ffprobe, OpenAI API, SQLite history, batch jobs, live progress, cancellation, logs, and admin defaults.",
-    demonstrates: "Python service design, Dockerized workloads, API integration, job state, media automation, safe demos, and operational logging.",
-    tech: ["FastAPI", "Python", "Docker", "SQLite", "FFmpeg/ffprobe", "OpenAI API", "REST APIs", "Cloudflare Pages demo"],
-    features: [],
+    subtitle: "Python backend and LLM integration",
+    description: "A FastAPI service that extracts subtitles with FFmpeg and translates subtitle files or media folders in batches through the OpenAI API.",
+    details: "Validates structured replies against source cue IDs to catch missing, duplicate, or misaligned translations. Retries failed batches and records interrupted jobs in SQLite. Includes automated tests and Docker deployment.",
+    tech: ["Python", "FastAPI", "OpenAI API", "FFmpeg", "SQLite", "Docker", "pytest"],
     githubUrl: "https://github.com/afshinsb/universal-subtitle-translator",
-    liveUrl: "https://translate.theafshin.com/"
-  }
-];
+    liveUrl: "https://translate.theafshin.com/",
+  },
+  aiRail: {
+    title: "AI Rail",
+    subtitle: "Python CLI and engineering automation",
+    description: "A local Python CLI that scopes AI-assisted coding to one GitHub issue at a time and prepares prompts and review packs for existing coding tools.",
+    details: "Runs project checks and records a verified snapshot so the release step can detect changes made after verification.",
+    tech: ["Python", "Git", "GitHub Issues", "GitHub CLI", "pytest", "pipx"],
+    githubUrl: "https://github.com/afshinsb/ai-rail",
+  },
+  recruiterChat: {
+    title: "Portfolio AI Recruiter Chatbot",
+    subtitle: "LLM application and API design",
+    description: "A recruiter Q&A built with TypeScript and Cloudflare Pages Functions. It uses the OpenAI Responses API to match questions to reviewed portfolio answers.",
+    details: "Validates requests and answer selections, enforces per-IP and daily quotas with Cloudflare KV, and limits replies to approved professional information.",
+    tech: ["TypeScript", "Cloudflare Pages Functions", "Cloudflare KV", "OpenAI Responses API", "Zod"],
+    githubUrl: "https://github.com/afshinsb/theafshin-v2",
+  },
+  modelFrontier: {
+    title: "Model Frontier",
+    subtitle: "AI model comparison dashboard",
+    description: "A React and TypeScript dashboard for exploring published AI model measurements with filters, plots, and side-by-side comparisons.",
+    details: "Uses validated data schemas and retains source provenance so readers can see which measurements are comparable.",
+    tech: ["React", "TypeScript", "Zod"],
+  },
+  docShape: {
+    title: "DocShape",
+    subtitle: "Document rendering and export",
+    description: "A document layout and export tool with a React editor and a server-side browser renderer for PDF output.",
+    details: "Separates the editing view from the export renderer and tests the layout and rendering behavior.",
+    tech: ["React", "TypeScript", "Cloudflare Workers", "Vitest"],
+  },
+  blushtime: {
+    title: "Blushtime",
+    subtitle: "Booking and administration software",
+    description: "A Next.js and TypeScript application for booking and appointment administration.",
+    details: "Validates booking requests and supports authenticated administration and appointment status changes with PostgreSQL.",
+    tech: ["Next.js", "TypeScript", "Supabase", "PostgreSQL", "Cloudflare"],
+  },
+  homelab: {
+    title: "Security & Infrastructure Homelab",
+    subtitle: "Systems reliability practice",
+    description: "An independent Linux and Docker lab for practicing deployment, service monitoring, troubleshooting, and backup and recovery.",
+    tech: ["Linux", "Docker", "Monitoring", "Backup and recovery"],
+  },
+} satisfies Record<string, ProjectData>;
 
 export const SKILL_CATEGORIES: SkillCategory[] = [
   {
-    title: "Systems & Infrastructure",
-    iconName: "Server",
-    skills: [
-      "Linux administration",
-      "Windows Server / Microsoft 365 basics",
-      "Docker and Docker Compose",
-      "Backup and restore validation"
-    ]
+    title: "Applied AI & Python",
+    skills: ["Python", "LLM API integration", "Structured outputs and validation", "Batch processing and retries"],
   },
   {
-    title: "Identity & Secure Access",
-    iconName: "Lock",
-    skills: [
-      "Microsoft 365 user administration",
-      "Permissions and MFA support",
-      "Authentication and access troubleshooting",
-      "VPN and private remote access",
-      "Credentials and service exposure management"
-    ]
+    title: "Backend & Data",
+    skills: ["FastAPI and REST APIs", "TypeScript and Next.js", "SQL, PostgreSQL, and SQLite", "Job state and application workflows"],
   },
   {
-    title: "Network & Security",
-    iconName: "Lock",
-    skills: [
-      "TCP/IP, DNS, HTTP, TLS",
-      "Firewall rules and policy changes",
-      "VPN access and tunnel design",
-      "Wireshark packet review",
-      "Segmentation and exposure reduction"
-    ]
+    title: "Testing & Delivery",
+    skills: ["Automated testing", "Git and GitHub workflows", "Docker and Docker Compose", "Cloudflare Pages and Workers"],
   },
   {
-    title: "Automation & DevTools",
-    iconName: "Terminal",
-    skills: [
-      "Python automation",
-      "Bash and PowerShell scripting",
-      "Git and GitHub workflows",
-      "REST API automation",
-      "Structured logs and CLI tooling"
-    ]
-  }
+    title: "Infrastructure & Security",
+    skills: ["Linux and Windows administration", "DNS, networking, and secure access", "Log-based troubleshooting", "Backup and recovery"],
+  },
 ];
 
 export const SUGGESTED_QUESTIONS = [
-  "Tell me about your security and infrastructure background.",
-  "Why are you moving deeper into Security Operations?",
-  "What did you do as a Systems Administrator?",
-  "How does your networking background apply to security?",
-  "Tell me about your Security & Infrastructure Homelab.",
-  "What was your role in the Blushtime project?",
-  "What have you been working on since early 2025?",
-  "What security or infrastructure roles are the best fit?"
+  "What AI applications has Afshin built?",
+  "What Python and backend experience does he have?",
+  "How does his subtitle translator use LLMs?",
+  "What does AI Rail do?",
+  "Does he have production ML training experience?",
+  "How does his infrastructure background support AI engineering?",
+  "Which AI and software roles are a good fit?",
+  "How can I reach Afshin for an interview?",
 ];

@@ -1,6 +1,6 @@
 # theafshin-v2
 
-Static React/Vite portfolio for Afshin Saberi, deployed on Cloudflare Pages with server-side API routes implemented as Cloudflare Pages Functions.
+React/Vite portfolio for Afshin Saberi, a Toronto-based software developer focused on applied AI, LLM applications, and Python backends. Cloudflare Pages serves the frontend and runs the API routes as Pages Functions.
 
 ## Architecture
 
@@ -138,7 +138,11 @@ The contact form uses Resend REST API for outbound delivery from Cloudflare Page
 2. Create a Resend API key.
 3. Set `RESEND_API_KEY`, `CONTACT_FROM_EMAIL`, and `CONTACT_TO_EMAIL` in the Pages project.
 
-Use placeholders in committed examples and docs. Configure real email values only in Cloudflare Pages Variables and secrets. Visitor email addresses are used only as `Reply-To`.
+Configure actual mail-delivery values in Cloudflare Pages Variables and secrets. The public professional email, `contact@theafshin.com`, is approved for the site, structured metadata, and recruiter chat. Form delivery uses the configured sender and recipient. Visitor email addresses are used as `Reply-To`.
+
+## Recruiter Chat Knowledge
+
+Update the reviewed public facts in `src/data.ts` and the approved replies in `functions/_shared/recruiter-profile.ts`. The OpenAI Responses API selects answer IDs and the server validates the selection before rendering the corresponding replies. Keep the answer catalog limited to approved professional information and public URLs.
 
 ## Cloudflare Security Rules
 
@@ -169,7 +173,7 @@ Server-side KV counters are a second line of defense, not the only control. Clou
 - API requests accept JSON only and reject bodies over 20 KB.
 - Chat validates request bodies with Zod, rejects malformed, empty, repeated, prompt-injection-like, and over-700-character messages.
 - Chat accepts the current validated message only for OpenAI input and caps output tokens at 400.
-- Chat is restricted to Afshin's resume, experience, projects, infrastructure, networking, and security background.
+- Chat returns reviewed replies about public projects, skills, role fit, employment, education, and professional contact.
 - Contact uses a fixed From address and puts visitor email only in Reply-To.
 - React Markdown does not render raw HTML and blocks unsafe URL protocols such as `javascript:`.
 - API errors are generic and do not expose stack traces or provider responses.
@@ -177,8 +181,11 @@ Server-side KV counters are a second line of defense, not the only control. Clou
 
 ## Checks
 
+Run the API tests with Node.js 22 or later.
+
 ```bash
 npm run lint
+npm test
 npm run build
 npm audit
 ```

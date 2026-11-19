@@ -8,25 +8,17 @@ export interface WorkExperience {
 }
 
 export interface ProjectData {
-  id: string;
   title: string;
   subtitle: string;
-  period?: string;
-  repositoryVisibility: "public" | "private";
   description: string;
-  purpose?: string;
-  built?: string;
-  demonstrates?: string;
+  details?: string;
   tech: string[];
-  features: string[];
-  highlights?: string[];
   githubUrl?: string;
   liveUrl?: string;
 }
 
 export interface SkillCategory {
   title: string;
-  iconName: string;
   skills: string[];
 }
 
