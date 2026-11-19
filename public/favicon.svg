@@ -1,14 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="AS">
-  <circle cx="32" cy="32" r="29" fill="#09090b" stroke="#22c55e" stroke-width="3"/>
-  <circle cx="32" cy="32" r="24" fill="none" stroke="#10b981" stroke-width="1" opacity="0.35"/>
-  <text
-    x="32"
-    y="38"
-    text-anchor="middle"
-    font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"
-    font-size="28"
-    font-weight="700"
-    fill="#22c55e"
-    letter-spacing="1"
-  >AS</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="16" fill="#251d59"/>
+  <path d="M25 20 15 43m23-26L25 47" fill="none" stroke="#eae3ff" stroke-width="5" stroke-linecap="round"/>
+  <path d="m47 24-8 18" fill="none" stroke="#ae9dff" stroke-width="5" stroke-linecap="round"/>
 </svg>

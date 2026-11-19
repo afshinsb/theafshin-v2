@@ -9,3 +9,11 @@ coverage/
 
 # Private Codex context files
 .codex/
+
+# Local Pages configuration and review output
+.dev.vars*
+!.dev.vars.example
+.wrangler/
+review/
+test-results/
+playwright-report/
