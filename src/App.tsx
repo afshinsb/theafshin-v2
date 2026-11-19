@@ -294,7 +294,7 @@ export default function App() {
               <Terminal className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <div className={"truncate whitespace-nowrap text-sm sm:text-lg font-semibold tracking-tight font-sans " + t.textTitle}>{PERSONAL_INFO.name}</div>
+              <div className={"truncate whitespace-nowrap text-sm sm:text-lg font-semibold tracking-tight font-sans " + t.textTitle}>{PERSONAL_INFO.name.toUpperCase()}</div>
               <span className="hidden text-xs text-zinc-400 font-mono sm:flex min-w-0 items-center gap-1.5 leading-none">
                 <span className={"h-2 w-2 shrink-0 rounded-full inline-block animate-pulse " + (isDarkMode ? "bg-emerald-500" : "bg-[#0284c7]")}></span>
                 <span>Software Developer · Applied AI</span>
