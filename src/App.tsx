@@ -20,6 +20,7 @@ import {
 import { motion, AnimatePresence } from "motion/react";
 import Markdown from "react-markdown";
 
+import { SubtitlePipeline } from "./components/SubtitlePipeline";
 import { EDUCATION, PERSONAL_INFO, WORK_EXPERIENCE, PROJECTS, SKILL_CATEGORIES, SUGGESTED_QUESTIONS } from "./data";
 import type { ChatMessage, ProjectData } from "./types";
 
@@ -389,12 +390,8 @@ export default function App() {
         
         {/* Core Profile Banner - displayed on top level of Overview */}
         {activeTab === "overview" && (
-          <div className={"mb-8 p-6 sm:p-8 rounded-2xl relative overflow-hidden " + t.card}>
-            <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
-              <Terminal className={"h-64 w-64 " + t.iconAccent} />
-            </div>
-            
-            <div className="w-full flex flex-col items-start">
+          <div className={"mb-8 grid items-center gap-6 rounded-2xl p-4 sm:p-8 lg:grid-cols-2 lg:gap-8 xl:gap-12 " + t.card}>
+            <div className="min-w-0">
               <h1 className={"max-w-4xl text-3xl sm:text-4xl font-semibold tracking-tight mb-2 " + t.textTitle}>
                 Building Practical AI Applications &amp; Reliable Software
               </h1>
@@ -406,7 +403,7 @@ export default function App() {
                 {PERSONAL_INFO.summary.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
               </div>
 
-              <div className="flex w-full flex-col gap-4 md:flex-row md:items-end md:justify-between">
+              <div className="flex w-full flex-col gap-4">
                 <div className={"rounded-lg border overflow-hidden w-full max-w-[368px] " + (isDarkMode ? "bg-zinc-950/85 border-zinc-800" : "bg-zinc-100 border-zinc-300")}>
                   <div className={"flex items-center justify-between border-b px-3 py-1.5 " + (isDarkMode ? "border-zinc-800" : "border-zinc-300")}>
                     <div className="flex items-center gap-1.5">
@@ -437,10 +434,10 @@ export default function App() {
                     </div>
                   </div>
                 </div>
-                <div className="flex w-full flex-col gap-3 md:ml-auto md:w-[250px] md:items-stretch">
+                <div className="flex w-full flex-col flex-wrap gap-3 sm:flex-row">
                   <button 
                     onClick={() => setActiveTab("chat")} 
-                    className={"w-full px-5 py-2.5 text-xs font-semibold rounded-lg transition duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-lg " + 
+                    className={"w-full px-5 py-2.5 text-xs font-semibold rounded-lg transition duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-lg sm:w-auto " +
                       (isDarkMode 
                         ? "bg-emerald-500 hover:bg-emerald-400 text-zinc-950 shadow-emerald-500/25" 
                         : "bg-[#0284c7] hover:bg-[#0369a1] text-white shadow-sky-600/15")}
@@ -449,13 +446,14 @@ export default function App() {
                   </button>
                   <a
                     href="#projects"
-                    className={"w-full px-5 py-2.5 text-xs font-semibold rounded-lg transition duration-200 flex items-center justify-center gap-2 cursor-pointer " + t.btnSec}
+                    className={"w-full px-5 py-2.5 text-xs font-semibold rounded-lg transition duration-200 flex items-center justify-center gap-2 cursor-pointer sm:w-auto " + t.btnSec}
                   >
                     <Terminal className="h-4 w-4" /> View Selected Projects
                   </a>
                 </div>
               </div>
             </div>
+            <SubtitlePipeline />
           </div>
         )}
 
