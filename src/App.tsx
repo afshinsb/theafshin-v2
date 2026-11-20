@@ -861,7 +861,7 @@ export default function App() {
                       onChange={(e) => setInputText(e.target.value)}
                       enterKeyHint="send"
                       maxLength={700}
-                      className={"min-w-0 flex-1 border rounded px-3 py-2 text-xs transition " + t.input}
+                      className={"chat-question min-w-0 flex-1 border rounded px-3 py-2 text-xs transition focus:outline-hidden " + t.input}
                       aria-label="Question"
                       placeholder="Ask about Python projects, LLMs, or role fit"
                     />

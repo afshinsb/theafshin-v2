@@ -45,6 +45,15 @@
   background: #52525b;
 }
 
+.chat-question:focus {
+  border-color: #0284c7;
+  box-shadow: none;
+}
+
+:root[data-theme="dark"] .chat-question:focus {
+  border-color: var(--color-emerald-500);
+}
+
 .subtitle-pipeline {
   --panel-surface: #fff;
   --panel-subtle: var(--color-zinc-100);
