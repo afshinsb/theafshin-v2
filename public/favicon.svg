@@ -1,14 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="AS">
-  <circle cx="32" cy="32" r="29" fill="#09090b" stroke="#22c55e" stroke-width="3"/>
-  <circle cx="32" cy="32" r="24" fill="none" stroke="#10b981" stroke-width="1" opacity="0.35"/>
-  <text
-    x="32"
-    y="38"
-    text-anchor="middle"
-    font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"
-    font-size="28"
-    font-weight="700"
-    fill="#22c55e"
-    letter-spacing="1"
-  >AS</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96" role="img" aria-label="Afshin Saberi favicon">
+  <rect width="96" height="96" rx="23" fill="#0b1318"/>
+  <!-- Deliberately compact A monogram; crisp at browser-tab scale -->
+  <path d="M45.5 19 H52.8 L75 73 H64.7 L49 35.4 L39.9 53 H60.1 L64 62 H35.2 L29.3 73 H19.2 Z" fill="#f7f8f6"/>
+  <path d="M13.5 73 L35.6 36.4 H46.5 L24.5 73 Z" fill="#00d9a1"/>
+  <rect x="76.5" y="65.4" width="13.5" height="7.6" fill="#00d9a1"/>
 </svg>

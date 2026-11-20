@@ -5,5 +5,12 @@
   "display": "standalone",
   "background_color": "#09090b",
   "theme_color": "#22c55e",
-  "description": "Afshin Saberi is a Toronto software developer building applied AI and LLM applications, Python backends, and engineering automation."
+  "description": "Afshin Saberi is a Toronto software developer building applied AI and LLM applications, Python backends, and engineering automation.",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
 }
