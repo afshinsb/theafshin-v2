@@ -132,6 +132,7 @@ export default function App() {
   ]);
   const [inputText, setInputText] = useState("");
   const [isAiTyping, setIsAiTyping] = useState(false);
+  const chatInputRef = useRef<HTMLInputElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   const [contactForm, setContactForm] = useState({ name: "", email: "", company: "", message: "", website: "" });
@@ -155,10 +156,19 @@ export default function App() {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isAiTyping]);
 
+  const openChat = () => {
+    setActiveTab("chat");
+    chatInputRef.current?.focus();
+  };
+
   // Handle Send Chat
   const handleSendChat = async (textToSend?: string) => {
+    if (isAiTyping) return;
+
     const rawMsg = textToSend || inputText;
     if (!rawMsg.trim()) return;
+
+    chatInputRef.current?.focus();
 
     if (rawMsg.trim().length > 700) {
       const validationMessage: ChatMessage = {
@@ -321,7 +331,7 @@ export default function App() {
             </button>
             <button 
               id="tab-chat"
-              onClick={() => setActiveTab("chat")} 
+              onClick={openChat}
               className={"px-4 py-1.5 text-xs font-medium rounded-md transition flex items-center gap-1.5 " + (activeTab === "chat" ? t.tabAct : t.tabInact)}
             >
               <Sparkles className={"h-3 w-3 " + t.iconAccent} /> Recruiter Q&A
@@ -379,7 +389,7 @@ export default function App() {
           <button onClick={() => setActiveTab("experience")} className={"flex-1 py-1 text-center text-[10px] uppercase font-mono tracking-wider " + (activeTab === "experience" ? t.tabAct + " rounded" : t.tabInact)}>
             Experience
           </button>
-          <button onClick={() => setActiveTab("chat")} className={"flex-1 py-1 text-center text-[10px] uppercase font-mono tracking-wider flex justify-center items-center gap-0.5 " + (activeTab === "chat" ? t.tabAct + " rounded" : t.tabInact)}>
+          <button onClick={openChat} className={"flex-1 py-1 text-center text-[10px] uppercase font-mono tracking-wider flex justify-center items-center gap-0.5 " + (activeTab === "chat" ? t.tabAct + " rounded" : t.tabInact)}>
             <Sparkles className={"h-2 w-2 " + t.iconAccent} /> Q&A
           </button>
         </div>
@@ -436,7 +446,7 @@ export default function App() {
                 </div>
                 <div className="flex w-full flex-col flex-wrap gap-3 sm:flex-row">
                   <button 
-                    onClick={() => setActiveTab("chat")} 
+                    onClick={openChat}
                     className={"w-full px-5 py-2.5 text-xs font-semibold rounded-lg transition duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-lg sm:w-auto " +
                       (isDarkMode 
                         ? "bg-emerald-500 hover:bg-emerald-400 text-zinc-950 shadow-emerald-500/25" 
@@ -836,20 +846,27 @@ export default function App() {
 
                 {/* Bottom Input Area */}
                 <div className={"p-3.5 border-t " + (isDarkMode ? "bg-zinc-900/40 border-zinc-800" : "bg-zinc-100/90 border-zinc-200")}>
-                  <div className="flex space-x-2">
+                  <form
+                    className="flex space-x-2"
+                    onSubmit={(event) => {
+                      event.preventDefault();
+                      void handleSendChat();
+                    }}
+                  >
                     <input 
+                      ref={chatInputRef}
                       type="text"
+                      autoFocus
                       value={inputText}
                       onChange={(e) => setInputText(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSendChat()}
-                      disabled={isAiTyping}
+                      enterKeyHint="send"
                       maxLength={700}
-                      className={"min-w-0 flex-1 border rounded px-3 py-2 text-xs transition disabled:opacity-50 " + t.input}
+                      className={"min-w-0 flex-1 border rounded px-3 py-2 text-xs transition " + t.input}
                       aria-label="Question"
                       placeholder="Ask about Python projects, LLMs, or role fit"
                     />
                     <button 
-                      onClick={() => handleSendChat()}
+                      type="submit"
                       disabled={isAiTyping || !inputText.trim()}
                       aria-label="Send question"
                       className={"p-2 px-3.5 rounded text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer disabled:opacity-50 " + 
@@ -859,7 +876,7 @@ export default function App() {
                     >
                       <Send className="h-3.5 w-3.5" />
                     </button>
-                  </div>
+                  </form>
                 </div>
 
               </div>
